@@ -1,0 +1,162 @@
+.page_width {
+    // width: calc(100% - calc(var(--spacing) * 64) - calc(var(--spacing) * 10));
+}
+
+
+* {
+    box-sizing: border-box;
+
+
+}
+
+.custom_b_border {
+    border-width: 0px 0px 1px 0px;
+    border-style: solid;
+    border-image: linear-gradient(90deg,
+            rgba(255, 255, 255, 0) 0%,
+            rgba(202, 202, 202, 1) 50%,
+            rgba(153, 153, 153, 0) 100%);
+    border-image-slice: 1;
+}
+
+.background_image {
+    height: 100%;
+    width: 100%;
+    overflow: visible;
+
+    img {
+        height: 100%;
+        width: 120%;
+        max-width: 120%;
+        object-fit: cover;
+    }
+}
+
+.phone-input-unified {
+    .PhoneInputCountry {
+        padding-right: 15px;
+        border-right: 1px solid #d1d5db;
+        margin-right: 8px;
+    }
+
+    .PhoneInputCountryIcon {
+        border-radius: 50%;
+        aspect-ratio: 1/1;
+        height: auto;
+        overflow: hidden;
+
+        .PhoneInputCountryIconImg {
+            object-fit: cover;
+        }
+    }
+
+    .PhoneInputCountrySelect {
+        padding: 0;
+    }
+
+    .PhoneInputInput {
+        border: none;
+        outline: none;
+    }
+}
+
+.bg_overlay {
+    height: 150%;
+    width: auto;
+    position: absolute;
+    transform: translate(-50%, -50%);
+    top: 50%;
+    left: 50%;
+
+    img {
+        height: 100%;
+        width: auto;
+        object-fit: contain;
+        max-width: unset !important;
+        animation: bg_move 20s linear infinite;
+    }
+}
+
+@keyframes bg_move {
+
+    0%,
+    100% {
+
+        transform: translateX(100px);
+    }
+
+    50% {
+
+        transform: translateX(-50px);
+    }
+
+}
+
+
+.sidebarLink {
+    padding: 12px 16px;
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    border-radius: 8px;
+    position: relative;
+    text-decoration: none;
+
+    transition: all 0.2s ease;
+
+    color: #cbd5e1; // slate-300
+
+    &:hover {
+        background: rgba(30, 41, 59, 0.5); // slate-800/50
+        color: #ffffff;
+    }
+
+    &.active {
+        background: linear-gradient(to right,
+                rgba(29, 78, 216, 0.3),
+                rgba(67, 56, 202, 0.2));
+        color: #ffffff;
+        font-weight: 500;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+        position: relative;
+        overflow: hidden;
+
+        &::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: -15%;
+            transform: translateY(-50%);
+            height: 120%;
+            width: auto;
+            border-radius: 100px;
+            aspect-ratio: 1/1;
+            background-color: rgba(134, 5, 255, 0.185);
+            transition: all 0.7s ease;
+        }
+
+        &:hover {
+            &::before {
+                width: 150%;
+
+            }
+        }
+    }
+
+    .icon {
+        flex-shrink: 0;
+        transition: transform 0.2s ease;
+        position: relative;
+        z-index: 1;
+    }
+
+    .title {
+        white-space: nowrap;
+        position: relative;
+        z-index: 1;
+        opacity: 1;
+        visibility: visible;
+        width: auto;
+        transition: all 0.3s ease;
+    }
+}
