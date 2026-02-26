@@ -1,12 +1,13 @@
-"use client";
+ "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Sidebar from "@/components/dashboard/Sidebar";
 import Header from "@/components/dashboard/Header";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Pencil, Square, Eye, Copy, Check } from "lucide-react";
 import Image from "next/image";
+import Loader from "@/components/loader/loader";
 
 function ScreenPreviewInner() {
   return (
@@ -63,6 +64,15 @@ export default function MyScreensPage() {
   const [screens] = useState(MOCK_SCREENS);
   const [copiedId, setCopiedId] = useState<string | null>(null);
 
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setLoading(false);
+    }, 2000);
+    return () => clearTimeout(timer);
+  }, []);
+
   const copyUrl = async (url: string, id: string) => {
     try {
       if (typeof navigator !== "undefined" && navigator.clipboard?.writeText) {
@@ -86,7 +96,9 @@ export default function MyScreensPage() {
   };
 
   return (
-    <div className="h-screen flex">
+    <>
+      {loading && <Loader />}
+      <div className="h-screen flex">
       <div className="fixed inset-0 -z-10 bg-[#f8fafc]" />
       <div className="fixed inset-0 -z-10 bg-linear-to-br from-slate-50 to-white" />
       <div className="background_image fixed inset-0 -z-1 bg-no-repeat bg-cover">
@@ -183,5 +195,6 @@ export default function MyScreensPage() {
         </div>
       </div>
     </div>
+    </>
   );
 }

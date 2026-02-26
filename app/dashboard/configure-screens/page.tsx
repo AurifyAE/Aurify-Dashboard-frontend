@@ -1,12 +1,14 @@
-"use client";
+ "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Sidebar from "@/components/dashboard/Sidebar";
 import Header from "@/components/dashboard/Header";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Search, X, Eye, ChevronRight } from "lucide-react";
 import Image from "next/image";
+import Loader from "@/components/loader/loader";
+import { useRouter } from "next/navigation";
 
 const TEMPLATES = [
   {
@@ -79,14 +81,30 @@ export default function ConfigureScreensPage() {
   const [search, setSearch] = useState("");
   const [detailsOpen, setDetailsOpen] = useState(false);
   const [selectedTemplate, setSelectedTemplate] = useState<typeof TEMPLATES[0] | null>(null);
+  const router = useRouter();
+
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setLoading(false);
+    }, 2000);
+    return () => clearTimeout(timer);
+  }, []);
 
   const openDetails = (t: (typeof TEMPLATES)[0]) => {
     setSelectedTemplate(t);
     setDetailsOpen(true);
   };
 
+  const goToEditor = (templateId: string) => {
+    router.push(`/dashboard/configure-screens/editor?templateId=${encodeURIComponent(templateId)}`);
+  };
+
   return (
-    <div className="h-screen flex">
+    <>
+      {loading && <Loader />}
+      <div className="h-screen flex">
       <div className="fixed inset-0 -z-10 bg-[#f8fafc]" />
     
       <div className="background_image fixed inset-0 -z-1 bg-no-repeat bg-cover">
@@ -136,7 +154,7 @@ export default function ConfigureScreensPage() {
                       </li>
                     ))}
                   </ul>
-                  <div className="px-5 pb-5">
+                  <div className="px-5 pb-5 flex flex-col gap-2">
                     <Button
                       variant="outline"
                       className="w-full bg-sky-50 border-sky-200 text-sky-700 hover:bg-sky-100"
@@ -144,6 +162,12 @@ export default function ConfigureScreensPage() {
                     >
                       VIEW MORE DETAILS
                       <ChevronRight className="w-4 h-4 ml-1" />
+                    </Button>
+                    <Button
+                      className="w-full bg-sky-600 hover:bg-sky-700 text-white"
+                      onClick={() => goToEditor(t.id)}
+                    >
+                      Select Template
                     </Button>
                   </div>
                 </div>
@@ -201,15 +225,27 @@ export default function ConfigureScreensPage() {
                 </ul>
               </div>
             </div>
-            <div className="p-5 border-t border-slate-200 bg-white">
-              <Button className="w-full bg-sky-600 hover:bg-sky-700">
+            <div className="p-5 border-t border-slate-200 bg-white flex flex-col gap-3">
+              <Button
+                variant="outline"
+                className="w-full"
+              >
                 <Eye className="w-4 h-4 mr-2" />
                 Live Preview
               </Button>
+              {selectedTemplate && (
+                <Button
+                  className="w-full bg-sky-600 hover:bg-sky-700"
+                  onClick={() => goToEditor(selectedTemplate.id)}
+                >
+                  Select Template
+                </Button>
+              )}
             </div>
           </aside>
         </>
       )}
     </div>
+    </>
   );
 }
