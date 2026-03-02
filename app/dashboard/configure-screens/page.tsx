@@ -163,12 +163,12 @@ export default function ConfigureScreensPage() {
                       VIEW MORE DETAILS
                       <ChevronRight className="w-4 h-4 ml-1" />
                     </Button>
-                    <Button
+                    {/* <Button
                       className="w-full bg-sky-600 hover:bg-sky-700 text-white"
                       onClick={() => goToEditor(t.id)}
                     >
                       Select Template
-                    </Button>
+                    </Button> */}
                   </div>
                 </div>
               ))}

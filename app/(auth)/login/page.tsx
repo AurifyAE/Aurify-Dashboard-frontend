@@ -4,6 +4,7 @@ import React, { useState, FormEvent } from "react";
 import Image from "next/image";
 import { Eye, EyeOff } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
+import Swal from "sweetalert2";
 
 interface FieldErrors {
   email?: string;
@@ -11,6 +12,9 @@ interface FieldErrors {
 }
 
 export default function LoginPage() {
+
+
+
   const { login } = useAuth();
 
   const [email, setEmail] = useState<string>("");
@@ -37,26 +41,55 @@ export default function LoginPage() {
 
   const handleLogin = async (e: FormEvent<HTMLFormElement>): Promise<void> => {
     e.preventDefault();
-    setApiError("");
+    setApiError(""); // optional — you can keep or remove banner
+    setFieldErrors({}); // clear previous field errors
 
     if (!validate()) return;
 
     setIsLoading(true);
+
     try {
       const res = await login(email, password);
-      if (!res.success) {
-        // Server-side field errors (422)
+
+      if (res.success) {
+        // ── Success case ─────────────────────────────────────
+        await Swal.fire({
+          icon: "success",
+          title: "Login Successful!",
+          text: "Welcome back to Aurify",
+          showConfirmButton: false,
+          timer: 1000,                    // disappears after 1.8 seconds
+        });
+
+        // Note: AuthContext probably already redirects → no need to do it here
+      } else {
+        // ── Failure cases ─────────────────────────────────────
         if (res.errors) {
+          // 422 validation errors from server → show in fields
           setFieldErrors(res.errors as FieldErrors);
+
+          await Swal.fire({
+            icon: "warning",
+            title: "Validation Error",
+            text: "Please check the highlighted fields",
+          });
         } else {
-          setApiError(res.message || "Login failed. Please try again.");
+          // General login failure (wrong credentials, etc.)
+          await Swal.fire({
+            icon: "error",
+            title: "Login Failed",
+            text: res.message || "Invalid email or password. Please try again.",
+          });
         }
       }
-      // On success, AuthContext redirects to /dashboard automatically
-    } catch {
-      setApiError(
-        "Unable to connect. Please check your network and try again.",
-      );
+    } catch (err) {
+      // Network / unexpected error
+      await Swal.fire({
+        icon: "error",
+        title: "Connection Error",
+        text: "Unable to connect. Please check your network and try again.",
+        confirmButtonColor: "#4A90E2",
+      });
     } finally {
       setIsLoading(false);
     }
@@ -64,10 +97,9 @@ export default function LoginPage() {
 
   // Helper for input class — shows red border on error
   const inputClass = (field: keyof FieldErrors) =>
-    `w-full px-4 py-[11px] text-[14px] border rounded-[6px] focus:outline-none focus:ring-1 transition-all text-[#374151] placeholder-[#9CA3AF] bg-white ${
-      fieldErrors[field]
-        ? "border-red-400 focus:ring-red-400 focus:border-red-400"
-        : "border-[#D1D5DB] focus:ring-[#4A90E2] focus:border-[#4A90E2]"
+    `w-full px-4 py-[11px] text-[14px] border rounded-[6px] focus:outline-none focus:ring-1 transition-all text-[#374151] placeholder-[#9CA3AF] bg-white ${fieldErrors[field]
+      ? "border-red-400 focus:ring-red-400 focus:border-red-400"
+      : "border-[#D1D5DB] focus:ring-[#4A90E2] focus:border-[#4A90E2]"
     }`;
 
   return (
