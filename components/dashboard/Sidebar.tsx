@@ -86,12 +86,12 @@ export default function Sidebar() {
       {/* Sidebar */}
       <aside
         className={cn(
-          "flex flex-col z-40 text-white transition-all duration-300 ease-in-out overflow-hidden lg:translate-x-0 lg:w-80 w-64 translate-x-0",
+          "flex flex-col z-40 text-white transition-all duration-300 ease-in-out overflow-hidden lg:translate-x-0 lg:w-60 w-64 translate-x-0",
         )}
         style={{ pointerEvents: "auto", minWidth: "270px" }}
       >
         {/* Logo section */}
-        <div className="p-6 min-h-10 border-b border-slate-700/60 flex justify-center items-center relative flex-shrink-0 overflow-hidden">
+        <div className="p-6 min-h-10 border-b border-slate-700/60 flex justify-start items-center relative flex-shrink-0 overflow-hidden">
           <div className="flex items-center gap-2 transition-all duration-300 relative">
             <Image
               src="/images/aurify-logo1.svg"

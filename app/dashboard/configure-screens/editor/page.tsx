@@ -345,24 +345,106 @@ function TemplatePreview({ config, scale }: { config: TemplateConfig; scale: num
   );
 }
 
+
+
 function SpotCard({ metal, icon, bid, ask, low, high, config, flex: flexVal }: {
   metal: string; icon: string; bid: string; ask: string; low: string; high: string; config: TemplateConfig; flex?: number;
 }) {
   return (
-    <div style={{ background: config.spotCardBg, borderRadius: 10, padding: "10px 16px", border: `1px solid ${config.spotCardBorder}`, flex: flexVal ?? "0 0 auto", minWidth: 0 }}>
-      <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 6 }}>
-        <span style={{ fontSize: 16 }}>{icon}</span>
-        <span style={{ fontWeight: 700, letterSpacing: 2, fontSize: 13, color: config.spotMetalLabelColor }}>{metal}</span>
+    <div style={{ 
+      background: config.spotCardBg || '#111', 
+      borderRadius: 12, 
+      padding: "16px", 
+      border: `1px solid ${config.spotCardBorder || "rgba(255,255,255,0.06)"}`, 
+      flex: flexVal ?? "1", 
+      minWidth: 0,
+    }}>
+      {/* Header: Clean & Compact */}
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 16 }}>
+        <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
+          <div style={{ width: 32, height: 32, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(255,255,255,0.03)', borderRadius: 8 }}>
+            
+            {/* ── Inline Metal SVG Icons ── */}
+            {metal.toLowerCase() === 'gold' ? (
+              <svg width="22" height="22" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="11" cy="11" r="10" fill="url(#goldGrad)" stroke="#a16207" strokeWidth="0.6"/>
+                <circle cx="11" cy="11" r="7.5" fill="url(#goldShine)" opacity="0.4"/>
+                <ellipse cx="8.5" cy="8" rx="3" ry="1.6" fill="rgba(255,255,255,0.3)" transform="rotate(-35 8.5 8)"/>
+                <text x="11" y="15" textAnchor="middle" fontSize="7.5" fontWeight="900" fontFamily="Georgia, serif" fill="#78350f" letterSpacing="0.3">Au</text>
+                <defs>
+                  <radialGradient id="goldGrad" cx="35%" cy="28%" r="72%" gradientUnits="objectBoundingBox">
+                    <stop offset="0%" stopColor="#fef08a"/>
+                    <stop offset="35%" stopColor="#facc15"/>
+                    <stop offset="70%" stopColor="#d97706"/>
+                    <stop offset="100%" stopColor="#92400e"/>
+                  </radialGradient>
+                  <radialGradient id="goldShine" cx="40%" cy="35%" r="60%" gradientUnits="objectBoundingBox">
+                    <stop offset="0%" stopColor="#ffffff" stopOpacity="0.9"/>
+                    <stop offset="100%" stopColor="#facc15" stopOpacity="0"/>
+                  </radialGradient>
+                </defs>
+              </svg>
+            ) : (
+              <svg width="22" height="22" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="11" cy="11" r="10" fill="url(#silverGrad)" stroke="#6b7280" strokeWidth="0.6"/>
+                <circle cx="11" cy="11" r="7.5" fill="url(#silverShine)" opacity="0.4"/>
+                <ellipse cx="8.5" cy="8" rx="3" ry="1.6" fill="rgba(255,255,255,0.35)" transform="rotate(-35 8.5 8)"/>
+                <text x="11" y="15" textAnchor="middle" fontSize="7.5" fontWeight="900" fontFamily="Georgia, serif" fill="#1f2937" letterSpacing="0.3">Ag</text>
+                <defs>
+                  <radialGradient id="silverGrad" cx="35%" cy="28%" r="72%" gradientUnits="objectBoundingBox">
+                    <stop offset="0%" stopColor="#f8fafc"/>
+                    <stop offset="35%" stopColor="#cbd5e1"/>
+                    <stop offset="70%" stopColor="#94a3b8"/>
+                    <stop offset="100%" stopColor="#475569"/>
+                  </radialGradient>
+                  <radialGradient id="silverShine" cx="40%" cy="35%" r="60%" gradientUnits="objectBoundingBox">
+                    <stop offset="0%" stopColor="#ffffff" stopOpacity="0.9"/>
+                    <stop offset="100%" stopColor="#cbd5e1" stopOpacity="0"/>
+                  </radialGradient>
+                </defs>
+              </svg>
+            )}
+
+          </div>
+          <div>
+            <div style={{ fontSize: 13, fontWeight: 700, color: '#fff', letterSpacing: '0.5px' }}>{metal}</div>
+            <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.4)', fontWeight: 500 }}>USD / OZ</div>
+          </div>
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 9, color: '#10b981', fontWeight: 700, background: 'rgba(16, 185, 129, 0.1)', padding: '2px 6px', borderRadius: 4 }}>
+          <span style={{ width: 4, height: 4, borderRadius: '50%', background: '#10b981' }} />
+          LIVE
+        </div>
       </div>
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 4, fontSize: 11 }}>
-        <div><div style={{ color: config.textColor, opacity: 0.5 }}>BID</div><div style={{ fontWeight: 700, fontSize: 14, color: config.spotBidColor }}>{bid}</div></div>
-        <div><div style={{ color: config.textColor, opacity: 0.5 }}>ASK</div><div style={{ fontWeight: 700, fontSize: 14, background: config.spotAskBg, color: config.spotAskColor, padding: "1px 8px", borderRadius: 3 }}>{ask}</div></div>
-        <div><div style={{ color: config.textColor, opacity: 0.5 }}>LOW</div><div style={{ color: config.spotLowColor }}>{low}</div></div>
-        <div><div style={{ color: config.textColor, opacity: 0.5 }}>HIGH</div><div style={{ color: config.spotHighColor }}>{high}</div></div>
+
+      {/* Pricing: High Contrast Typography */}
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20 }}>
+        <div>
+          <div style={{ fontSize: 10, fontWeight: 600, color: 'rgba(255,255,255,0.3)', marginBottom: 4 }}>BID</div>
+          <div style={{ fontSize: 20, fontWeight: 700, color: '#10b981', fontFamily: 'monospace' }}>{bid}</div>
+          <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.5)', marginTop: 4 }}>
+            L: <span style={{ color: '#fff' }}>{low}</span>
+          </div>
+        </div>
+        
+        <div style={{ borderLeft: '1px solid rgba(255,255,255,0.06)', paddingLeft: 20 }}>
+          <div style={{ fontSize: 10, fontWeight: 600, color: 'rgba(255,255,255,0.3)', marginBottom: 4 }}>ASK</div>
+          <div style={{ fontSize: 20, fontWeight: 700, color: '#ef4444', fontFamily: 'monospace' }}>{ask}</div>
+          <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.5)', marginTop: 4 }}>
+            H: <span style={{ color: '#fff' }}>{high}</span>
+          </div>
+        </div>
       </div>
     </div>
   );
 }
+
+
+
+
+
+
+
 
 // ─── Font Picker ──────────────────────────────────────────────────────────────
 function FontPicker({ value, onChange }: { value: string; onChange: (v: string) => void }) {
@@ -946,7 +1028,7 @@ function TemplateEditorInner() {
       {/* ─── Top Nav ─── */}
       <div style={{
         height: 56, flexShrink: 0, background: "#ffffff", borderBottom: "1px solid #e5e7eb",
-        display: "flex", alignItems: "center", padding: "0 20px", gap: 12,
+        display: "flex", alignItems: "center", padding: "0 20px 0 0", gap: 12,
       }}>
         <button onClick={() => router.push("/dashboard/configure-screens")} style={{
           display: "flex", alignItems: "center", gap: 6,
@@ -1026,7 +1108,7 @@ function TemplateEditorInner() {
                 <div style={{ width: 1, height: 18, background: "#e5e7eb", margin: "0 2px" }} />
 
                 <button
-                  onClick={() => setZoom(0.75)}
+                  onClick={() => setZoom(1)}
                   title="Reset zoom"
                   style={{
                     width: 30, height: 30, borderRadius: 6, background: "transparent", border: "none",
