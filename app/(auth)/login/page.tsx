@@ -83,6 +83,8 @@ export default function LoginPage() {
         }
       }
     } catch (err) {
+      console.error("Login Error:", err);
+
       // Network / unexpected error
       await Swal.fire({
         icon: "error",

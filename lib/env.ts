@@ -18,4 +18,4 @@ export const SOCKET_SECRET =
 
 /** Backend API base URL for commodities, auth, etc. */
 export const BACKEND_URL =
-  process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:5000";
+  process.env.NEXT_PUBLIC_BACKEND_URL || "http://127.0.0.1:5001";
