@@ -23,6 +23,7 @@ import {
   Rocket,
   Save,
 } from "lucide-react";
+import Loader from "@/components/loader/loader";
 
 const WIDGETS = [
   "Spot Rates",
@@ -77,14 +78,21 @@ export default function ScreenBuilderPage() {
   const [themes, setThemes] = useState<MerchantTheme[]>([]);
   const [layouts, setLayouts] = useState<ScreenLayout[]>([]);
   const [message, setMessage] = useState("");
-  const [messageType, setMessageType] = useState<"info" | "success" | "error">("info");
-  const [previewSize, setPreviewSize] = useState<"1920x1080" | "3840x2160">("1920x1080");
+  const [messageType, setMessageType] = useState<"info" | "success" | "error">(
+    "info",
+  );
+  const [previewSize, setPreviewSize] = useState<"1920x1080" | "3840x2160">(
+    "1920x1080",
+  );
   const [draft, setDraft] = useState<DraftState>(defaultDraft);
   const [draggedSection, setDraggedSection] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 
-  const showMessage = (text: string, type: "info" | "success" | "error" = "info") => {
+  const showMessage = (
+    text: string,
+    type: "info" | "success" | "error" = "info",
+  ) => {
     setMessage(text);
     setMessageType(type);
   };
@@ -116,11 +124,15 @@ export default function ScreenBuilderPage() {
           themeId: latest.themeId || prev.themeId,
           widgets: latest.widgets?.length ? latest.widgets : prev.widgets,
           sectionOrder:
-            (latest.body as { sectionOrder?: string[] })?.sectionOrder || prev.sectionOrder,
+            (latest.body as { sectionOrder?: string[] })?.sectionOrder ||
+            prev.sectionOrder,
         }));
       }
     } catch (err) {
-      showMessage(err instanceof Error ? err.message : "Failed to load builder", "error");
+      showMessage(
+        err instanceof Error ? err.message : "Failed to load builder",
+        "error",
+      );
     } finally {
       setLoading(false);
     }
@@ -131,16 +143,23 @@ export default function ScreenBuilderPage() {
   }, []);
 
   const selectedTheme = themes.find((theme) => theme.themeId === draft.themeId);
-  const canGoLive = Boolean(merchant?.status === "Active" && draft.themeId && draft.name.trim());
+  const canGoLive = Boolean(
+    merchant?.status === "Active" && draft.themeId && draft.name.trim(),
+  );
   const primaryColor = String(
-    (selectedTheme?.customizations as { colors?: { primary?: string } } | undefined)?.colors
-      ?.primary || "#d4a017",
+    (
+      selectedTheme?.customizations as
+        | { colors?: { primary?: string } }
+        | undefined
+    )?.colors?.primary || "#d4a017",
   );
 
   const moveSection = (targetSection: string) => {
     if (!draggedSection || draggedSection === targetSection) return;
     setDraft((prev) => {
-      const next = prev.sectionOrder.filter((section) => section !== draggedSection);
+      const next = prev.sectionOrder.filter(
+        (section) => section !== draggedSection,
+      );
       const targetIndex = next.indexOf(targetSection);
       next.splice(targetIndex, 0, draggedSection);
       return { ...prev, sectionOrder: next };
@@ -187,10 +206,15 @@ export default function ScreenBuilderPage() {
 
     setSaving(true);
     try {
-      const saved = await marketplaceApi.saveLayout(buildLayoutPayload(themeId));
+      const saved = await marketplaceApi.saveLayout(
+        buildLayoutPayload(themeId),
+      );
       setDraft((prev) => ({ ...prev, layoutId: saved.layoutId, themeId }));
       await load();
-      showMessage("Draft saved. You can keep editing or go live when approved.", "success");
+      showMessage(
+        "Draft saved. You can keep editing or go live when approved.",
+        "success",
+      );
     } catch (err) {
       showMessage(err instanceof Error ? err.message : "Save failed", "error");
     } finally {
@@ -213,19 +237,26 @@ export default function ScreenBuilderPage() {
     try {
       let layoutId = draft.layoutId;
       if (!layoutId) {
-        const saved = await marketplaceApi.saveLayout(buildLayoutPayload(draft.themeId));
+        const saved = await marketplaceApi.saveLayout(
+          buildLayoutPayload(draft.themeId),
+        );
         layoutId = saved.layoutId;
       }
       const assignedDevices = draft.assignedDevices
         .split(",")
         .map((item) => item.trim())
         .filter(Boolean);
-      const result = await marketplaceApi.publishLayout(layoutId, { assignedDevices });
+      const result = await marketplaceApi.publishLayout(layoutId, {
+        assignedDevices,
+      });
       setDraft((prev) => ({ ...prev, layoutId }));
       showMessage(`Screen is live: ${result.liveUrl}`, "success");
       await load();
     } catch (err) {
-      showMessage(err instanceof Error ? err.message : "Publish failed", "error");
+      showMessage(
+        err instanceof Error ? err.message : "Publish failed",
+        "error",
+      );
     } finally {
       setSaving(false);
     }
@@ -240,9 +271,12 @@ export default function ScreenBuilderPage() {
     <DashboardShell>
       <div className="mb-6 flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
         <div>
-          <h1 className="text-2xl font-semibold text-slate-900">Screen Builder</h1>
+          <h1 className="text-2xl font-semibold text-slate-900">
+            Screen Builder
+          </h1>
           <p className="text-sm text-slate-600">
-            Set up your screen in four simple steps — save a draft anytime, go live when ready.
+            Set up your screen in four simple steps — save a draft anytime, go
+            live when ready.
           </p>
         </div>
         <div className="flex gap-2">
@@ -297,16 +331,15 @@ export default function ScreenBuilderPage() {
       )}
 
       {loading ? (
-        <div className="flex items-center justify-center py-24 text-slate-500">
-          <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-          Loading builder…
-        </div>
+        <Loader />
       ) : (
         <div className="grid gap-6 xl:grid-cols-[360px_1fr]">
           <aside className="rounded-lg border border-slate-200 p-5">
             {step === 1 && (
               <div className="grid gap-4">
-                <h2 className="text-sm font-semibold text-slate-800">Screen details</h2>
+                <h2 className="text-sm font-semibold text-slate-800">
+                  Screen details
+                </h2>
                 <Input
                   placeholder="Screen name"
                   value={draft.name}
@@ -315,12 +348,16 @@ export default function ScreenBuilderPage() {
                 <Input
                   placeholder="URL slug (e.g. main)"
                   value={draft.screenSlug}
-                  onChange={(e) => setDraft({ ...draft, screenSlug: e.target.value })}
+                  onChange={(e) =>
+                    setDraft({ ...draft, screenSlug: e.target.value })
+                  }
                 />
                 <select
                   className="h-10 rounded-md border border-slate-200 px-3 text-sm"
                   value={draft.selectedLayout}
-                  onChange={(e) => setDraft({ ...draft, selectedLayout: e.target.value })}
+                  onChange={(e) =>
+                    setDraft({ ...draft, selectedLayout: e.target.value })
+                  }
                 >
                   {LAYOUTS.map((layout) => (
                     <option key={layout}>{layout}</option>
@@ -329,7 +366,9 @@ export default function ScreenBuilderPage() {
                 <Input
                   placeholder="Devices to assign (comma separated)"
                   value={draft.assignedDevices}
-                  onChange={(e) => setDraft({ ...draft, assignedDevices: e.target.value })}
+                  onChange={(e) =>
+                    setDraft({ ...draft, assignedDevices: e.target.value })
+                  }
                 />
                 <Button type="button" onClick={() => setStep(2)}>
                   Next: Choose theme
@@ -339,11 +378,16 @@ export default function ScreenBuilderPage() {
 
             {step === 2 && (
               <div className="grid gap-4">
-                <h2 className="text-sm font-semibold text-slate-800">Installed theme</h2>
+                <h2 className="text-sm font-semibold text-slate-800">
+                  Installed theme
+                </h2>
                 {themes.length === 0 ? (
                   <div className="rounded-lg border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900">
                     No theme installed yet.{" "}
-                    <Link href="/dashboard/theme-marketplace" className="font-medium underline">
+                    <Link
+                      href="/dashboard/theme-marketplace"
+                      className="font-medium underline"
+                    >
                       Pick one from Theme Marketplace
                     </Link>
                   </div>
@@ -351,7 +395,9 @@ export default function ScreenBuilderPage() {
                   <select
                     className="h-10 rounded-md border border-slate-200 px-3 text-sm"
                     value={draft.themeId}
-                    onChange={(e) => setDraft({ ...draft, themeId: e.target.value })}
+                    onChange={(e) =>
+                      setDraft({ ...draft, themeId: e.target.value })
+                    }
                   >
                     {themes.map((theme) => (
                       <option key={theme._id} value={theme.themeId}>
@@ -361,10 +407,18 @@ export default function ScreenBuilderPage() {
                   </select>
                 )}
                 <div className="flex gap-2">
-                  <Button type="button" variant="outline" onClick={() => setStep(1)}>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => setStep(1)}
+                  >
                     Back
                   </Button>
-                  <Button type="button" onClick={() => setStep(3)} disabled={!draft.themeId && themes.length === 0}>
+                  <Button
+                    type="button"
+                    onClick={() => setStep(3)}
+                    disabled={!draft.themeId && themes.length === 0}
+                  >
                     Next: Arrange sections
                   </Button>
                 </div>
@@ -373,13 +427,18 @@ export default function ScreenBuilderPage() {
 
             {step === 3 && (
               <div>
-                <h2 className="mb-2 text-sm font-semibold text-slate-800">Drag to reorder sections</h2>
+                <h2 className="mb-2 text-sm font-semibold text-slate-800">
+                  Drag to reorder sections
+                </h2>
                 <p className="mb-4 text-xs text-slate-500">
-                  Drag rows or use arrows. Order updates the TV preview instantly.
+                  Drag rows or use arrows. Order updates the TV preview
+                  instantly.
                 </p>
                 <div className="mb-5 grid gap-2">
                   {draft.sectionOrder.map((sectionId, index) => {
-                    const section = SECTIONS.find((item) => item.id === sectionId);
+                    const section = SECTIONS.find(
+                      (item) => item.id === sectionId,
+                    );
                     if (!section) return null;
                     const isDragging = draggedSection === section.id;
                     return (
@@ -420,10 +479,15 @@ export default function ScreenBuilderPage() {
                     );
                   })}
                 </div>
-                <h2 className="mb-3 text-sm font-semibold text-slate-800">Widgets on screen</h2>
+                <h2 className="mb-3 text-sm font-semibold text-slate-800">
+                  Widgets on screen
+                </h2>
                 <div className="mb-4 grid gap-2">
                   {WIDGETS.map((widget) => (
-                    <label key={widget} className="flex items-center gap-2 text-sm text-slate-700">
+                    <label
+                      key={widget}
+                      className="flex items-center gap-2 text-sm text-slate-700"
+                    >
                       <Checkbox
                         checked={draft.widgets.includes(widget)}
                         onCheckedChange={(checked) =>
@@ -440,7 +504,11 @@ export default function ScreenBuilderPage() {
                   ))}
                 </div>
                 <div className="flex gap-2">
-                  <Button type="button" variant="outline" onClick={() => setStep(2)}>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => setStep(2)}
+                  >
                     Back
                   </Button>
                   <Button type="button" onClick={() => setStep(4)}>
@@ -452,7 +520,9 @@ export default function ScreenBuilderPage() {
 
             {step === 4 && (
               <div className="grid gap-4">
-                <h2 className="text-sm font-semibold text-slate-800">Preview resolution</h2>
+                <h2 className="text-sm font-semibold text-slate-800">
+                  Preview resolution
+                </h2>
                 <div className="flex gap-2">
                   {(["1920x1080", "3840x2160"] as const).map((size) => (
                     <Button
@@ -466,14 +536,20 @@ export default function ScreenBuilderPage() {
                   ))}
                 </div>
                 <div className="rounded-lg border border-slate-200 bg-slate-50 p-4 text-sm text-slate-600">
-                  <p className="font-medium text-slate-800">Ready to publish?</p>
+                  <p className="font-medium text-slate-800">
+                    Ready to publish?
+                  </p>
                   <ul className="mt-2 space-y-1">
                     <li className="flex items-center gap-2">
-                      <CheckCircle2 className={`h-4 w-4 ${draft.name ? "text-emerald-500" : "text-slate-300"}`} />
+                      <CheckCircle2
+                        className={`h-4 w-4 ${draft.name ? "text-emerald-500" : "text-slate-300"}`}
+                      />
                       Screen name set
                     </li>
                     <li className="flex items-center gap-2">
-                      <CheckCircle2 className={`h-4 w-4 ${draft.themeId ? "text-emerald-500" : "text-slate-300"}`} />
+                      <CheckCircle2
+                        className={`h-4 w-4 ${draft.themeId ? "text-emerald-500" : "text-slate-300"}`}
+                      />
                       Theme selected
                     </li>
                     <li className="flex items-center gap-2">
@@ -485,10 +561,19 @@ export default function ScreenBuilderPage() {
                   </ul>
                 </div>
                 <div className="flex gap-2">
-                  <Button type="button" variant="outline" onClick={() => setStep(3)}>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => setStep(3)}
+                  >
                     Back
                   </Button>
-                  <Button type="button" variant="outline" onClick={save} disabled={saving}>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={save}
+                    disabled={saving}
+                  >
                     Save Draft
                   </Button>
                 </div>
@@ -509,13 +594,20 @@ export default function ScreenBuilderPage() {
                 {draft.sectionOrder.map((sectionId) => {
                   if (sectionId === "header") {
                     return (
-                      <div key={sectionId} className="flex items-start justify-between">
+                      <div
+                        key={sectionId}
+                        className="flex items-start justify-between"
+                      >
                         <div>
-                          <div className="text-2xl font-bold" style={{ color: primaryColor }}>
+                          <div
+                            className="text-2xl font-bold"
+                            style={{ color: primaryColor }}
+                          >
                             {merchant?.companyName || "Your Company"}
                           </div>
                           <div className="text-sm text-slate-300">
-                            {draft.selectedLayout} · {selectedTheme?.name || "No theme"}
+                            {draft.selectedLayout} ·{" "}
+                            {selectedTheme?.name || "No theme"}
                           </div>
                         </div>
                         {draft.widgets.includes("Clock") && (
@@ -526,18 +618,34 @@ export default function ScreenBuilderPage() {
                       </div>
                     );
                   }
-                  if (sectionId === "spotRates" && draft.widgets.includes("Spot Rates")) {
+                  if (
+                    sectionId === "spotRates" &&
+                    draft.widgets.includes("Spot Rates")
+                  ) {
                     return (
-                      <div key={sectionId} className="my-4 rounded-lg border border-white/10 bg-white/5 p-4">
-                        <div className="text-sm text-slate-300">GOLD BID / ASK</div>
+                      <div
+                        key={sectionId}
+                        className="my-4 rounded-lg border border-white/10 bg-white/5 p-4"
+                      >
+                        <div className="text-sm text-slate-300">
+                          GOLD BID / ASK
+                        </div>
                         <div className="mt-2 text-3xl font-bold">1,234.00</div>
                       </div>
                     );
                   }
-                  if (sectionId === "commodities" && draft.widgets.includes("Commodity Table")) {
+                  if (
+                    sectionId === "commodities" &&
+                    draft.widgets.includes("Commodity Table")
+                  ) {
                     return (
-                      <div key={sectionId} className="my-4 rounded-lg border border-white/10 bg-white/5 p-4">
-                        <div className="text-sm text-slate-300">COMMODITIES</div>
+                      <div
+                        key={sectionId}
+                        className="my-4 rounded-lg border border-white/10 bg-white/5 p-4"
+                      >
+                        <div className="text-sm text-slate-300">
+                          COMMODITIES
+                        </div>
                         <div className="mt-2 space-y-2 text-sm">
                           <div>Gold Bar 999 · BUY 54671 · SELL 54691</div>
                           <div>Silver Bar 999 · BUY 3420 · SELL 3440</div>
@@ -562,7 +670,9 @@ export default function ScreenBuilderPage() {
 
             {layouts.length > 0 && (
               <div className="mt-6">
-                <h2 className="mb-3 font-semibold text-slate-900">Saved drafts</h2>
+                <h2 className="mb-3 font-semibold text-slate-900">
+                  Saved drafts
+                </h2>
                 <div className="grid gap-3">
                   {layouts.map((layout) => (
                     <button
@@ -576,10 +686,12 @@ export default function ScreenBuilderPage() {
                           name: layout.name,
                           screenSlug: layout.screenSlug,
                           themeId: layout.themeId || prev.themeId,
-                          widgets: layout.widgets?.length ? layout.widgets : prev.widgets,
+                          widgets: layout.widgets?.length
+                            ? layout.widgets
+                            : prev.widgets,
                           sectionOrder:
-                            (layout.body as { sectionOrder?: string[] })?.sectionOrder ||
-                            prev.sectionOrder,
+                            (layout.body as { sectionOrder?: string[] })
+                              ?.sectionOrder || prev.sectionOrder,
                         }))
                       }
                     >

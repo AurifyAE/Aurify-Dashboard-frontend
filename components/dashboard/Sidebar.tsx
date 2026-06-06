@@ -22,6 +22,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import Image from "next/image";
 import { useAuth } from "@/context/AuthContext";
 import type { UserRole } from "@/lib/auth";
+import { ArrowRight } from "lucide-react";
 
 interface NavItem {
   title: string;
@@ -56,7 +57,7 @@ const navItems: NavItem[] = [
     title: "Configure Screens",
     href: "/dashboard/configure-screens",
     icon: ComputerSettingsIcon,
-    roles: ["super_admin", "admin",'user'], // hidden for plain 'user'
+    roles: ["super_admin", "admin", "user"], // hidden for plain 'user'
   },
   {
     title: "My Screens",
@@ -77,7 +78,7 @@ const navItems: NavItem[] = [
 
 export default function Sidebar() {
   const pathname = usePathname();
-  const { user, logout, hasHydrated } = useAuth();
+  const { user, logout } = useAuth();
   const [isMobileOpen, setIsMobileOpen] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
 
@@ -159,61 +160,105 @@ export default function Sidebar() {
         </nav>
 
         {/* Bottom — User info + Logout */}
-        <div className="p-4 border-t border-slate-700/60 flex-shrink-0">
-          {/* User Info */}
-          {hasHydrated && user && (
-            <div className="flex items-center gap-3 px-2 py-2 mb-2">
-              <Avatar className="w-9 h-9 flex-shrink-0">
-                <AvatarFallback className="bg-blue-600 text-white text-[13px] font-semibold">
-                  {getInitials(user.companyName)}
-                </AvatarFallback>
-              </Avatar>
-              <div className="flex-1 min-w-0">
-                <p className="text-white text-[13px] font-medium truncate">
-                  {user.companyName}
-                </p>
-                <p className="text-slate-400 text-[11px] truncate">
-                  {user.email}
-                </p>
+        <div className="flex-shrink-0">
+          {/* Hairline separator */}
+          <div className="mx-4 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+
+          <div className="p-4 space-y-2">
+            {user && (
+              <>
+                {/* User card */}
+                <div className="relative rounded-xl bg-white/[0.03] border border-white/[0.07] p-3 overflow-hidden">
+                  {/* Ambient top-right glow */}
+                  <div className="pointer-events-none absolute top-0 right-0 w-20 h-20 bg-[radial-gradient(circle_at_top_right,rgba(251,191,36,0.06),transparent_70%)]" />
+
+                  {/* Avatar row */}
+                  <div className="flex items-center gap-2.5 mb-3">
+                    <div className="relative flex-shrink-0">
+                      <div className="w-9 h-9 rounded-full bg-gradient-to-br from-slate-800 to-slate-950 border border-amber-400/35 flex items-center justify-center">
+                        <span className="text-[12px] font-semibold text-amber-400 tracking-wide">
+                          {getInitials(user.companyName)}
+                        </span>
+                      </div>
+                      <span className="absolute bottom-px right-px w-1.5 h-1.5 rounded-full bg-emerald-400 ring-[1.5px] ring-[#0f1117]" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-[13px] font-medium text-white/90 truncate leading-tight">
+                        {user.companyName}
+                      </p>
+                      <p className="text-[11px] font-mono text-white/35 truncate mt-0.5">
+                        {user.email}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Divider */}
+                  <div className="h-px bg-white/[0.06] mb-3" />
+
+                  {/* Role row */}
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-1.5">
+                      <span className="w-1 h-1 rounded-full bg-amber-400" />
+                      <span className="text-[11px] text-white/40 tracking-widest uppercase">
+                        {user.role === "super_admin"
+                          ? "Super Admin"
+                          : user.role === "admin"
+                            ? "Admin"
+                            : "User"}
+                      </span>
+                    </div>
+                    {user.role === "super_admin" && (
+                      <div className="flex items-center gap-1 bg-amber-400/[0.08] border border-amber-400/20 rounded-full px-2 py-0.5">
+                        <Crown className="w-2.5 h-2.5 text-amber-400" />
+                        <span className="text-[10px] font-medium text-amber-400 tracking-wide">
+                          Premium
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Stat tiles */}
+                <div className="grid grid-cols-2 gap-1.5">
+                  <div className="bg-white/[0.02] border border-white/[0.06] rounded-lg px-2.5 py-2">
+                    <p className="text-[10px] text-white/30 uppercase tracking-widest">
+                      Last Login
+                    </p>
+                    <p className="text-[12px] font-medium text-white/65 mt-0.5">
+                      Today, 9:41 AM
+                    </p>
+                  </div>
+                  <div className="bg-white/[0.02] border border-white/[0.06] rounded-lg px-2.5 py-2">
+                    <p className="text-[10px] text-white/30 uppercase tracking-widest">
+                      Session
+                    </p>
+                    <p className="text-[12px] font-medium text-white/65 mt-0.5">
+                      2h 14m
+                    </p>
+                  </div>
+                </div>
+              </>
+            )}
+
+            {/* Logout */}
+            <button
+              onClick={logout}
+              className="w-full flex items-center gap-2.5 bg-white/[0.02] hover:bg-red-500/[0.08] border border-white/[0.06] hover:border-red-500/20 rounded-xl px-3 py-2.5 transition-all duration-200 group/logout"
+            >
+              <div className="w-7 h-7 flex-shrink-0 rounded-[7px] bg-red-500/[0.08] border border-red-500/15 flex items-center justify-center">
+                <HugeiconsIcon
+                  icon={Logout01Icon}
+                  size={14}
+                  color="#f87171"
+                  strokeWidth={1.5}
+                />
               </div>
-            </div>
-          )}
-
-          {/* Role badge */}
-          {hasHydrated && user && (
-            <div className="px-2 mb-3">
-              <span
-                className={cn(
-                  "text-[11px] font-medium px-2 py-0.5 rounded-full",
-                  user.role === "super_admin" &&
-                    "bg-purple-500/20 text-purple-300",
-                  user.role === "admin" && "bg-blue-500/20 text-blue-300",
-                  user.role === "user" && "bg-slate-500/20 text-slate-300",
-                )}
-              >
-                {user.role === "super_admin"
-                  ? "Super Admin"
-                  : user.role === "admin"
-                    ? "Admin"
-                    : "User"}
+              <span className="text-[13px] font-medium text-white/50 flex-1 text-left">
+                Sign out
               </span>
-            </div>
-          )}
-
-          {/* Logout Button */}
-          <button
-            onClick={logout}
-            className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-slate-300 hover:bg-red-500/10 hover:text-red-400 transition-all duration-200 group"
-          >
-            <HugeiconsIcon
-              icon={Logout01Icon}
-              size={20}
-              color="currentColor"
-              strokeWidth={1.5}
-              className="flex-shrink-0"
-            />
-            <span className="text-[14px] font-medium">Logout</span>
-          </button>
+              <ArrowRight className="w-3.5 h-3.5 text-red-400 opacity-0 -translate-x-1 group-hover/logout:opacity-100 group-hover/logout:translate-x-0 transition-all duration-200" />
+            </button>
+          </div>
         </div>
       </aside>
 
