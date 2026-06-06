@@ -12,9 +12,6 @@ interface FieldErrors {
 }
 
 export default function LoginPage() {
-
-
-
   const { login } = useAuth();
 
   const [email, setEmail] = useState<string>("");
@@ -58,7 +55,7 @@ export default function LoginPage() {
           title: "Login Successful!",
           text: "Welcome back to Aurify",
           showConfirmButton: false,
-          timer: 1000,                    // disappears after 1.8 seconds
+          timer: 1000, // disappears after 1.8 seconds
         });
 
         // Note: AuthContext probably already redirects → no need to do it here
@@ -99,9 +96,10 @@ export default function LoginPage() {
 
   // Helper for input class — shows red border on error
   const inputClass = (field: keyof FieldErrors) =>
-    `w-full px-4 py-[11px] text-[14px] border rounded-[6px] focus:outline-none focus:ring-1 transition-all text-[#374151] placeholder-[#9CA3AF] bg-white ${fieldErrors[field]
-      ? "border-red-400 focus:ring-red-400 focus:border-red-400"
-      : "border-[#D1D5DB] focus:ring-[#4A90E2] focus:border-[#4A90E2]"
+    `w-full px-4 py-[11px] text-[14px] border rounded-[6px] focus:outline-none focus:ring-1 transition-all text-[#374151] placeholder-[#9CA3AF] bg-white ${
+      fieldErrors[field]
+        ? "border-red-400 focus:ring-red-400 focus:border-red-400"
+        : "border-[#D1D5DB] focus:ring-[#4A90E2] focus:border-[#4A90E2]"
     }`;
 
   return (
@@ -231,15 +229,38 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full bg-[#4067B1] hover:bg-[#1a356d] disabled:bg-[#9ab0d9] disabled:cursor-not-allowed text-white py-[13px] rounded-[6px] font-medium transition-all duration-200 text-[15px] mt-2 flex items-center justify-center gap-2"
+              className="relative w-full overflow-hidden bg-transparent py-[17px] rounded-[6px] text-white text-[13px] tracking-[0.26em] uppercase flex items-center justify-center gap-[10px] transition-[filter] duration-300 hover:brightness-[1.08] active:scale-[0.994] group"
+              style={{
+                fontFamily: "'Tenor Sans', serif",
+                background:
+                  "linear-gradient(90deg,#5393ca 0%, #3051bb 50%, #5393ca 100%)",
+                border: "none",
+              }}
             >
+              <span
+                className="absolute top-0 left-0 right-0 h-px"
+                style={{
+                  background:
+                    "linear-gradient(90deg,transparent,rgba(255,255,255,0.8) 50%,transparent)",
+                }}
+              />
+              <span
+                className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-[650ms] ease-in-out"
+                style={{
+                  background:
+                    "linear-gradient(105deg,transparent 35%,rgba(255,255,255,0.14) 50%,transparent 65%)",
+                }}
+              />
               {isLoading ? (
                 <>
-                  <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                  Logging in…
+                  <span className="w-[13px] h-[13px] rounded-full border-[1.5px] border-white/30 border-t-white animate-spin" />
+                  Signing in…
                 </>
               ) : (
-                "Login"
+                <>
+                  <span className=" text-[9px]">✦</span>Login
+                  <span className=" text-[9px]">✦</span>
+                </>
               )}
             </button>
 
