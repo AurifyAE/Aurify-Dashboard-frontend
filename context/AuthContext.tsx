@@ -24,6 +24,7 @@ import {
 interface AuthContextValue {
   user: AuthUser | null;
   isLoading: boolean;
+  hasHydrated: boolean;
   isAuthenticated: boolean;
   login: (email: string, password: string) => Promise<AuthResponse>;
   register: (data: {
@@ -42,6 +43,7 @@ const AuthContext = createContext<AuthContextValue | null>(null);
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<AuthUser | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [hasHydrated, setHasHydrated] = useState(false);
   const router = useRouter();
 
   // Hydrate user from stored token on mount
@@ -52,6 +54,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setUser(decoded);
     }
     setIsLoading(false);
+    setHasHydrated(true);
   }, []);
 
   const login = useCallback(
@@ -97,6 +100,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       value={{
         user,
         isLoading,
+        hasHydrated,
         isAuthenticated: !!user,
         login,
         register,

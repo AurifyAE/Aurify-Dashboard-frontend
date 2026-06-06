@@ -13,6 +13,8 @@ import {
   GoldIngotsIcon,
   Computer,
   ComputerSettingsIcon,
+  Building05Icon,
+  Store01Icon,
 } from "@hugeicons/core-free-icons";
 
 import { cn } from "@/lib/utils";
@@ -46,6 +48,11 @@ const navItems: NavItem[] = [
     icon: GoldIngotsIcon,
   },
   {
+    title: "Screen Builder",
+    href: "/dashboard/screen-builder",
+    icon: Computer,
+  },
+  {
     title: "Configure Screens",
     href: "/dashboard/configure-screens",
     icon: ComputerSettingsIcon,
@@ -56,11 +63,21 @@ const navItems: NavItem[] = [
     href: "/dashboard/my-screens",
     icon: Computer,
   },
+  {
+    title: "Marketplace",
+    href: "/dashboard/marketplace",
+    icon: Store01Icon,
+  },
+  {
+    title: "Profile",
+    href: "/dashboard/merchant-profile",
+    icon: Building05Icon,
+  },
 ];
 
 export default function Sidebar() {
   const pathname = usePathname();
-  const { user, logout } = useAuth();
+  const { user, logout, hasHydrated } = useAuth();
   const [isMobileOpen, setIsMobileOpen] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
 
@@ -144,7 +161,7 @@ export default function Sidebar() {
         {/* Bottom — User info + Logout */}
         <div className="p-4 border-t border-slate-700/60 flex-shrink-0">
           {/* User Info */}
-          {user && (
+          {hasHydrated && user && (
             <div className="flex items-center gap-3 px-2 py-2 mb-2">
               <Avatar className="w-9 h-9 flex-shrink-0">
                 <AvatarFallback className="bg-blue-600 text-white text-[13px] font-semibold">
@@ -163,7 +180,7 @@ export default function Sidebar() {
           )}
 
           {/* Role badge */}
-          {user && (
+          {hasHydrated && user && (
             <div className="px-2 mb-3">
               <span
                 className={cn(

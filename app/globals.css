@@ -7,8 +7,6 @@
   interpolate-size: allow-keywords;
 }
 
-
-
 @theme {
   --color-background: hsl(0 0% 100%);
   --color-foreground: hsl(222.2 84% 4.9%);
@@ -62,8 +60,8 @@
 
   --color-white: #ffffff;
   --color-black: #171717;
-  --color-primary-1: #D4AF37;
-  --color-primary-2: #D8CBA0;
+  --color-primary-1: #d4af37;
+  --color-primary-2: #d8cba0;
   --font-primary: "DM Sans", sans-serif;
 }
 
@@ -109,7 +107,6 @@
     /* Chrome, Safari */
   }
 }
-
 
 /* ============================= */
 /* CUSTOM STYLES (for non-dashboard pages) */
@@ -181,6 +178,8 @@ ol {
   outline: none;
 }
 
-
-
+input:focus-visible {
+  outline: none !important;
+  outline-offset: none !important;
+}
  

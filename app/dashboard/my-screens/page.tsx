@@ -1,11 +1,9 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import Sidebar from "@/components/dashboard/Sidebar";
-import Header from "@/components/dashboard/Header";
+import DashboardShell from "@/components/dashboard/DashboardShell";
 import { Button } from "@/components/ui/button";
 import { Pencil, Square, Eye, Copy, Check, Play } from "lucide-react";
-import Image from "next/image";
 import Loader from "@/components/loader/loader";
 import { useRouter } from "next/navigation";
 
@@ -94,26 +92,7 @@ export default function MyScreensPage() {
   return (
     <>
       {loading && <Loader />}
-
-      <div className="h-screen flex">
-        <div className="fixed inset-0 -z-10 bg-[#f8fafc]" />
-        <div className="fixed inset-0 -z-10 bg-gradient-to-br from-slate-50 to-white" />
-        <div className="background_image fixed inset-0 -z-1 bg-no-repeat bg-cover">
-          <Image
-            src="/images/background.svg"
-            height={1000}
-            width={1000}
-            alt=""
-          />
-        </div>
-
-        <Sidebar />
-
-        <div className="flex-1 transition-all duration-300 p-5 overflow-hidden">
-          <div className="h-full bg-white rounded-[15px] overflow-hidden flex flex-col shadow-sm">
-            <Header />
-
-            <main className="flex-1 p-6 overflow-y-auto">
+      <DashboardShell>
               <h1 className="text-xl font-semibold text-slate-800 mb-6">
                 My Screens
               </h1>
@@ -223,10 +202,7 @@ export default function MyScreensPage() {
                   </p>
                 </div>
               )}
-            </main>
-          </div>
-        </div>
-      </div>
+      </DashboardShell>
     </>
   );
 }

@@ -27,8 +27,8 @@ import {
   Image as ImageIcon,
   Layers,
 } from "lucide-react";
-import Sidebar from "@/components/dashboard/Sidebar";
-import Header from "@/components/dashboard/Header";
+import DashboardShell from "@/components/dashboard/DashboardShell";
+import LiveClock from "@/components/LiveClock";
 import Image from "next/image";
 
 // ─── Font Definitions ──────────────────────────────────────────────────────────
@@ -87,24 +87,6 @@ const WORLD_CLOCKS: ClockCity[] = [
   { id: "beijing", label: "China", country: "China", code: "cn", timezone: "Asia/Shanghai" },
   { id: "frankfurt", label: "Germany", country: "Germany", code: "de", timezone: "Europe/Berlin" },
 ];
-
-function getClockTime(timezone: string): string {
-  try {
-    return new Intl.DateTimeFormat("en-US", {
-      timeZone: timezone, hour: "2-digit", minute: "2-digit", hour12: true,
-    }).format(new Date());
-  } catch {
-    return "--:--";
-  }
-}
-
-function useClockTick() {
-  const [, setTick] = useState(0);
-  useEffect(() => {
-    const id = setInterval(() => setTick((t) => t + 1), 1000);
-    return () => clearInterval(id);
-  }, []);
-}
 
 function useLoadGoogleFonts(fonts: FontOption[]) {
   useEffect(() => {
@@ -231,7 +213,6 @@ const DEFAULT_CONFIG: TemplateConfig = {
 
 // ─── Template Preview ─────────────────────────────────────────────────────────
 function TemplatePreview({ config, scale }: { config: TemplateConfig; scale: number }) {
-  useClockTick();
   const activeCommodities = config.commodities.filter((c) => c.enabled);
   return (
     <div style={{
@@ -304,7 +285,9 @@ function TemplatePreview({ config, scale }: { config: TemplateConfig; scale: num
                 />
               )}
               <div style={{ fontSize: 9, letterSpacing: 1, color: config.textColor, opacity: 0.6 }}>{c.label}</div>
-              <div style={{ fontSize: 12, fontWeight: 600, color: config.clockTimeColor }}>{getClockTime(c.timezone)}</div>
+              <div style={{ fontSize: 12, fontWeight: 600, color: config.clockTimeColor }}>
+                <LiveClock timeZone={c.timezone} />
+              </div>
             </div>
           ))}
         </div>
@@ -1422,25 +1405,16 @@ function TemplateEditorInner() {
 
 export default function TemplateEditorPage() {
   return (
-    <div className="h-screen flex">
-      <div className="background_image fixed inset-0 -z-1 bg-no-repeat bg-cover">
-        <Image src={"/images/background.svg"} height={1000} width={1000} alt="" />
-      </div>
-      <Sidebar />
-      <div className="flex-1 transition-all duration-300 p-5 overflow-hidden">
-        <div className="h-full bg-white rounded-[15px] overflow-hidden flex flex-col">
-          <Header />
-          <main className="flex-1 pl-6 pb-6 h-9 space-y-6">
-            <Suspense fallback={
-              <div style={{ display: "flex", height: "100%", alignItems: "center", justifyContent: "center", background: "#f9fafb" }}>
-                <div style={{ color: "#6b7280", fontSize: 14 }}>Loading editor…</div>
-              </div>
-            }>
-              <TemplateEditorInner />
-            </Suspense>
-          </main>
-        </div>
-      </div>
-    </div>
+    <DashboardShell contentClassName="pl-6 pb-6 pt-0">
+      <Suspense
+        fallback={
+          <div className="flex h-full min-h-[400px] items-center justify-center bg-slate-50 rounded-lg">
+            <div className="text-sm text-slate-500">Loading editor…</div>
+          </div>
+        }
+      >
+        <TemplateEditorInner />
+      </Suspense>
+    </DashboardShell>
   );
 }

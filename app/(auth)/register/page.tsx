@@ -6,6 +6,7 @@ import { Eye, EyeOff } from "lucide-react";
 import PhoneInput from "react-phone-number-input";
 import "react-phone-number-input/style.css";
 import { useAuth } from "@/context/AuthContext";
+import { useHasMounted } from "@/lib/useHasMounted";
 
 interface FieldErrors {
   companyName?: string;
@@ -25,6 +26,7 @@ type RegisterForm = {
 
 export default function RegisterPage() {
   const { register } = useAuth();
+  const mounted = useHasMounted();
 
   const [form, setForm] = useState<RegisterForm>({
     companyName: "",
@@ -207,14 +209,22 @@ export default function RegisterPage() {
                     : "border-[#D1D5DB] focus-within:ring-[#4A90E2]"
                 }`}
               >
-                <PhoneInput
-                  international
-                  withCountryCallingCode
-                  defaultCountry="IN"
-                  value={form.phone}
-                  onChange={(value) => updateField("phone", value)}
-                  className="flex w-full phone-input-unified"
-                />
+                {mounted ? (
+                  <PhoneInput
+                    international
+                    withCountryCallingCode
+                    defaultCountry="IN"
+                    value={form.phone}
+                    onChange={(value) => updateField("phone", value)}
+                    className="flex w-full phone-input-unified"
+                  />
+                ) : (
+                  <input
+                    readOnly
+                    placeholder="Phone number"
+                    className="w-full border-0 bg-transparent text-[14px] text-[#9CA3AF] outline-none"
+                  />
+                )}
               </div>
               {fieldErrors.phone && (
                 <p className="mt-1 text-[12px] text-red-500">

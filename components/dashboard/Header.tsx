@@ -8,7 +8,7 @@ import { useAuth } from "@/context/AuthContext";
 import { cn } from "@/lib/utils";
 
 const Header = () => {
-  const { user } = useAuth();
+  const { user, hasHydrated } = useAuth();
 
   const getInitials = (name: string): string => {
     return name
@@ -23,7 +23,7 @@ const Header = () => {
     <header className="sticky top-0 z-30 w-full py-1.5 bg-[#F1F1F1] border-b border-slate-200">
       <div className="flex h-14 items-center justify-between px-6 gap-3">
         {/* Left — Welcome text */}
-        {user && (
+        {hasHydrated && user && (
           <div className="flex items-center gap-2">
             <p className="text-[14px] font-medium text-[#374151]">
               Welcome,{" "}
@@ -62,7 +62,7 @@ const Header = () => {
             {/* Avatar with initials */}
             <Avatar className="h-9 w-9 cursor-pointer">
               <AvatarFallback className="bg-[#4067B1] text-white text-[13px] font-semibold">
-                {user ? getInitials(user.companyName) : "U"}
+                {hasHydrated && user ? getInitials(user.companyName) : "U"}
               </AvatarFallback>
             </Avatar>
 

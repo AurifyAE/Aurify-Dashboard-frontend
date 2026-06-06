@@ -1,12 +1,10 @@
- "use client";
+"use client";
 
 import React, { useEffect, useState } from "react";
-import Sidebar from "@/components/dashboard/Sidebar";
-import Header from "@/components/dashboard/Header";
+import DashboardShell from "@/components/dashboard/DashboardShell";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Search, X, Eye, ChevronRight } from "lucide-react";
-import Image from "next/image";
 import Loader from "@/components/loader/loader";
 import { useRouter } from "next/navigation";
 
@@ -14,13 +12,23 @@ const TEMPLATES = [
   {
     id: "1",
     name: "Template 1",
-    features: ["Spot Rate (Gold & Silver)", "Max 4 Commodities", "3 Country Clock", "News"],
+    features: [
+      "Spot Rate (Gold & Silver)",
+      "Max 4 Commodities",
+      "3 Country Clock",
+      "News",
+    ],
     maxCommodities: 4,
   },
   {
     id: "2",
     name: "Template 2",
-    features: ["Spot Rate (Gold & Silver)", "Max 10 Commodities", "3 Country Clock", "News"],
+    features: [
+      "Spot Rate (Gold & Silver)",
+      "Max 10 Commodities",
+      "3 Country Clock",
+      "News",
+    ],
     maxCommodities: 10,
   },
 ];
@@ -37,17 +45,23 @@ function TemplatePreviewCard({ compact = false }: { compact?: boolean }) {
           <div className="text-[10px] font-semibold text-emerald-100">GOLD</div>
           <div className="text-xs font-bold">BID: 1,234.00</div>
           <div className="text-xs font-bold text-red-200">ASK: 1,234.00</div>
-          <div className="text-[10px] text-white/80">LOW 1234.00 · HIGH 1234.00</div>
+          <div className="text-[10px] text-white/80">
+            LOW 1234.00 · HIGH 1234.00
+          </div>
         </div>
         <div className="rounded bg-slate-600/90 px-2 py-1.5">
           <div className="text-[10px] font-semibold text-slate-200">SILVER</div>
           <div className="text-xs font-bold">BID: 1,234.00</div>
           <div className="text-xs font-bold text-red-200">ASK: 1,234.00</div>
-          <div className="text-[10px] text-white/80">LOW 1234.00 · HIGH 1234.00</div>
+          <div className="text-[10px] text-white/80">
+            LOW 1234.00 · HIGH 1234.00
+          </div>
         </div>
       </div>
       <div className="text-center py-2">
-        <div className="text-amber-400 font-bold text-lg tracking-wide">KESHAV AUCTION</div>
+        <div className="text-amber-400 font-bold text-lg tracking-wide">
+          KESHAV AUCTION
+        </div>
         <div className="text-[10px] text-white/70">OCT 26, 2023 Monday</div>
       </div>
       <div className="flex justify-center gap-1 pb-1">
@@ -80,7 +94,9 @@ function TemplatePreviewCard({ compact = false }: { compact?: boolean }) {
 export default function ConfigureScreensPage() {
   const [search, setSearch] = useState("");
   const [detailsOpen, setDetailsOpen] = useState(false);
-  const [selectedTemplate, setSelectedTemplate] = useState<typeof TEMPLATES[0] | null>(null);
+  const [selectedTemplate, setSelectedTemplate] = useState<
+    (typeof TEMPLATES)[0] | null
+  >(null);
   const router = useRouter();
 
   const [loading, setLoading] = useState(true);
@@ -98,84 +114,76 @@ export default function ConfigureScreensPage() {
   };
 
   const goToEditor = (templateId: string) => {
-    router.push(`/dashboard/configure-screens/editor?templateId=${encodeURIComponent(templateId)}`);
+    router.push(
+      `/dashboard/configure-screens/editor?templateId=${encodeURIComponent(templateId)}`,
+    );
   };
 
   return (
     <>
       {loading && <Loader />}
-      <div className="h-screen flex">
-      <div className="fixed inset-0 -z-10 bg-[#f8fafc]" />
-    
-      <div className="background_image fixed inset-0 -z-1 bg-no-repeat bg-cover">
-        <Image src="/images/background.svg" height={1000} width={1000} alt="" />
-      </div>  <Sidebar />
-      <div className="flex-1 transition-all duration-300 p-5 overflow-hidden">
-        <div className="h-full bg-white rounded-[15px] overflow-hidden flex flex-col shadow-sm">
-          <Header />
-
-          <main className="flex-1 p-6 overflow-y-auto">
-            {/* Banner */}
-            <div className="relative rounded-xl overflow-hidden bg-linear-to-br from-[#2563eb] via-[#1d4ed8] to-[#1e40af] mb-8">
-              <div className="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 800 400\'%3E%3Cpath fill=\'%23ffffff\' fill-opacity=\'.06\' d=\'M0 200 Q200 100 400 200 T800 200 L800 400 L0 400 Z\'/%3E%3Cpath fill=\'%23ffffff\' fill-opacity=\'.04\' d=\'M0 250 Q300 150 600 250 L800 220 L800 400 L0 400 Z\'/%3E%3C/svg%3E')] bg-cover bg-bottom" />
-              <div className="relative px-8 py-10 text-center">
-                <h1 className="text-2xl font-bold text-white mb-6">
-                  Find the best template for your screen
-                </h1>
-                <div className="max-w-md mx-auto relative">
-                  <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
-                  <Input
-                    type="search"
-                    placeholder="Search"
-                    value={search}
-                    onChange={(e) => setSearch(e.target.value)}
-                    className="pl-11 h-12 rounded-lg border-slate-200 bg-white text-slate-800 placeholder:text-slate-400"
-                  />
-                </div>
-              </div>
+      <DashboardShell>
+        {/* Banner */}
+        <div className="relative  rounded-xl overflow-hidden bg-linear-to-br from-[#2563eb] via-[#1d4ed8] to-[#1e40af] mb-8">
+          <div className="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 800 400\'%3E%3Cpath fill=\'%23ffffff\' fill-opacity=\'.06\' d=\'M0 200 Q200 100 400 200 T800 200 L800 400 L0 400 Z\'/%3E%3Cpath fill=\'%23ffffff\' fill-opacity=\'.04\' d=\'M0 250 Q300 150 600 250 L800 220 L800 400 L0 400 Z\'/%3E%3C/svg%3E')] bg-cover bg-bottom" />
+          <div className="relative px-8 py-10 text-center">
+            <h1 className="text-2xl font-bold text-white mb-6">
+              Find the best template for your screen
+            </h1>
+            <div className="max-w-md mx-auto relative">
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+              <Input
+                type="search"
+                placeholder="Search"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                className="pl-11 h-12 rounded-lg border-slate-200 bg-white text-slate-800 placeholder:text-slate-400"
+              />
             </div>
+          </div>
+        </div>
 
-            {/* All Templates */}
-            <h2 className="text-lg font-semibold text-slate-800 mb-4">All Templates</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {TEMPLATES.map((t) => (
-                <div
-                  key={t.id}
-                  className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden hover:shadow-md transition-shadow"
+        {/* All Templates */}
+        <h2 className="text-lg font-semibold text-slate-800 mb-4">
+          All Templates
+        </h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {TEMPLATES.map((t) => (
+            <div
+              key={t.id}
+              className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden hover:shadow-md transition-shadow"
+            >
+              <div className="p-3">
+                <TemplatePreviewCard compact />
+              </div>
+              <ul className="px-5 pb-3 text-sm text-slate-600 space-y-1">
+                {t.features.map((f, i) => (
+                  <li key={i} className="flex items-center gap-2">
+                    <span className="text-amber-500">•</span>
+                    {f}
+                  </li>
+                ))}
+              </ul>
+              <div className="px-5 pb-5 flex flex-col gap-2">
+                <Button
+                  variant="outline"
+                  className="w-full bg-sky-50 border-sky-200 text-sky-700 hover:bg-sky-100"
+                  onClick={() => openDetails(t)}
                 >
-                  <div className="p-3">
-                    <TemplatePreviewCard compact />
-                  </div>
-                  <ul className="px-5 pb-3 text-sm text-slate-600 space-y-1">
-                    {t.features.map((f, i) => (
-                      <li key={i} className="flex items-center gap-2">
-                        <span className="text-amber-500">•</span>
-                        {f}
-                      </li>
-                    ))}
-                  </ul>
-                  <div className="px-5 pb-5 flex flex-col gap-2">
-                    <Button
-                      variant="outline"
-                      className="w-full bg-sky-50 border-sky-200 text-sky-700 hover:bg-sky-100"
-                      onClick={() => openDetails(t)}
-                    >
-                      VIEW MORE DETAILS
-                      <ChevronRight className="w-4 h-4 ml-1" />
-                    </Button>
-                    {/* <Button
+                  VIEW MORE DETAILS
+                  <ChevronRight className="w-4 h-4 ml-1" />
+                </Button>
+                {/* <Button
                       className="w-full bg-sky-600 hover:bg-sky-700 text-white"
                       onClick={() => goToEditor(t.id)}
                     >
                       Select Template
                     </Button> */}
-                  </div>
-                </div>
-              ))}
+              </div>
             </div>
-          </main>
+          ))}
         </div>
-      </div>
+      </DashboardShell>
 
       {/* Template Details floating sidebar */}
       {detailsOpen && (
@@ -191,7 +199,9 @@ export default function ConfigureScreensPage() {
             aria-label="Template Details"
           >
             <div className="flex items-center justify-between p-5 border-b border-slate-200 bg-white shrink-0">
-              <h2 className="text-lg font-semibold text-slate-800">Template Details</h2>
+              <h2 className="text-lg font-semibold text-slate-800">
+                Template Details
+              </h2>
               <button
                 type="button"
                 onClick={() => setDetailsOpen(false)}
@@ -206,10 +216,15 @@ export default function ConfigureScreensPage() {
                 <TemplatePreviewCard />
               </div>
               <div>
-                <h3 className="text-sm font-semibold text-slate-800 mb-3">Features</h3>
+                <h3 className="text-sm font-semibold text-slate-800 mb-3">
+                  Features
+                </h3>
                 <ul className="space-y-2">
                   {selectedTemplate?.features.map((f, i) => (
-                    <li key={i} className="flex items-center gap-2 text-sm text-slate-700">
+                    <li
+                      key={i}
+                      className="flex items-center gap-2 text-sm text-slate-700"
+                    >
                       <span className="flex h-5 w-5 items-center justify-center rounded bg-sky-100 text-sky-600">
                         ✓
                       </span>
@@ -226,10 +241,7 @@ export default function ConfigureScreensPage() {
               </div>
             </div>
             <div className="p-5 border-t border-slate-200 bg-white flex flex-col gap-3">
-              <Button
-                variant="outline"
-                className="w-full"
-              >
+              <Button variant="outline" className="w-full">
                 <Eye className="w-4 h-4 mr-2" />
                 Live Preview
               </Button>
@@ -245,7 +257,6 @@ export default function ConfigureScreensPage() {
           </aside>
         </>
       )}
-    </div>
     </>
   );
 }

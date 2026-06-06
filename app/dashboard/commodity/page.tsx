@@ -1,8 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useCallback } from "react";
-import Sidebar from "@/components/dashboard/Sidebar";
-import Header from "@/components/dashboard/Header";
+import DashboardShell from "@/components/dashboard/DashboardShell";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -228,18 +227,8 @@ export default function CommodityPage() {
   return (
     <>
       {showFullscreenLoader && <Loader />}
-      <div className="h-screen flex">
-        <div className="fixed inset-0 -z-10 bg-linear-to-br from-slate-50 to-white" />
-        <div className="background_image fixed inset-0 -z-1 bg-no-repeat bg-cover">
-          <Image src="/images/background.svg" height={1000} width={1000} alt="" />
-        </div>
-        <Sidebar />
-        <div className="flex-1 transition-all duration-300 p-5 overflow-hidden">
-          <div className="h-full bg-white rounded-[15px] overflow-hidden flex flex-col">
-            <Header />
-
-            <main className="flex-1 p-6 overflow-y-auto">
-              <div className="flex mb-8 flex-col justify-between gap-6">
+      <DashboardShell className="overflow-y-auto">
+            <div className="flex mb-8 flex-col justify-between gap-6">
                 <div className="flex items-center justify-between gap-4">
                   <div className="min-w-[220px] flex items-center gap-3">
                     <label className="text-sm text-slate-600 h-auto block">Currency</label>
@@ -442,9 +431,7 @@ export default function CommodityPage() {
                   </Table>
                 )}
               </div>
-            </main>
-          </div>
-        </div>
+      </DashboardShell>
 
         {/* Floating Add Commodity sidebar — overlay + panel */}
         {sidebarOpen && (
@@ -598,7 +585,6 @@ export default function CommodityPage() {
             </aside>
           </>
         )}
-      </div>
     </>
   );
 }

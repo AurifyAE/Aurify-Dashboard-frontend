@@ -1,8 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import Sidebar from "@/components/dashboard/Sidebar";
-import Header from "@/components/dashboard/Header";
+import DashboardShell from "@/components/dashboard/DashboardShell";
 import Image from "next/image";
 import { Edit2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
@@ -268,45 +267,29 @@ function SpotRateContent() {
   };
 
   return (
-    <div className="h-screen flex">
-      <div className="background_image fixed inset-0 -z-1 bg-no-repeat bg-cover">
-        <Image
-          src={"/images/background.svg"}
-          height={1000}
-          width={1000}
-          alt=""
+    <DashboardShell className="scrollbar-none">
+      {/* Trading Cards Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <TradingCard
+          name="GOLD"
+          data={goldData}
+          bidSpread={spreadSettings.goldBidSpread}
+          askSpread={spreadSettings.goldAskSpread}
+          onSpreadChange={(type, value) =>
+            handleSpreadChange("gold", type, value)
+          }
+        />
+        <TradingCard
+          name="SILVER"
+          data={silverData}
+          bidSpread={spreadSettings.silverBidSpread}
+          askSpread={spreadSettings.silverAskSpread}
+          onSpreadChange={(type, value) =>
+            handleSpreadChange("silver", type, value)
+          }
         />
       </div>
-      <Sidebar />
-      <div className="flex-1 transition-all duration-300 p-5 overflow-hidden">
-        <div className="h-full bg-white rounded-[15px] overflow-hidden flex flex-col">
-          <Header />
-          <main className="flex-1 p-6 overflow-y-auto scrollbar-none">
-            {/* Trading Cards Grid */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <TradingCard
-                name="GOLD"
-                data={goldData}
-                bidSpread={spreadSettings.goldBidSpread}
-                askSpread={spreadSettings.goldAskSpread}
-                onSpreadChange={(type, value) =>
-                  handleSpreadChange("gold", type, value)
-                }
-              />
-              <TradingCard
-                name="SILVER"
-                data={silverData}
-                bidSpread={spreadSettings.silverBidSpread}
-                askSpread={spreadSettings.silverAskSpread}
-                onSpreadChange={(type, value) =>
-                  handleSpreadChange("silver", type, value)
-                }
-              />
-            </div>
-          </main>
-        </div>
-      </div>
-    </div>
+    </DashboardShell>
   );
 }
 
