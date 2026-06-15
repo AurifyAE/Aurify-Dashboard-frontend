@@ -138,6 +138,10 @@ export const marketplaceApi = {
       method: id ? "PATCH" : "POST",
       body: JSON.stringify(body),
     }),
+  deleteCommodity: (id: string) =>
+    request<{ success: boolean; message: string }>(`/merchant-commodities/${id}`, {
+      method: "DELETE",
+    }),
   news: () => request<MerchantNews[]>("/news"),
   saveNews: (body: unknown, id?: string) =>
     request<MerchantNews>(id ? `/news/${id}` : "/news", {
