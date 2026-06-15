@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, Suspense } from "react";
 import DashboardShell from "@/components/dashboard/DashboardShell";
 import MyScreensTab from "./MyScreensTab";
 import ScreenBuilderTab from "./ScreenBuilderTab";
@@ -18,7 +18,7 @@ import { useSearchParams, useRouter } from "next/navigation";
 
 type TabId = "my-screens" | "builder" | "themes" | "profile" | "others";
 
-export default function ScreenConsolePage() {
+function ScreenConsoleContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   
@@ -184,5 +184,13 @@ export default function ScreenConsolePage() {
         </div>
       </div>
     </DashboardShell>
+  );
+}
+
+export default function ScreenConsolePage() {
+  return (
+    <Suspense fallback={<div className="p-6 text-center text-slate-500">Loading console...</div>}>
+      <ScreenConsoleContent />
+    </Suspense>
   );
 }
