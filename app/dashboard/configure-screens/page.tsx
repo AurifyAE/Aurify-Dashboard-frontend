@@ -2,257 +2,250 @@
 
 import React, { useEffect, useState } from "react";
 import DashboardShell from "@/components/dashboard/DashboardShell";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Search, X, Eye, ChevronRight } from "lucide-react";
-import Loader from "@/components/loader/loader";
+import { marketplaceApi, type MarketplaceTheme } from "@/lib/api/marketplace";
 import { useRouter } from "next/navigation";
+import {
+  ChevronRight,
+  Download,
+  Eye,
+  Loader2,
+  Palette,
+  Search,
+  X,
+} from "lucide-react";
 
-const TEMPLATES = [
-  {
-    id: "1",
-    name: "Template 1",
-    features: [
-      "Spot Rate (Gold & Silver)",
-      "Max 4 Commodities",
-      "3 Country Clock",
-      "News",
-    ],
-    maxCommodities: 4,
-  },
-  {
-    id: "2",
-    name: "Template 2",
-    features: [
-      "Spot Rate (Gold & Silver)",
-      "Max 10 Commodities",
-      "3 Country Clock",
-      "News",
-    ],
-    maxCommodities: 10,
-  },
-];
-
-function TemplatePreviewCard({ compact = false }: { compact?: boolean }) {
+function MiniTV({
+  primary = "#d4a017",
+  secondary = "#111827",
+  accent = "#38bdf8",
+  name = "Theme",
+  compact = false,
+}: {
+  primary?: string;
+  secondary?: string;
+  accent?: string;
+  name?: string;
+  compact?: boolean;
+}) {
   return (
     <div
-      className={`rounded-lg overflow-hidden bg-[#0f1419] text-white ${
-        compact ? "aspect-video" : "min-h-[280px]"
-      }`}
+      className={`overflow-hidden rounded-xl ${compact ? "aspect-video" : "min-h-[220px]"}`}
+      style={{ background: secondary }}
     >
-      <div className="p-3 grid grid-cols-2 gap-2">
-        <div className="rounded bg-emerald-600/90 px-2 py-1.5">
-          <div className="text-[10px] font-semibold text-emerald-100">GOLD</div>
-          <div className="text-xs font-bold">BID: 1,234.00</div>
-          <div className="text-xs font-bold text-red-200">ASK: 1,234.00</div>
-          <div className="text-[10px] text-white/80">
-            LOW 1234.00 · HIGH 1234.00
-          </div>
-        </div>
-        <div className="rounded bg-slate-600/90 px-2 py-1.5">
-          <div className="text-[10px] font-semibold text-slate-200">SILVER</div>
-          <div className="text-xs font-bold">BID: 1,234.00</div>
-          <div className="text-xs font-bold text-red-200">ASK: 1,234.00</div>
-          <div className="text-[10px] text-white/80">
-            LOW 1234.00 · HIGH 1234.00
-          </div>
-        </div>
+      <div className="flex items-center justify-between px-3 py-2" style={{ borderBottom: `1px solid ${primary}30` }}>
+        <span className="text-[9px] font-bold" style={{ color: primary }}>AURIFY GOLD</span>
+        <span className="rounded px-1.5 py-0.5 text-[7px] font-bold" style={{ background: accent, color: secondary }}>LIVE</span>
       </div>
-      <div className="text-center py-2">
-        <div className="text-amber-400 font-bold text-lg tracking-wide">
-          KESHAV AUCTION
-        </div>
-        <div className="text-[10px] text-white/70">OCT 26, 2023 Monday</div>
-      </div>
-      <div className="flex justify-center gap-1 pb-1">
-        {["🇦🇪", "🇬🇧", "🇺🇸", "🇮🇳"].map((f, i) => (
-          <span key={i} className="text-sm">
-            {f}
-          </span>
+      <div className="grid grid-cols-2 gap-1 px-2 py-1.5">
+        {[{label:"GOLD",color:primary},{label:"SILVER",color:accent}].map((m) => (
+          <div key={m.label} className="rounded px-2 py-1" style={{ background: `${m.color}18`, borderLeft: `2px solid ${m.color}` }}>
+            <div className="text-[7px] font-bold" style={{ color: m.color }}>{m.label}</div>
+            <div className="text-[10px] font-bold text-white">{m.label === "GOLD" ? "2,345.60" : "28.40"}</div>
+          </div>
         ))}
       </div>
-      <div className="border-t border-white/10 mx-2 pt-1">
-        <div className="grid grid-cols-5 gap-0.5 text-[9px]">
-          <div className="font-semibold text-amber-400/90">COMMODITY</div>
-          <div className="font-semibold text-amber-400/90">UNIT</div>
-          <div className="font-semibold text-amber-400/90">BID</div>
-          <div className="font-semibold text-amber-400/90 col-span-2">ASK</div>
-          <div className="text-white/90">Ten Tola Bar</div>
-          <div className="text-white/90">1 TTB</div>
-          <div className="text-white/90">5469</div>
-          <div className="text-white/90 col-span-2">5461</div>
-          <div className="text-white/90">One Kilo Bar</div>
-          <div className="text-white/90">1 KG</div>
-          <div className="text-white/90">—</div>
-          <div className="text-white/90 col-span-2">—</div>
+      <div className="px-2 pb-1">
+        <div className="grid grid-cols-4 gap-0.5 text-[6px] font-semibold opacity-40 text-white mb-0.5"><span>ITEM</span><span>WT</span><span>BUY</span><span>SELL</span></div>
+        {[["Gold Bar","1g","224","225"],["Gold Coin","8g","182","183"]].map((r) => (
+          <div key={r[0]} className="grid grid-cols-4 gap-0.5 text-[6px] text-white/70 py-0.5" style={{ borderTop: `1px solid ${primary}12` }}>
+            {r.map((c,i)=><span key={i}>{c}</span>)}
+          </div>
+        ))}
+      </div>
+      {!compact && (
+        <div className="text-center py-2">
+          <div className="text-[9px] font-bold" style={{ color: primary }}>{name.toUpperCase()}</div>
         </div>
+      )}
+      <div className="px-2 py-1 text-[5.5px] font-semibold" style={{ background: primary, color: secondary }}>
+        📢 Market update: Gold prices remain strong
       </div>
     </div>
   );
 }
 
 export default function ConfigureScreensPage() {
+  const [themes, setThemes] = useState<MarketplaceTheme[]>([]);
+  const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [detailsOpen, setDetailsOpen] = useState(false);
-  const [selectedTemplate, setSelectedTemplate] = useState<
-    (typeof TEMPLATES)[0] | null
-  >(null);
+  const [selected, setSelected] = useState<MarketplaceTheme | null>(null);
+  const [installing, setInstalling] = useState<string | null>(null);
   const router = useRouter();
 
-  const [loading, setLoading] = useState(true);
-
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setLoading(false);
-    }, 2000);
-    return () => clearTimeout(timer);
+    marketplaceApi
+      .themes()
+      .then(setThemes)
+      .catch(console.error)
+      .finally(() => setLoading(false));
   }, []);
 
-  const openDetails = (t: (typeof TEMPLATES)[0]) => {
-    setSelectedTemplate(t);
-    setDetailsOpen(true);
-  };
+  const filtered = themes.filter(
+    (t) =>
+      !search ||
+      t.name.toLowerCase().includes(search.toLowerCase()) ||
+      t.category.toLowerCase().includes(search.toLowerCase()),
+  );
 
-  const goToEditor = (templateId: string) => {
-    router.push(
-      `/dashboard/configure-screens/editor?templateId=${encodeURIComponent(templateId)}`,
-    );
+  const installAndEdit = async (theme: MarketplaceTheme) => {
+    setInstalling(theme._id);
+    try {
+      await marketplaceApi.installTheme(theme._id);
+    } catch {
+      // ok if already installed
+    } finally {
+      setInstalling(null);
+    }
+    setDetailsOpen(false);
+    router.push("/dashboard/screen-builder");
   };
 
   return (
     <>
-      {loading && <Loader />}
       <DashboardShell>
         {/* Banner */}
-        <div className="relative  rounded-xl overflow-hidden bg-linear-to-br from-[#2563eb] via-[#1d4ed8] to-[#1e40af] mb-8">
-          <div className="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 800 400\'%3E%3Cpath fill=\'%23ffffff\' fill-opacity=\'.06\' d=\'M0 200 Q200 100 400 200 T800 200 L800 400 L0 400 Z\'/%3E%3Cpath fill=\'%23ffffff\' fill-opacity=\'.04\' d=\'M0 250 Q300 150 600 250 L800 220 L800 400 L0 400 Z\'/%3E%3C/svg%3E')] bg-cover bg-bottom" />
+        <div className="relative overflow-hidden rounded-2xl bg-slate-900 mb-8">
+          <div className="absolute inset-0 opacity-5" style={{
+            backgroundImage: "radial-gradient(circle at 20% 80%, #ffffff 0%, transparent 50%), radial-gradient(circle at 80% 20%, #3051bb 0%, transparent 50%)"
+          }} />
           <div className="relative px-8 py-10 text-center">
-            <h1 className="text-2xl font-bold text-white mb-6">
-              Find the best template for your screen
+            <h1 className="text-2xl font-bold text-white mb-2">
+              Choose a Template for Your Screen
             </h1>
+            <p className="text-slate-400 text-sm mb-6">
+              Select a professional theme and customise it in the Screen Builder
+            </p>
             <div className="max-w-md mx-auto relative">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
-              <Input
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+              <input
                 type="search"
-                placeholder="Search"
+                placeholder="Search templates..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="pl-11 h-12 rounded-lg border-slate-200 bg-white text-slate-800 placeholder:text-slate-400"
+                className="w-full pl-11 pr-4 h-11 rounded-xl border-0 bg-white text-slate-800 text-sm placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-300"
               />
             </div>
           </div>
         </div>
 
-        {/* All Templates */}
-        <h2 className="text-lg font-semibold text-slate-800 mb-4">
+        <h2 className="text-lg font-bold text-slate-800 mb-4">
           All Templates
+          <span className="ml-2 text-sm font-normal text-slate-400">({filtered.length})</span>
         </h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {TEMPLATES.map((t) => (
-            <div
-              key={t.id}
-              className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden hover:shadow-md transition-shadow"
-            >
-              <div className="p-3">
-                <TemplatePreviewCard compact />
+
+        {loading ? (
+          <div className="flex justify-center py-20">
+            <Loader2 className="h-8 w-8 animate-spin text-slate-400" />
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {filtered.map((t) => (
+              <div
+                key={t._id}
+                className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden hover:shadow-md hover:border-blue-200 transition-all group"
+              >
+                <div className="p-3 bg-slate-50">
+                  <MiniTV
+                    primary={t.colors?.primary}
+                    secondary={t.colors?.secondary}
+                    accent={t.colors?.accent}
+                    name={t.name}
+                    compact
+                  />
+                </div>
+                <div className="px-4 pb-2 pt-1">
+                  <div className="flex items-start justify-between gap-2 mb-2">
+                    <div>
+                      <p className="font-bold text-slate-900">{t.name}</p>
+                      <p className="text-xs text-slate-500">{t.category}</p>
+                    </div>
+                    <div className="flex gap-1 mt-0.5">
+                      {Object.values(t.colors || {}).slice(0, 3).map((c: any, i) => (
+                        <div key={i} className="h-3.5 w-3.5 rounded-full border border-white shadow" style={{ background: c }} />
+                      ))}
+                    </div>
+                  </div>
+                  <div className="flex flex-wrap gap-1 mb-3">
+                    {t.widgets?.slice(0, 3).map((w) => (
+                      <span key={w} className="rounded-full bg-slate-100 px-2 py-0.5 text-[10px] text-slate-600">{w}</span>
+                    ))}
+                  </div>
+                </div>
+                <div className="px-4 pb-4 flex flex-col gap-2">
+                  <button
+                    type="button"
+                    onClick={() => { setSelected(t); setDetailsOpen(true); }}
+                    className="btn-secondary w-full"
+                  >
+                    View Details
+                    <ChevronRight className="h-4 w-4" />
+                  </button>
+                </div>
               </div>
-              <ul className="px-5 pb-3 text-sm text-slate-600 space-y-1">
-                {t.features.map((f, i) => (
-                  <li key={i} className="flex items-center gap-2">
-                    <span className="text-amber-500">•</span>
-                    {f}
-                  </li>
-                ))}
-              </ul>
-              <div className="px-5 pb-5 flex flex-col gap-2">
-                <Button
-                  variant="outline"
-                  className="w-full bg-sky-50 border-sky-200 text-sky-700 hover:bg-sky-100"
-                  onClick={() => openDetails(t)}
-                >
-                  VIEW MORE DETAILS
-                  <ChevronRight className="w-4 h-4 ml-1" />
-                </Button>
-                {/* <Button
-                      className="w-full bg-sky-600 hover:bg-sky-700 text-white"
-                      onClick={() => goToEditor(t.id)}
-                    >
-                      Select Template
-                    </Button> */}
-              </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
       </DashboardShell>
 
-      {/* Template Details floating sidebar */}
-      {detailsOpen && (
+      {/* Details Sidebar */}
+      {detailsOpen && selected && (
         <>
-          <div
-            className="fixed inset-0 bg-black/50 z-40"
-            aria-hidden
-            onClick={() => setDetailsOpen(false)}
-          />
-          <aside
-            className="fixed top-0 right-0 bottom-0 w-full max-w-[420px] bg-slate-50 shadow-2xl z-50 flex flex-col border-l border-slate-200"
-            role="dialog"
-            aria-label="Template Details"
-          >
-            <div className="flex items-center justify-between p-5 border-b border-slate-200 bg-white shrink-0">
-              <h2 className="text-lg font-semibold text-slate-800">
-                Template Details
-              </h2>
-              <button
-                type="button"
-                onClick={() => setDetailsOpen(false)}
-                className="p-2 rounded-lg hover:bg-slate-100 text-slate-600"
-                aria-label="Close"
-              >
+          <div className="fixed inset-0 bg-black/50 z-40" onClick={() => setDetailsOpen(false)} />
+          <aside className="fixed top-0 right-0 bottom-0 w-full max-w-[420px] bg-white shadow-2xl z-50 flex flex-col border-l border-slate-200">
+            <div className="flex items-center justify-between p-5 border-b border-slate-100">
+              <h2 className="text-lg font-bold text-slate-800">{selected.name}</h2>
+              <button type="button" onClick={() => setDetailsOpen(false)} className="p-2 rounded-xl hover:bg-slate-100 text-slate-500">
                 <X className="w-5 h-5" />
               </button>
             </div>
-            <div className="flex-1 overflow-y-auto p-5 space-y-5 min-h-0">
-              <div className="rounded-lg overflow-hidden border border-slate-200 bg-white">
-                <TemplatePreviewCard />
+            <div className="flex-1 overflow-y-auto p-5 space-y-5">
+              <MiniTV
+                primary={selected.colors?.primary}
+                secondary={selected.colors?.secondary}
+                accent={selected.colors?.accent}
+                name={selected.name}
+              />
+              {/* Category & Colors */}
+              <div className="rounded-xl border border-slate-100 bg-slate-50 p-4">
+                <p className="text-xs font-bold uppercase tracking-wide text-slate-500 mb-3">Theme Details</p>
+                <div className="space-y-2 text-sm text-slate-700">
+                  <div className="flex items-center justify-between">
+                    <span>Category</span>
+                    <span className="font-semibold">{selected.category}</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span>Fonts</span>
+                    <span className="font-semibold">{selected.fonts?.join(", ")}</span>
+                  </div>
+                </div>
               </div>
+              {/* Widgets */}
               <div>
-                <h3 className="text-sm font-semibold text-slate-800 mb-3">
-                  Features
-                </h3>
-                <ul className="space-y-2">
-                  {selectedTemplate?.features.map((f, i) => (
-                    <li
-                      key={i}
-                      className="flex items-center gap-2 text-sm text-slate-700"
-                    >
-                      <span className="flex h-5 w-5 items-center justify-center rounded bg-sky-100 text-sky-600">
-                        ✓
-                      </span>
-                      {f}
-                    </li>
+                <p className="text-xs font-bold uppercase tracking-wide text-slate-500 mb-2">Included Widgets</p>
+                <div className="space-y-2">
+                  {selected.widgets?.map((w) => (
+                    <div key={w} className="flex items-center gap-2 text-sm text-slate-700">
+                      <span className="flex h-5 w-5 items-center justify-center rounded-md bg-blue-100 text-blue-600 text-xs">✓</span>
+                      {w}
+                    </div>
                   ))}
-                  <li className="flex items-center gap-2 text-sm text-slate-700">
-                    <span className="flex h-5 w-5 items-center justify-center rounded bg-sky-100 text-sky-600">
-                      ✓
-                    </span>
-                    Youtube
-                  </li>
-                </ul>
+                </div>
               </div>
             </div>
-            <div className="p-5 border-t border-slate-200 bg-white flex flex-col gap-3">
-              <Button variant="outline" className="w-full">
-                <Eye className="w-4 h-4 mr-2" />
-                Live Preview
-              </Button>
-              {selectedTemplate && (
-                <Button
-                  className="w-full bg-sky-600 hover:bg-sky-700"
-                  onClick={() => goToEditor(selectedTemplate.id)}
-                >
-                  Select Template
-                </Button>
-              )}
+            <div className="p-5 border-t border-slate-100 flex flex-col gap-2">
+              <button
+                type="button"
+                disabled={!!installing}
+                onClick={() => installAndEdit(selected)}
+                className="btn-primary w-full"
+              >
+                {installing === selected._id ? (
+                  <><Loader2 className="h-4 w-4 animate-spin" /> Installing...</>
+                ) : (
+                  <><Download className="h-4 w-4" /> Install & Customize</>
+                )}
+              </button>
             </div>
           </aside>
         </>

@@ -49,7 +49,11 @@ export interface ScreenLayout {
   widgets: string[];
   styles: Record<string, unknown>;
   status: "draft" | "published" | "archived";
+  body?: Record<string, unknown>;
+  header?: Record<string, unknown>;
+  footer?: Record<string, unknown>;
 }
+
 
 export interface MerchantNews {
   _id: string;

@@ -4,9 +4,6 @@ import React, { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import DashboardShell from "@/components/dashboard/DashboardShell";
 import LiveClock from "@/components/LiveClock";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Checkbox } from "@/components/ui/checkbox";
 import {
   marketplaceApi,
   type Merchant,
@@ -15,13 +12,20 @@ import {
 } from "@/lib/api/marketplace";
 import {
   ArrowDown,
+  ArrowLeft,
+  ArrowRight,
   ArrowUp,
+  Check,
   CheckCircle2,
   GripVertical,
   Loader2,
   Monitor,
+  Palette,
   Rocket,
   Save,
+  Settings2,
+  Tv,
+  XCircle,
 } from "lucide-react";
 import Loader from "@/components/loader/loader";
 
@@ -34,7 +38,12 @@ const WIDGETS = [
   "London Fix",
 ];
 
-const LAYOUTS = ["Layout A", "Layout B", "Layout C", "Layout D"];
+const LAYOUTS = [
+  { id: "Layout A", label: "Standard" },
+  { id: "Layout B", label: "Wide Ticker" },
+  { id: "Layout C", label: "Split Screen" },
+  { id: "Layout D", label: "Fullscreen" },
+];
 
 const SECTIONS = [
   { id: "header", label: "Header" },
@@ -44,10 +53,10 @@ const SECTIONS = [
 ];
 
 const STEPS = [
-  { id: 1, label: "Screen setup" },
-  { id: 2, label: "Theme" },
-  { id: 3, label: "Sections" },
-  { id: 4, label: "Preview & publish" },
+  { id: 1, label: "Screen Setup", icon: Settings2 },
+  { id: 2, label: "Theme", icon: Palette },
+  { id: 3, label: "Customize", icon: Tv },
+  { id: 4, label: "Preview & Publish", icon: Monitor },
 ];
 
 type DraftState = {
@@ -59,6 +68,9 @@ type DraftState = {
   widgets: string[];
   sectionOrder: string[];
   assignedDevices: string;
+  colorOverride: { primary: string; secondary: string; accent: string };
+  showLogo: boolean;
+  showName: boolean;
 };
 
 const defaultDraft: DraftState = {
@@ -70,6 +82,9 @@ const defaultDraft: DraftState = {
   widgets: ["Spot Rates", "Commodity Table", "News", "Clock"],
   sectionOrder: ["header", "spotRates", "commodities", "news"],
   assignedDevices: "TV 1, TV 2",
+  colorOverride: { primary: "", secondary: "", accent: "" },
+  showLogo: true,
+  showName: true,
 };
 
 export default function ScreenBuilderPage() {
@@ -78,21 +93,14 @@ export default function ScreenBuilderPage() {
   const [themes, setThemes] = useState<MerchantTheme[]>([]);
   const [layouts, setLayouts] = useState<ScreenLayout[]>([]);
   const [message, setMessage] = useState("");
-  const [messageType, setMessageType] = useState<"info" | "success" | "error">(
-    "info",
-  );
-  const [previewSize, setPreviewSize] = useState<"1920x1080" | "3840x2160">(
-    "1920x1080",
-  );
+  const [messageType, setMessageType] = useState<"info" | "success" | "error">("info");
+  const [previewSize, setPreviewSize] = useState<"1920x1080" | "3840x2160">("1920x1080");
   const [draft, setDraft] = useState<DraftState>(defaultDraft);
   const [draggedSection, setDraggedSection] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 
-  const showMessage = (
-    text: string,
-    type: "info" | "success" | "error" = "info",
-  ) => {
+  const showMessage = (text: string, type: "info" | "success" | "error" = "info") => {
     setMessage(text);
     setMessageType(type);
   };
@@ -129,39 +137,31 @@ export default function ScreenBuilderPage() {
         }));
       }
     } catch (err) {
-      showMessage(
-        err instanceof Error ? err.message : "Failed to load builder",
-        "error",
-      );
+      showMessage(err instanceof Error ? err.message : "Failed to load builder", "error");
     } finally {
       setLoading(false);
     }
   };
 
-  useEffect(() => {
-    load();
-  }, []);
+  useEffect(() => { load(); }, []);
 
-  const selectedTheme = themes.find((theme) => theme.themeId === draft.themeId);
-  const canGoLive = Boolean(
-    merchant?.status === "Active" && draft.themeId && draft.name.trim(),
-  );
-  const primaryColor = String(
-    (
-      selectedTheme?.customizations as
-        | { colors?: { primary?: string } }
-        | undefined
-    )?.colors?.primary || "#d4a017",
-  );
+  const selectedTheme = themes.find((t) => t.themeId === draft.themeId);
+  const themeColors = selectedTheme?.customizations as
+    | { colors?: { primary?: string; secondary?: string; accent?: string } }
+    | undefined;
+
+  const effectivePrimary = draft.colorOverride.primary || themeColors?.colors?.primary || "#d4a017";
+  const effectiveSecondary = draft.colorOverride.secondary || themeColors?.colors?.secondary || "#111827";
+  const effectiveAccent = draft.colorOverride.accent || themeColors?.colors?.accent || "#38bdf8";
+
+  const canGoLive = Boolean(merchant?.status === "Active" && draft.themeId && draft.name.trim());
 
   const moveSection = (targetSection: string) => {
     if (!draggedSection || draggedSection === targetSection) return;
     setDraft((prev) => {
-      const next = prev.sectionOrder.filter(
-        (section) => section !== draggedSection,
-      );
-      const targetIndex = next.indexOf(targetSection);
-      next.splice(targetIndex, 0, draggedSection);
+      const next = prev.sectionOrder.filter((s) => s !== draggedSection);
+      const idx = next.indexOf(targetSection);
+      next.splice(idx, 0, draggedSection);
       return { ...prev, sectionOrder: next };
     });
     setDraggedSection(null);
@@ -178,7 +178,7 @@ export default function ScreenBuilderPage() {
     });
   };
 
-  const buildLayoutPayload = (themeId: string) => ({
+  const buildPayload = (themeId: string) => ({
     layoutId: draft.layoutId || undefined,
     name: draft.name.trim(),
     screenSlug: draft.screenSlug.trim(),
@@ -188,38 +188,27 @@ export default function ScreenBuilderPage() {
     sidebar: {},
     footer: { ticker: "enabled" },
     widgets: draft.widgets,
-    styles: selectedTheme?.customizations || {},
+    styles: {
+      ...((selectedTheme?.customizations as Record<string, unknown>) || {}),
+      colorOverride: draft.colorOverride,
+      showLogo: draft.showLogo,
+      showName: draft.showName,
+    },
   });
 
   const save = async () => {
-    if (!draft.name.trim()) {
-      showMessage("Give your screen a name before saving.", "error");
-      setStep(1);
-      return;
-    }
+    if (!draft.name.trim()) { showMessage("Give your screen a name first.", "error"); setStep(1); return; }
     const themeId = draft.themeId || themes[0]?.themeId;
-    if (!themeId) {
-      showMessage("Install a theme first from Theme Marketplace.", "error");
-      setStep(2);
-      return;
-    }
-
+    if (!themeId) { showMessage("Install a theme from Theme Marketplace first.", "error"); setStep(2); return; }
     setSaving(true);
     try {
-      const saved = await marketplaceApi.saveLayout(
-        buildLayoutPayload(themeId),
-      );
+      const saved = await marketplaceApi.saveLayout(buildPayload(themeId));
       setDraft((prev) => ({ ...prev, layoutId: saved.layoutId, themeId }));
       await load();
-      showMessage(
-        "Draft saved. You can keep editing or go live when approved.",
-        "success",
-      );
+      showMessage("Draft saved successfully.", "success");
     } catch (err) {
       showMessage(err instanceof Error ? err.message : "Save failed", "error");
-    } finally {
-      setSaving(false);
-    }
+    } finally { setSaving(false); }
   };
 
   const publish = async () => {
@@ -232,481 +221,522 @@ export default function ScreenBuilderPage() {
       );
       return;
     }
-
     setSaving(true);
     try {
       let layoutId = draft.layoutId;
       if (!layoutId) {
-        const saved = await marketplaceApi.saveLayout(
-          buildLayoutPayload(draft.themeId),
-        );
+        const saved = await marketplaceApi.saveLayout(buildPayload(draft.themeId));
         layoutId = saved.layoutId;
       }
-      const assignedDevices = draft.assignedDevices
-        .split(",")
-        .map((item) => item.trim())
-        .filter(Boolean);
       const result = await marketplaceApi.publishLayout(layoutId, {
-        assignedDevices,
+        assignedDevices: draft.assignedDevices.split(",").map((d) => d.trim()).filter(Boolean),
       });
       setDraft((prev) => ({ ...prev, layoutId }));
-      showMessage(`Screen is live: ${result.liveUrl}`, "success");
+      showMessage(`🎉 Screen is live: ${result.liveUrl}`, "success");
       await load();
     } catch (err) {
-      showMessage(
-        err instanceof Error ? err.message : "Publish failed",
-        "error",
-      );
-    } finally {
-      setSaving(false);
-    }
+      showMessage(err instanceof Error ? err.message : "Publish failed", "error");
+    } finally { setSaving(false); }
   };
 
-  const previewScale = useMemo(
-    () => (previewSize === "3840x2160" ? "4K UHD" : "Full HD"),
-    [previewSize],
-  );
+  const inputClass =
+    "w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm text-slate-800 placeholder-slate-400 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all";
+
+  if (loading) return <DashboardShell><Loader /></DashboardShell>;
 
   return (
     <DashboardShell>
+      {/* Header */}
       <div className="mb-6 flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
         <div>
-          <h1 className="text-2xl font-semibold text-slate-900">
-            Screen Builder
-          </h1>
-          <p className="text-sm text-slate-600">
-            Set up your screen in four simple steps — save a draft anytime, go
-            live when ready.
+          <h1 className="text-2xl font-bold text-slate-900">Screen Builder</h1>
+          <p className="text-sm text-slate-500">
+            Build and publish your TV display in four steps.
           </p>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline" onClick={save} disabled={saving}>
-            {saving ? (
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-            ) : (
-              <Save className="mr-2 h-4 w-4" />
-            )}
+          <button
+            type="button"
+            onClick={save}
+            disabled={saving}
+            className="btn-secondary"
+          >
+            {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
             Save Draft
-          </Button>
-          <Button
+          </button>
+          <button
+            type="button"
             onClick={publish}
             disabled={!canGoLive || saving}
-            className="bg-emerald-600 hover:bg-emerald-700"
+            className="btn-primary"
           >
-            <Rocket className="mr-2 h-4 w-4" />
+            <Rocket className="h-4 w-4" />
             Go Live
-          </Button>
+          </button>
         </div>
       </div>
 
-      <div className="mb-6 flex flex-wrap gap-2">
-        {STEPS.map((item) => (
-          <button
-            key={item.id}
-            type="button"
-            onClick={() => setStep(item.id)}
-            className={`rounded-full px-4 py-2 text-sm font-medium transition-colors ${
-              step === item.id
-                ? "bg-blue-600 text-white"
-                : "bg-slate-100 text-slate-600 hover:bg-slate-200"
-            }`}
-          >
-            {item.id}. {item.label}
-          </button>
+      {/* Step Indicators */}
+      <div className="mb-6 flex items-center gap-0 overflow-x-auto rounded-2xl border border-slate-200 bg-slate-50/60 p-1">
+        {STEPS.map((s, i) => (
+          <React.Fragment key={s.id}>
+            <button
+              type="button"
+              onClick={() => setStep(s.id)}
+              className={`flex flex-1 items-center justify-center gap-2 rounded-xl px-3 py-2.5 text-sm font-semibold transition-all whitespace-nowrap ${
+                step === s.id
+                  ? "bg-white text-blue-700 shadow-sm"
+                  : step > s.id
+                    ? "text-emerald-600"
+                    : "text-slate-400 hover:text-slate-700"
+              }`}
+            >
+              <span className={`flex h-6 w-6 items-center justify-center rounded-full text-xs font-bold ${
+                step === s.id ? "bg-blue-600 text-white" : step > s.id ? "bg-emerald-500 text-white" : "bg-slate-200 text-slate-500"
+              }`}>
+                {step > s.id ? <Check className="h-3 w-3" /> : s.id}
+              </span>
+              <span className="hidden sm:block">{s.label}</span>
+            </button>
+          </React.Fragment>
         ))}
       </div>
 
+      {/* Message */}
       {message && (
-        <div
-          className={`mb-4 rounded-lg border p-3 text-sm ${
-            messageType === "success"
-              ? "border-emerald-200 bg-emerald-50 text-emerald-800"
-              : messageType === "error"
-                ? "border-red-200 bg-red-50 text-red-800"
-                : "border-slate-200 bg-slate-50 text-slate-700"
-          }`}
-        >
+        <div className={`mb-4 flex items-start gap-2 rounded-xl border p-3 text-sm ${
+          messageType === "success" ? "border-emerald-200 bg-emerald-50 text-emerald-800"
+          : messageType === "error" ? "border-red-200 bg-red-50 text-red-800"
+          : "border-slate-200 bg-slate-50 text-slate-700"
+        }`}>
+          {messageType === "success" ? <CheckCircle2 className="h-4 w-4 mt-0.5 flex-shrink-0" />
+          : messageType === "error" ? <XCircle className="h-4 w-4 mt-0.5 flex-shrink-0" /> : null}
           {message}
         </div>
       )}
 
-      {loading ? (
-        <Loader />
-      ) : (
-        <div className="grid gap-6 xl:grid-cols-[360px_1fr]">
-          <aside className="rounded-lg border border-slate-200 p-5">
-            {step === 1 && (
-              <div className="grid gap-4">
-                <h2 className="text-sm font-semibold text-slate-800">
-                  Screen details
-                </h2>
-                <Input
-                  placeholder="Screen name"
-                  value={draft.name}
-                  onChange={(e) => setDraft({ ...draft, name: e.target.value })}
-                />
-                <Input
-                  placeholder="URL slug (e.g. main)"
-                  value={draft.screenSlug}
-                  onChange={(e) =>
-                    setDraft({ ...draft, screenSlug: e.target.value })
-                  }
-                />
-                <select
-                  className="h-10 rounded-md border border-slate-200 px-3 text-sm"
-                  value={draft.selectedLayout}
-                  onChange={(e) =>
-                    setDraft({ ...draft, selectedLayout: e.target.value })
-                  }
-                >
-                  {LAYOUTS.map((layout) => (
-                    <option key={layout}>{layout}</option>
-                  ))}
-                </select>
-                <Input
-                  placeholder="Devices to assign (comma separated)"
-                  value={draft.assignedDevices}
-                  onChange={(e) =>
-                    setDraft({ ...draft, assignedDevices: e.target.value })
-                  }
-                />
-                <Button type="button" onClick={() => setStep(2)}>
-                  Next: Choose theme
-                </Button>
+      <div className="grid gap-6 xl:grid-cols-[380px_1fr]">
+        {/* Left Panel */}
+        <aside className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+          {/* STEP 1 */}
+          {step === 1 && (
+            <div className="space-y-4">
+              <h2 className="font-bold text-slate-800">Screen Details</h2>
+              <div>
+                <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-500">Screen Name</label>
+                <input className={inputClass} placeholder="e.g. Main Showroom" value={draft.name} onChange={(e) => setDraft({ ...draft, name: e.target.value })} />
               </div>
-            )}
-
-            {step === 2 && (
-              <div className="grid gap-4">
-                <h2 className="text-sm font-semibold text-slate-800">
-                  Installed theme
-                </h2>
-                {themes.length === 0 ? (
-                  <div className="rounded-lg border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900">
-                    No theme installed yet.{" "}
-                    <Link
-                      href="/dashboard/theme-marketplace"
-                      className="font-medium underline"
+              <div>
+                <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-500">URL Slug</label>
+                <input className={inputClass} placeholder="main" value={draft.screenSlug} onChange={(e) => setDraft({ ...draft, screenSlug: e.target.value })} />
+              </div>
+              <div>
+                <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-500">Layout Style</label>
+                <div className="grid grid-cols-2 gap-2">
+                  {LAYOUTS.map((l) => (
+                    <button
+                      key={l.id}
+                      type="button"
+                      onClick={() => setDraft({ ...draft, selectedLayout: l.id })}
+                      className={`rounded-xl border-2 p-3 text-left text-xs font-semibold transition-all ${
+                        draft.selectedLayout === l.id
+                          ? "border-blue-500 bg-blue-50 text-blue-700"
+                          : "border-slate-200 text-slate-600 hover:border-slate-300"
+                      }`}
                     >
-                      Pick one from Theme Marketplace
-                    </Link>
-                  </div>
-                ) : (
-                  <select
-                    className="h-10 rounded-md border border-slate-200 px-3 text-sm"
-                    value={draft.themeId}
-                    onChange={(e) =>
-                      setDraft({ ...draft, themeId: e.target.value })
-                    }
-                  >
-                    {themes.map((theme) => (
-                      <option key={theme._id} value={theme.themeId}>
-                        {theme.name}
-                      </option>
-                    ))}
-                  </select>
-                )}
-                <div className="flex gap-2">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={() => setStep(1)}
-                  >
-                    Back
-                  </Button>
-                  <Button
-                    type="button"
-                    onClick={() => setStep(3)}
-                    disabled={!draft.themeId && themes.length === 0}
-                  >
-                    Next: Arrange sections
-                  </Button>
+                      {l.label}
+                    </button>
+                  ))}
                 </div>
               </div>
-            )}
-
-            {step === 3 && (
               <div>
-                <h2 className="mb-2 text-sm font-semibold text-slate-800">
-                  Drag to reorder sections
-                </h2>
-                <p className="mb-4 text-xs text-slate-500">
-                  Drag rows or use arrows. Order updates the TV preview
-                  instantly.
-                </p>
-                <div className="mb-5 grid gap-2">
-                  {draft.sectionOrder.map((sectionId, index) => {
-                    const section = SECTIONS.find(
-                      (item) => item.id === sectionId,
+                <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-500">Assigned Devices</label>
+                <input className={inputClass} placeholder="TV 1, TV 2" value={draft.assignedDevices} onChange={(e) => setDraft({ ...draft, assignedDevices: e.target.value })} />
+              </div>
+              <button type="button" onClick={() => setStep(2)} className="btn-primary w-full">
+                Next: Choose Theme <ArrowRight className="h-4 w-4" />
+              </button>
+            </div>
+          )}
+
+          {/* STEP 2 */}
+          {step === 2 && (
+            <div className="space-y-4">
+              <h2 className="font-bold text-slate-800">Select Theme</h2>
+              {themes.length === 0 ? (
+                <div className="rounded-xl border border-blue-200 bg-blue-50/50 p-4 text-sm text-blue-900">
+                  No themes installed.{" "}
+                  <Link href="/dashboard/theme-marketplace" className="font-semibold underline">
+                    Browse Theme Marketplace →
+                  </Link>
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  {themes.map((theme) => {
+                    const colors = (theme.customizations as any)?.colors;
+                    const isSelected = draft.themeId === theme.themeId;
+                    return (
+                      <button
+                        key={theme._id}
+                        type="button"
+                        onClick={() => setDraft({ ...draft, themeId: theme.themeId })}
+                        className={`w-full flex items-center gap-3 rounded-xl border-2 p-3 text-left transition-all ${
+                          isSelected ? "border-blue-500 bg-blue-50/50" : "border-slate-100 hover:border-slate-200"
+                        }`}
+                      >
+                        <div className="h-10 w-16 rounded-lg overflow-hidden flex-shrink-0 flex items-center justify-center" style={{ background: colors?.secondary || "#111827" }}>
+                          <span className="text-[8px] font-bold" style={{ color: colors?.primary || "#d4a017" }}>
+                            {theme.name.slice(0, 8)}
+                          </span>
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-semibold text-slate-800 truncate">{theme.name}</p>
+                          <p className="text-xs text-slate-500 truncate">{theme.category}</p>
+                          <div className="mt-1 flex gap-1">
+                            {Object.values(colors || {}).slice(0, 3).map((c: any, i) => (
+                              <div key={i} className="h-2.5 w-2.5 rounded-full border border-white/50" style={{ background: c }} />
+                            ))}
+                          </div>
+                        </div>
+                        {isSelected && <Check className="h-4 w-4 text-blue-500 flex-shrink-0" />}
+                      </button>
                     );
+                  })}
+                </div>
+              )}
+              <div className="flex gap-2 pt-2">
+                <button type="button" onClick={() => setStep(1)} className="btn-secondary">
+                  <ArrowLeft className="h-4 w-4" /> Back
+                </button>
+                <button type="button" onClick={() => setStep(3)} disabled={!draft.themeId && themes.length === 0} className="btn-primary flex-1">
+                  Next: Customize <ArrowRight className="h-4 w-4" />
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* STEP 3 */}
+          {step === 3 && (
+            <div className="space-y-5">
+              <h2 className="font-bold text-slate-800">Customize</h2>
+
+              {/* Sections Order */}
+              <div>
+                <h3 className="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-500">Section Order</h3>
+                <div className="space-y-1.5">
+                  {draft.sectionOrder.map((sId, index) => {
+                    const section = SECTIONS.find((s) => s.id === sId);
                     if (!section) return null;
-                    const isDragging = draggedSection === section.id;
                     return (
                       <div
                         key={section.id}
                         draggable
                         onDragStart={() => setDraggedSection(section.id)}
-                        onDragOver={(event) => event.preventDefault()}
+                        onDragOver={(e) => e.preventDefault()}
                         onDrop={() => moveSection(section.id)}
                         onDragEnd={() => setDraggedSection(null)}
-                        className={`flex items-center gap-2 rounded-lg border px-3 py-2 text-sm transition-all ${
-                          isDragging
-                            ? "border-blue-400 bg-blue-50 opacity-70"
-                            : "border-slate-200 bg-white text-slate-700"
+                        className={`flex items-center gap-2 rounded-xl border px-3 py-2 text-sm transition-all ${
+                          draggedSection === section.id ? "border-blue-500 bg-blue-50 opacity-70" : "border-slate-200 bg-white text-slate-700"
                         }`}
                       >
-                        <GripVertical className="h-4 w-4 shrink-0 cursor-grab text-slate-400" />
+                        <GripVertical className="h-4 w-4 cursor-grab text-slate-300" />
                         <span className="flex-1">{section.label}</span>
-                        <button
-                          type="button"
-                          className="rounded p-1 hover:bg-slate-100"
-                          onClick={() => shiftSection(section.id, -1)}
-                          disabled={index === 0}
-                          aria-label="Move up"
-                        >
-                          <ArrowUp className="h-4 w-4" />
+                        <button type="button" onClick={() => shiftSection(section.id, -1)} disabled={index === 0} className="rounded p-0.5 hover:bg-slate-100 disabled:opacity-30">
+                          <ArrowUp className="h-3.5 w-3.5" />
                         </button>
-                        <button
-                          type="button"
-                          className="rounded p-1 hover:bg-slate-100"
-                          onClick={() => shiftSection(section.id, 1)}
-                          disabled={index === draft.sectionOrder.length - 1}
-                          aria-label="Move down"
-                        >
-                          <ArrowDown className="h-4 w-4" />
+                        <button type="button" onClick={() => shiftSection(section.id, 1)} disabled={index === draft.sectionOrder.length - 1} className="rounded p-0.5 hover:bg-slate-100 disabled:opacity-30">
+                          <ArrowDown className="h-3.5 w-3.5" />
                         </button>
                       </div>
                     );
                   })}
                 </div>
-                <h2 className="mb-3 text-sm font-semibold text-slate-800">
-                  Widgets on screen
-                </h2>
-                <div className="mb-4 grid gap-2">
-                  {WIDGETS.map((widget) => (
-                    <label
-                      key={widget}
-                      className="flex items-center gap-2 text-sm text-slate-700"
-                    >
-                      <Checkbox
-                        checked={draft.widgets.includes(widget)}
-                        onCheckedChange={(checked) =>
+              </div>
+
+              {/* Widgets */}
+              <div>
+                <h3 className="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-500">Active Widgets</h3>
+                <div className="grid grid-cols-2 gap-1.5">
+                  {WIDGETS.map((w) => {
+                    const active = draft.widgets.includes(w);
+                    return (
+                      <button
+                        key={w}
+                        type="button"
+                        onClick={() =>
                           setDraft((prev) => ({
                             ...prev,
-                            widgets: checked
-                              ? [...prev.widgets, widget]
-                              : prev.widgets.filter((item) => item !== widget),
+                            widgets: active ? prev.widgets.filter((x) => x !== w) : [...prev.widgets, w],
                           }))
                         }
+                        className={`flex items-center gap-1.5 rounded-lg border px-2.5 py-1.5 text-xs font-semibold transition-all ${
+                          active ? "border-blue-300 bg-blue-50 text-blue-700" : "border-slate-200 text-slate-500 hover:border-slate-300"
+                        }`}
+                      >
+                        <span className={`h-2 w-2 rounded-full ${active ? "bg-blue-600" : "bg-slate-300"}`} />
+                        {w}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Color Overrides */}
+              <div>
+                <h3 className="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-500">Color Overrides</h3>
+                <div className="space-y-2">
+                  {[
+                    { key: "primary", label: "Primary" },
+                    { key: "secondary", label: "Background" },
+                    { key: "accent", label: "Accent" },
+                  ].map((c) => (
+                    <div key={c.key} className="flex items-center gap-3">
+                      <input
+                        type="color"
+                        value={(draft.colorOverride as any)[c.key] || (themeColors?.colors as any)?.[c.key] || "#ffffff"}
+                        onChange={(e) =>
+                          setDraft((prev) => ({
+                            ...prev,
+                            colorOverride: { ...prev.colorOverride, [c.key]: e.target.value },
+                          }))
+                        }
+                        className="h-8 w-8 rounded-lg border border-slate-200 cursor-pointer p-0.5"
                       />
-                      {widget}
+                      <span className="text-xs font-medium text-slate-600 flex-1">{c.label}</span>
+                      {(draft.colorOverride as any)[c.key] && (
+                        <button
+                          type="button"
+                          onClick={() => setDraft((prev) => ({ ...prev, colorOverride: { ...prev.colorOverride, [c.key]: "" } }))}
+                          className="text-[10px] text-slate-400 hover:text-red-400"
+                        >
+                          Reset
+                        </button>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Visibility */}
+              <div>
+                <h3 className="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-500">Visibility</h3>
+                <div className="space-y-2">
+                  {[
+                    { key: "showLogo", label: "Show Company Logo" },
+                    { key: "showName", label: "Show Company Name" },
+                  ].map((v) => (
+                    <label key={v.key} className="flex cursor-pointer items-center justify-between rounded-xl border border-slate-100 bg-slate-50 px-3 py-2">
+                      <span className="text-sm text-slate-700">{v.label}</span>
+                      <button
+                        type="button"
+                        role="switch"
+                        aria-checked={(draft as any)[v.key]}
+                        onClick={() => setDraft((prev) => ({ ...prev, [v.key]: !(prev as any)[v.key] }))}
+                        className={`relative h-5 w-9 rounded-full transition-all ${(draft as any)[v.key] ? "bg-blue-600" : "bg-slate-300"}`}
+                      >
+                        <span className={`absolute top-0.5 h-4 w-4 rounded-full bg-white shadow transition-all ${(draft as any)[v.key] ? "left-4" : "left-0.5"}`} />
+                      </button>
                     </label>
                   ))}
                 </div>
-                <div className="flex gap-2">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={() => setStep(2)}
-                  >
-                    Back
-                  </Button>
-                  <Button type="button" onClick={() => setStep(4)}>
-                    Next: Preview
-                  </Button>
-                </div>
               </div>
-            )}
 
-            {step === 4 && (
-              <div className="grid gap-4">
-                <h2 className="text-sm font-semibold text-slate-800">
-                  Preview resolution
-                </h2>
-                <div className="flex gap-2">
-                  {(["1920x1080", "3840x2160"] as const).map((size) => (
-                    <Button
-                      key={size}
-                      type="button"
-                      variant={previewSize === size ? "default" : "outline"}
-                      onClick={() => setPreviewSize(size)}
-                    >
-                      {size}
-                    </Button>
-                  ))}
-                </div>
-                <div className="rounded-lg border border-slate-200 bg-slate-50 p-4 text-sm text-slate-600">
-                  <p className="font-medium text-slate-800">
-                    Ready to publish?
-                  </p>
-                  <ul className="mt-2 space-y-1">
-                    <li className="flex items-center gap-2">
-                      <CheckCircle2
-                        className={`h-4 w-4 ${draft.name ? "text-emerald-500" : "text-slate-300"}`}
-                      />
-                      Screen name set
-                    </li>
-                    <li className="flex items-center gap-2">
-                      <CheckCircle2
-                        className={`h-4 w-4 ${draft.themeId ? "text-emerald-500" : "text-slate-300"}`}
-                      />
-                      Theme selected
-                    </li>
-                    <li className="flex items-center gap-2">
-                      <CheckCircle2
-                        className={`h-4 w-4 ${merchant?.status === "Active" ? "text-emerald-500" : "text-slate-300"}`}
-                      />
-                      Merchant approved (required for Go Live)
-                    </li>
-                  </ul>
-                </div>
-                <div className="flex gap-2">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={() => setStep(3)}
-                  >
-                    Back
-                  </Button>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={save}
-                    disabled={saving}
-                  >
-                    Save Draft
-                  </Button>
-                </div>
-              </div>
-            )}
-          </aside>
-
-          <section className="rounded-lg border border-slate-200 p-5">
-            <div className="mb-4 flex items-center justify-between">
-              <div className="flex items-center gap-2 font-semibold text-slate-900">
-                <Monitor className="h-5 w-5" />
-                TV Preview
-              </div>
-              <div className="text-sm text-slate-500">{previewScale}</div>
-            </div>
-            <div className="aspect-video overflow-hidden rounded-lg bg-slate-950 p-6 text-white">
-              <div className="flex h-full flex-col">
-                {draft.sectionOrder.map((sectionId) => {
-                  if (sectionId === "header") {
-                    return (
-                      <div
-                        key={sectionId}
-                        className="flex items-start justify-between"
-                      >
-                        <div>
-                          <div
-                            className="text-2xl font-bold"
-                            style={{ color: primaryColor }}
-                          >
-                            {merchant?.companyName || "Your Company"}
-                          </div>
-                          <div className="text-sm text-slate-300">
-                            {draft.selectedLayout} ·{" "}
-                            {selectedTheme?.name || "No theme"}
-                          </div>
-                        </div>
-                        {draft.widgets.includes("Clock") && (
-                          <div className="rounded bg-white/10 px-3 py-2 text-sm">
-                            <LiveClock />
-                          </div>
-                        )}
-                      </div>
-                    );
-                  }
-                  if (
-                    sectionId === "spotRates" &&
-                    draft.widgets.includes("Spot Rates")
-                  ) {
-                    return (
-                      <div
-                        key={sectionId}
-                        className="my-4 rounded-lg border border-white/10 bg-white/5 p-4"
-                      >
-                        <div className="text-sm text-slate-300">
-                          GOLD BID / ASK
-                        </div>
-                        <div className="mt-2 text-3xl font-bold">1,234.00</div>
-                      </div>
-                    );
-                  }
-                  if (
-                    sectionId === "commodities" &&
-                    draft.widgets.includes("Commodity Table")
-                  ) {
-                    return (
-                      <div
-                        key={sectionId}
-                        className="my-4 rounded-lg border border-white/10 bg-white/5 p-4"
-                      >
-                        <div className="text-sm text-slate-300">
-                          COMMODITIES
-                        </div>
-                        <div className="mt-2 space-y-2 text-sm">
-                          <div>Gold Bar 999 · BUY 54671 · SELL 54691</div>
-                          <div>Silver Bar 999 · BUY 3420 · SELL 3440</div>
-                        </div>
-                      </div>
-                    );
-                  }
-                  if (sectionId === "news" && draft.widgets.includes("News")) {
-                    return (
-                      <div
-                        key={sectionId}
-                        className="mt-auto rounded bg-amber-400 px-4 py-2 text-sm font-semibold text-slate-950"
-                      >
-                        Market updates and merchant announcements scroll here
-                      </div>
-                    );
-                  }
-                  return null;
-                })}
+              <div className="flex gap-2 pt-1">
+                <button type="button" onClick={() => setStep(2)} className="btn-secondary">
+                  <ArrowLeft className="h-4 w-4" /> Back
+                </button>
+                <button type="button" onClick={() => setStep(4)} className="btn-primary flex-1">
+                  Preview <ArrowRight className="h-4 w-4" />
+                </button>
               </div>
             </div>
+          )}
 
-            {layouts.length > 0 && (
-              <div className="mt-6">
-                <h2 className="mb-3 font-semibold text-slate-900">
-                  Saved drafts
-                </h2>
-                <div className="grid gap-3">
-                  {layouts.map((layout) => (
+          {/* STEP 4 */}
+          {step === 4 && (
+            <div className="space-y-4">
+              <h2 className="font-bold text-slate-800">Preview & Publish</h2>
+
+              {/* Resolution Toggle */}
+              <div>
+                <h3 className="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-500">Resolution</h3>
+                <div className="flex gap-2">
+                  {(["1920x1080", "3840x2160"] as const).map((res) => (
                     <button
-                      key={layout.layoutId}
+                      key={res}
                       type="button"
-                      className="rounded-lg border border-slate-200 p-3 text-left text-sm hover:bg-slate-50"
-                      onClick={() =>
-                        setDraft((prev) => ({
-                          ...prev,
-                          layoutId: layout.layoutId,
-                          name: layout.name,
-                          screenSlug: layout.screenSlug,
-                          themeId: layout.themeId || prev.themeId,
-                          widgets: layout.widgets?.length
-                            ? layout.widgets
-                            : prev.widgets,
-                          sectionOrder:
-                            (layout.body as { sectionOrder?: string[] })
-                              ?.sectionOrder || prev.sectionOrder,
-                        }))
-                      }
+                      onClick={() => setPreviewSize(res)}
+                      className={`flex-1 rounded-xl border-2 py-2 text-xs font-bold transition-all ${
+                        previewSize === res ? "border-blue-500 bg-blue-50 text-blue-700" : "border-slate-200 text-slate-500 hover:border-slate-300"
+                      }`}
                     >
-                      <span className="font-semibold">{layout.name}</span>
-                      <span className="ml-2 text-slate-500">
-                        {layout.status} · /{layout.screenSlug}
-                      </span>
+                      {res === "1920x1080" ? "Full HD" : "4K UHD"}
                     </button>
                   ))}
                 </div>
               </div>
-            )}
-          </section>
-        </div>
-      )}
+
+              {/* Publish Checklist */}
+              <div className="rounded-xl border border-slate-200 bg-slate-50/60 p-4 space-y-2">
+                <p className="text-sm font-semibold text-slate-800 mb-3">Publish Checklist</p>
+                {[
+                  { label: "Screen name set", done: Boolean(draft.name.trim()) },
+                  { label: "Theme selected", done: Boolean(draft.themeId) },
+                  { label: "Merchant approved", done: merchant?.status === "Active" },
+                ].map((item) => (
+                  <div key={item.label} className="flex items-center gap-2 text-sm">
+                    {item.done ? (
+                      <CheckCircle2 className="h-4 w-4 text-emerald-500 flex-shrink-0" />
+                    ) : (
+                      <XCircle className="h-4 w-4 text-slate-300 flex-shrink-0" />
+                    )}
+                    <span className={item.done ? "text-slate-700" : "text-slate-400"}>
+                      {item.label}
+                    </span>
+                  </div>
+                ))}
+              </div>
+
+              <div className="flex gap-2">
+                <button type="button" onClick={() => setStep(3)} className="btn-secondary">
+                  <ArrowLeft className="h-4 w-4" /> Back
+                </button>
+                <button type="button" onClick={save} disabled={saving} className="btn-secondary flex-1">
+                  <Save className="h-4 w-4" /> Save Draft
+                </button>
+              </div>
+            </div>
+          )}
+        </aside>
+
+        {/* Right: TV Preview */}
+        <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+          <div className="mb-4 flex items-center justify-between">
+            <div className="flex items-center gap-2 font-bold text-slate-900">
+              <Monitor className="h-5 w-5 text-blue-600" />
+              Live TV Preview
+            </div>
+            <div className="text-xs font-semibold text-slate-400 uppercase tracking-wide">
+              {previewSize === "1920x1080" ? "Full HD · 1080p" : "4K UHD · 2160p"}
+            </div>
+          </div>
+
+          {/* TV Screen */}
+          <div
+            className="aspect-video overflow-hidden rounded-2xl p-5 text-white shadow-inner"
+            style={{ background: effectiveSecondary }}
+          >
+            <div className="flex h-full flex-col gap-3">
+              {draft.sectionOrder.map((sectionId) => {
+                if (sectionId === "header") {
+                  return (
+                    <div key={sectionId} className="flex items-start justify-between">
+                      <div>
+                        {draft.showName && (
+                          <div className="text-2xl font-bold" style={{ color: effectivePrimary }}>
+                            {merchant?.companyName || "Your Company"}
+                          </div>
+                        )}
+                        <div className="text-sm opacity-60">
+                          {draft.selectedLayout} · {selectedTheme?.name || "No theme"}
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        {draft.widgets.includes("Clock") && (
+                          <div className="rounded-lg px-3 py-1.5 text-sm" style={{ background: `${effectivePrimary}22` }}>
+                            <LiveClock />
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  );
+                }
+                if (sectionId === "spotRates" && draft.widgets.includes("Spot Rates")) {
+                  return (
+                    <div key={sectionId} className="grid grid-cols-2 gap-3">
+                      {[
+                        { label: "GOLD", bid: "2,345.60", ask: "2,346.10", color: effectivePrimary },
+                        { label: "SILVER", bid: "28.40", ask: "28.45", color: effectiveAccent },
+                      ].map((metal) => (
+                        <div key={metal.label} className="rounded-xl p-4" style={{ background: `${metal.color}15`, borderLeft: `3px solid ${metal.color}` }}>
+                          <div className="text-xs font-bold mb-1" style={{ color: metal.color }}>{metal.label}</div>
+                          <div className="text-2xl font-bold">{metal.bid}</div>
+                          <div className="text-xs opacity-50">ASK: {metal.ask}</div>
+                        </div>
+                      ))}
+                    </div>
+                  );
+                }
+                if (sectionId === "commodities" && draft.widgets.includes("Commodity Table")) {
+                  return (
+                    <div key={sectionId} className="rounded-xl p-4" style={{ background: "rgba(255,255,255,0.05)" }}>
+                      <div className="text-xs font-bold mb-2 opacity-60">COMMODITIES</div>
+                      <div className="space-y-1.5 text-sm">
+                        {[
+                          ["Gold Bar 999", "1g", "224.80", "225.20"],
+                          ["Gold Coin", "8g", "182.40", "183.00"],
+                        ].map(([name, wt, buy, sell]) => (
+                          <div key={name} className="grid grid-cols-4 gap-2 py-1" style={{ borderTop: `1px solid ${effectivePrimary}20` }}>
+                            <span className="col-span-1 opacity-80">{name}</span>
+                            <span className="opacity-50">{wt}</span>
+                            <span style={{ color: effectivePrimary }}>{buy}</span>
+                            <span style={{ color: effectiveAccent }}>{sell}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  );
+                }
+                if (sectionId === "news" && draft.widgets.includes("News")) {
+                  return (
+                    <div key={sectionId} className="mt-auto rounded-lg px-4 py-2 text-sm font-semibold" style={{ background: effectivePrimary, color: effectiveSecondary }}>
+                      📢 Market update · Gold prices rally · Special offers available
+                    </div>
+                  );
+                }
+                return null;
+              })}
+            </div>
+          </div>
+
+          {/* Saved Drafts */}
+          {layouts.length > 0 && (
+            <div className="mt-5">
+              <h3 className="mb-3 text-sm font-bold text-slate-800">Saved Drafts</h3>
+              <div className="space-y-2">
+                {layouts.map((layout) => (
+                  <button
+                    key={layout.layoutId}
+                    type="button"
+                    onClick={() =>
+                      setDraft((prev) => ({
+                        ...prev,
+                        layoutId: layout.layoutId,
+                        name: layout.name,
+                        screenSlug: layout.screenSlug,
+                        themeId: layout.themeId || prev.themeId,
+                        widgets: layout.widgets?.length ? layout.widgets : prev.widgets,
+                        sectionOrder: (layout.body as any)?.sectionOrder || prev.sectionOrder,
+                      }))
+                    }
+                    className="w-full flex items-center justify-between rounded-xl border border-slate-100 bg-slate-50 px-4 py-2.5 text-left hover:border-blue-200 hover:bg-blue-50/30 transition-all"
+                  >
+                    <div>
+                      <span className="text-sm font-semibold text-slate-800">{layout.name}</span>
+                      <span className="ml-2 text-xs text-slate-400">/{layout.screenSlug}</span>
+                    </div>
+                    <span className={`rounded-full px-2 py-0.5 text-[10px] font-bold uppercase ${
+                      layout.status === "published" ? "bg-emerald-100 text-emerald-700" : "bg-slate-100 text-slate-500"
+                    }`}>
+                      {layout.status}
+                    </span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+        </section>
+      </div>
     </DashboardShell>
   );
 }

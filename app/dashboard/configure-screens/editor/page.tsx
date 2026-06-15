@@ -1167,7 +1167,7 @@ function TemplateEditorInner() {
             {/* ── CONTENT TAB ── */}
             {rightTab === "content" && (
               <>
-                <PanelSection title="Company Logo" icon={<ImageIcon style={{ width: 13, height: 13 }} />} accent="#f59e0b" defaultOpen>
+                <PanelSection title="Company Logo" icon={<ImageIcon style={{ width: 13, height: 13 }} />} defaultOpen>
                   <div style={{ padding: "8px 0 4px" }}>
                     <LogoZone logoUrl={config.logoUrl} onClick={() => logoInputRef.current?.click()} />
                     <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "10px 16px 6px" }}>
@@ -1180,7 +1180,7 @@ function TemplateEditorInner() {
                   </div>
                 </PanelSection>
 
-                <PanelSection title="Company Info" icon={<Building2 style={{ width: 13, height: 13 }} />} accent="#f59e0b" defaultOpen>
+                <PanelSection title="Company Info" icon={<Building2 style={{ width: 13, height: 13 }} />} defaultOpen>
                   <div style={{ padding: "8px 0 4px" }}>
                     <LightInput label="Company Name" value={config.companyName} onChange={(v) => update("companyName", v)} placeholder="e.g. KESHAV BULLION" />
                     <LightInput label="Tagline" value={config.companyTagline} onChange={(v) => update("companyTagline", v)} placeholder="e.g. THE GOLD TRADING L.L.C" />
@@ -1195,14 +1195,14 @@ function TemplateEditorInner() {
                   </div>
                 </PanelSection>
 
-                <PanelSection title="Spot Rate" icon={<BarChart2 style={{ width: 13, height: 13 }} />} accent="#f59e0b">
+                <PanelSection title="Spot Rate" icon={<BarChart2 style={{ width: 13, height: 13 }} />}>
                   <div style={{ paddingBottom: 4 }}>
                     <CheckRow label="GOLD" checked={config.showGold} onChange={(v) => update("showGold", v)} />
                     <CheckRow label="SILVER" checked={config.showSilver} onChange={(v) => update("showSilver", v)} />
                   </div>
                 </PanelSection>
 
-                <PanelSection title="Commodities" icon={<Layers style={{ width: 13, height: 13 }} />} accent="#8b5cf6">
+                <PanelSection title="Commodities" icon={<Layers style={{ width: 13, height: 13 }} />}>
                   <div style={{ padding: "8px 0 4px" }}>
                     <div style={{ display: "flex", justifyContent: "space-between", padding: "4px 16px 12px", alignItems: "center" }}>
                       <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 6 }}>
@@ -1233,7 +1233,7 @@ function TemplateEditorInner() {
                   </div>
                 </PanelSection>
 
-                <PanelSection title="News Ticker" icon={<Newspaper style={{ width: 13, height: 13 }} />} accent="#ef4444">
+                <PanelSection title="News Ticker" icon={<Newspaper style={{ width: 13, height: 13 }} />}>
                   <div style={{ padding: "8px 0 4px" }}>
                     <LightInput label="Headline" value={config.newsHeadline} onChange={(v) => update("newsHeadline", v)} placeholder="Headline" />
                     <div style={{ padding: "0 16px", marginBottom: 8 }}>
@@ -1243,14 +1243,14 @@ function TemplateEditorInner() {
                   </div>
                 </PanelSection>
 
-                <PanelSection title="YouTube Video" icon={<Youtube style={{ width: 13, height: 13 }} />} accent="#ef4444">
+                <PanelSection title="YouTube Video" icon={<Youtube style={{ width: 13, height: 13 }} />}>
                   <div style={{ padding: "8px 0 4px" }}>
                     <LightInput value={config.youtubeUrl} onChange={(v) => update("youtubeUrl", v)} placeholder="Paste YouTube video URL here" />
                   </div>
                 </PanelSection>
 
                 {/* ── World Clocks — flag image chips ── */}
-                <PanelSection title="World Clocks" icon={<Globe style={{ width: 13, height: 13 }} />} accent="#0ea5e9">
+                <PanelSection title="World Clocks" icon={<Globe style={{ width: 13, height: 13 }} />}>
                   <div style={{ padding: "6px 0 4px" }}>
                     <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "4px 16px 10px", borderBottom: "1px solid #f3f4f6" }}>
                       <span style={{ fontSize: 13, color: "#374151", fontWeight: 500 }}>Show Clocks</span>
@@ -1276,7 +1276,7 @@ function TemplateEditorInner() {
               <>
 
 
-                <PanelSection title="Colors & Font" icon={<Palette style={{ width: 13, height: 13 }} />} accent="#8b5cf6" defaultOpen>
+                <PanelSection title="Colors & Font" icon={<Palette style={{ width: 13, height: 13 }} />} defaultOpen>
                   <div style={{ padding: "6px 0 4px" }}>
                     <ColorAccordion title="General">
                       {/* ── Background Type Toggle ── */}

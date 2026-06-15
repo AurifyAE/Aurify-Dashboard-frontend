@@ -1,95 +1,113 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
-  DashboardSquare02Icon,
-  Chart01Icon,
-  Settings01Icon,
   Logout01Icon,
-  GoldIngotsIcon,
-  Computer,
-  ComputerSettingsIcon,
-  Building05Icon,
-  Store01Icon,
 } from "@hugeicons/core-free-icons";
 
 import { cn } from "@/lib/utils";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import Image from "next/image";
 import { useAuth } from "@/context/AuthContext";
 import type { UserRole } from "@/lib/auth";
-import { ArrowRight } from "lucide-react";
+import {
+  ArrowRight,
+  BarChart2,
+  Building2,
+  Crown,
+  GemIcon,
+  LayoutDashboard,
+  Megaphone,
+  Monitor,
+  MonitorPlay,
+  Newspaper,
+  Palette,
+  Rocket,
+  Settings2,
+  ShoppingBag,
+  Store,
+  Tv,
+} from "lucide-react";
+
+type LucideIcon = React.ComponentType<{ className?: string; size?: number }>;
 
 interface NavItem {
   title: string;
   href: string;
-  icon: typeof DashboardSquare02Icon;
+  icon: LucideIcon;
   badge?: string;
-  roles?: UserRole[]; // undefined = visible to all
+  roles?: UserRole[];
 }
 
 const navItems: NavItem[] = [
   {
     title: "Dashboard",
     href: "/dashboard",
-    icon: DashboardSquare02Icon,
+    icon: LayoutDashboard,
   },
   {
     title: "Spot Rate",
     href: "/dashboard/spotrate",
-    icon: Chart01Icon,
-  },
-  {
-    title: "Commodity",
-    href: "/dashboard/commodity",
-    icon: GoldIngotsIcon,
+    icon: BarChart2,
   },
   {
     title: "Screen Builder",
     href: "/dashboard/screen-builder",
-    icon: Computer,
+    icon: Tv,
   },
   {
     title: "Configure Screens",
     href: "/dashboard/configure-screens",
-    icon: ComputerSettingsIcon,
-    roles: ["super_admin", "admin", "user"], // hidden for plain 'user'
+    icon: Settings2,
+    roles: ["super_admin", "admin", "user"],
   },
   {
     title: "My Screens",
     href: "/dashboard/my-screens",
-    icon: Computer,
+    icon: Monitor,
+  },
+  {
+    title: "Theme Marketplace",
+    href: "/dashboard/theme-marketplace",
+    icon: Palette,
   },
   {
     title: "Marketplace",
     href: "/dashboard/marketplace",
-    icon: Store01Icon,
+    icon: Store,
+  },
+  {
+    title: "Commodities",
+    href: "/dashboard/merchant-commodities",
+    icon: ShoppingBag,
+  },
+  {
+    title: "News Management",
+    href: "/dashboard/news-management",
+    icon: Megaphone,
   },
   {
     title: "Profile",
     href: "/dashboard/merchant-profile",
-    icon: Building05Icon,
+    icon: Building2,
   },
 ];
+
 
 export default function Sidebar() {
   const pathname = usePathname();
   const { user, logout } = useAuth();
   const [isMobileOpen, setIsMobileOpen] = useState(false);
-  const [isHovered, setIsHovered] = useState(false);
 
-  // Filter nav items based on user role
   const visibleNavItems = navItems.filter((item) => {
-    if (!item.roles) return true; // visible to all
+    if (!item.roles) return true;
     if (!user) return false;
     return item.roles.includes(user.role);
   });
 
-  // Get initials for avatar fallback
   const getInitials = (name: string): string => {
     return name
       .split(" ")
@@ -138,7 +156,11 @@ export default function Sidebar() {
         {/* Navigation */}
         <nav className="flex-1 overflow-y-auto overflow-x-hidden p-4 space-y-1">
           {visibleNavItems.map((item) => {
-            const isActive = pathname === item.href;
+            const isActive =
+              item.href === "/dashboard"
+                ? pathname === "/dashboard"
+                : pathname.startsWith(item.href);
+            const IconComp = item.icon;
             return (
               <Link
                 key={item.href}
@@ -146,17 +168,12 @@ export default function Sidebar() {
                 onClick={() => setIsMobileOpen(false)}
                 className={`${"sidebarLink "} ${isActive ? "active custom_b_border" : ""}`}
               >
-                <HugeiconsIcon
-                  icon={item.icon}
-                  size={20}
-                  color="currentColor"
-                  strokeWidth={1.5}
-                  className={"icon"}
-                />
+                <IconComp className={"icon"} size={20} />
                 <span className={"title"}>{item.title}</span>
               </Link>
             );
           })}
+
         </nav>
 
         {/* Bottom — User info + Logout */}
@@ -215,26 +232,6 @@ export default function Sidebar() {
                         </span>
                       </div>
                     )}
-                  </div>
-                </div>
-
-                {/* Stat tiles */}
-                <div className="grid grid-cols-2 gap-1.5">
-                  <div className="bg-white/[0.02] border border-white/[0.06] rounded-lg px-2.5 py-2">
-                    <p className="text-[10px] text-white/30 uppercase tracking-widest">
-                      Last Login
-                    </p>
-                    <p className="text-[12px] font-medium text-white/65 mt-0.5">
-                      Today, 9:41 AM
-                    </p>
-                  </div>
-                  <div className="bg-white/[0.02] border border-white/[0.06] rounded-lg px-2.5 py-2">
-                    <p className="text-[10px] text-white/30 uppercase tracking-widest">
-                      Session
-                    </p>
-                    <p className="text-[12px] font-medium text-white/65 mt-0.5">
-                      2h 14m
-                    </p>
                   </div>
                 </div>
               </>

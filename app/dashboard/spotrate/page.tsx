@@ -117,13 +117,13 @@ function SpotRateContent() {
           <div className="flex justify-end gap-2 mb-3">
             <button
               onClick={() => setIsEditMode(false)}
-              className="bg-blue-400 text-white rounded-md px-3 py-1.5 text-sm cursor-pointer"
+              className="btn-primary"
             >
               Save
             </button>
             <button
               onClick={() => setIsEditMode(false)}
-              className="bg-red-500 text-white rounded-md px-3 py-1.5 text-sm cursor-pointer"
+              className="btn-secondary"
             >
               Cancel
             </button>
@@ -132,7 +132,7 @@ function SpotRateContent() {
 
         {/* BID Section */}
         <div className="rounded-lg mb-3 border-1 border-gray-200 overflow-hidden">
-          <div className="flex bg-blue-50 p-2.5 items-center justify-center relative">
+          <div className="flex bg-slate-50 p-2.5 items-center justify-center relative">
             <span className="text-[22px] font-bold text-slate-700">BID</span>
             {!isEditMode && (
               <Edit2
@@ -179,7 +179,7 @@ function SpotRateContent() {
 
         {/* ASK Section */}
         <div className="rounded-lg mb-3 border-1 border-gray-200 overflow-hidden">
-          <div className="flex bg-blue-50 p-2.5 items-center justify-center relative">
+          <div className="flex bg-slate-50 p-2.5 items-center justify-center relative">
             <span className="text-[22px] font-bold text-slate-700">ASK</span>
             {!isEditMode && (
               <Edit2
@@ -226,7 +226,7 @@ function SpotRateContent() {
 
         {/* LOW & HIGH VALUE Section */}
         <div className="rounded-lg mb-3 border-1 border-gray-200 overflow-hidden">
-          <div className="flex bg-blue-50 p-2.5 items-center justify-center relative">
+          <div className="flex bg-slate-50 p-2.5 items-center justify-center relative">
             <span className="text-[22px] font-bold text-slate-700">
               LOW &amp; HIGH VALUE
             </span>
