@@ -52,6 +52,7 @@ export interface ScreenLayout {
   body?: Record<string, unknown>;
   header?: Record<string, unknown>;
   footer?: Record<string, unknown>;
+  assignedDevices?: string[];
 }
 
 
@@ -148,6 +149,7 @@ export const marketplaceApi = {
       method: id ? "PATCH" : "POST",
       body: JSON.stringify(body),
     }),
+  allLiveScreens: () => request<any[]>("/screens/all"),
 };
 
 export async function fetchLiveScreen(merchantSlug: string, screenSlug = "main") {

@@ -54,35 +54,14 @@ const navItems: NavItem[] = [
     icon: BarChart2,
   },
   {
-    title: "Screen Builder",
-    href: "/dashboard/screen-builder",
-    icon: Tv,
-  },
-  {
-    title: "Configure Screens",
-    href: "/dashboard/configure-screens",
-    icon: Settings2,
-    roles: ["super_admin", "admin", "user"],
-  },
-  {
-    title: "My Screens",
-    href: "/dashboard/my-screens",
-    icon: Monitor,
-  },
-  {
-    title: "Theme Marketplace",
-    href: "/dashboard/theme-marketplace",
-    icon: Palette,
-  },
-  {
-    title: "Marketplace",
-    href: "/dashboard/marketplace",
-    icon: Store,
-  },
-  {
     title: "Commodities",
     href: "/dashboard/merchant-commodities",
     icon: ShoppingBag,
+  },
+  {
+    title: "Screens & Marketplace",
+    href: "/dashboard/screen-builder",
+    icon: Tv,
   },
   {
     title: "News Management",

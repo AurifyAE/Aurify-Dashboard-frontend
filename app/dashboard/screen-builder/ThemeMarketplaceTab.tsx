@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import DashboardShell from "@/components/dashboard/DashboardShell";
 import {
   marketplaceApi,
   type MarketplaceTheme,
@@ -13,8 +12,6 @@ import {
   Download,
   Loader2,
   Palette,
-  Sparkles,
-  Star,
 } from "lucide-react";
 
 const CATEGORIES = [
@@ -110,7 +107,11 @@ function MiniTVPreview({ theme }: { theme: MarketplaceTheme }) {
   );
 }
 
-export default function ThemeMarketplacePage() {
+interface ThemeMarketplaceTabProps {
+  onThemeInstalled?: () => void;
+}
+
+export default function ThemeMarketplaceTab({ onThemeInstalled }: ThemeMarketplaceTabProps) {
   const [themes, setThemes] = useState<MarketplaceTheme[]>([]);
   const [installed, setInstalled] = useState<MerchantTheme[]>([]);
   const [activeCategory, setActiveCategory] = useState("All");
@@ -142,7 +143,10 @@ export default function ThemeMarketplacePage() {
       await load();
       setMessage("Theme installed successfully into your merchant library.");
       setMessageType("success");
-    } catch (err) {
+      if (onThemeInstalled) {
+        onThemeInstalled();
+      }
+    } catch (err: any) {
       setMessage(err instanceof Error ? err.message : "Install failed");
       setMessageType("error");
     } finally {
@@ -155,14 +159,10 @@ export default function ThemeMarketplacePage() {
   );
 
   return (
-    <DashboardShell>
+    <div className="space-y-6">
       {/* Header */}
-      <div className="mb-6">
-        <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-widest text-blue-600 mb-1.5">
-          <Palette className="h-3.5 w-3.5" />
-          Theme Library
-        </div>
-        <h1 className="text-2xl font-bold text-slate-900">Theme Marketplace</h1>
+      <div>
+        <h2 className="text-xl font-bold text-slate-900">Theme Library & Marketplace</h2>
         <p className="mt-1 text-sm text-slate-500">
           Browse professional TV screen themes. Install any theme to your library
           — your customizations are always preserved.
@@ -172,7 +172,7 @@ export default function ThemeMarketplacePage() {
       {/* Message */}
       {message && (
         <div
-          className={`mb-5 flex items-center gap-2 rounded-xl border px-4 py-3 text-sm ${
+          className={`flex items-center gap-2 rounded-xl border px-4 py-3 text-sm ${
             messageType === "success"
               ? "border-emerald-200 bg-emerald-50 text-emerald-800"
               : "border-red-200 bg-red-50 text-red-800"
@@ -187,30 +187,24 @@ export default function ThemeMarketplacePage() {
 
       {/* Installed Banner */}
       {installed.length > 0 && (
-        <div className="mb-6 flex items-center gap-3 rounded-2xl border border-emerald-200 bg-emerald-50/60 px-5 py-3">
+        <div className="flex items-center gap-3 rounded-2xl border border-emerald-200 bg-emerald-50/60 px-5 py-3">
           <CheckCircle2 className="h-5 w-5 text-emerald-600 flex-shrink-0" />
           <p className="text-sm text-emerald-800">
             You have{" "}
             <strong>{installed.length} theme{installed.length > 1 ? "s" : ""}</strong>{" "}
-            installed.{" "}
-            <a
-              href="/dashboard/screen-builder"
-              className="font-semibold underline"
-            >
-              Open Screen Builder →
-            </a>
+            installed in your library.
           </p>
         </div>
       )}
 
       {/* Category Filter */}
-      <div className="mb-6 flex flex-wrap gap-2">
+      <div className="flex flex-wrap gap-2">
         {CATEGORIES.map((cat) => (
           <button
             key={cat}
             type="button"
             onClick={() => setActiveCategory(cat)}
-            className={`rounded-full px-4 py-1.5 text-sm font-semibold transition-all ${
+            className={`rounded-full px-4 py-1.5 text-sm font-semibold transition-all cursor-pointer ${
               activeCategory === cat
                 ? "bg-blue-600 text-white shadow-sm shadow-blue-600/10"
                 : "bg-slate-100 text-slate-600 hover:bg-slate-200"
@@ -244,7 +238,7 @@ export default function ThemeMarketplacePage() {
             return (
               <article
                 key={theme._id}
-                className={`group overflow-hidden rounded-2xl border transition-all hover:shadow-lg ${
+                className={`group overflow-hidden rounded-2xl border transition-all hover:shadow-lg bg-white ${
                   isInstalled
                     ? "border-emerald-200 shadow-sm shadow-emerald-100"
                     : "border-slate-200 hover:border-slate-300"
@@ -314,7 +308,7 @@ export default function ThemeMarketplacePage() {
                     className={
                       isInstalled
                         ? "flex h-10 w-full items-center justify-center gap-2 rounded-xl border border-slate-200 bg-slate-50 text-slate-400 cursor-default text-sm font-semibold"
-                        : "btn-primary w-full"
+                        : "btn-primary w-full cursor-pointer"
                     }
                   >
                     {isInstalling ? (
@@ -340,6 +334,6 @@ export default function ThemeMarketplacePage() {
           })}
         </div>
       )}
-    </DashboardShell>
+    </div>
   );
 }

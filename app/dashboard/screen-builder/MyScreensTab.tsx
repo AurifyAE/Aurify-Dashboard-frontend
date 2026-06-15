@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import DashboardShell from "@/components/dashboard/DashboardShell";
 import { marketplaceApi, type ScreenLayout } from "@/lib/api/marketplace";
 import {
   Check,
@@ -13,7 +12,11 @@ import {
   Plus,
   Rocket,
 } from "lucide-react";
-import Link from "next/link";
+
+interface MyScreensTabProps {
+  onEditLayout: (layoutId: string) => void;
+  onCreateNew: () => void;
+}
 
 function MiniScreenPreview({
   primaryColor = "#d4a017",
@@ -84,18 +87,23 @@ function MiniScreenPreview({
   );
 }
 
-export default function MyScreensPage() {
+export default function MyScreensTab({ onEditLayout, onCreateNew }: MyScreensTabProps) {
   const [layouts, setLayouts] = useState<ScreenLayout[]>([]);
   const [loading, setLoading] = useState(true);
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [error, setError] = useState("");
 
-  useEffect(() => {
+  const load = () => {
+    setLoading(true);
     marketplaceApi
       .layouts()
       .then(setLayouts)
       .catch((err) => setError(err.message))
       .finally(() => setLoading(false));
+  };
+
+  useEffect(() => {
+    load();
   }, []);
 
   const copyUrl = async (url: string, id: string) => {
@@ -112,26 +120,26 @@ export default function MyScreensPage() {
     `https://screen.aurify.ae/${layout.screenSlug}`;
 
   return (
-    <DashboardShell>
+    <div className="space-y-6">
       {/* Header */}
-      <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900">My Screens</h1>
+          <h2 className="text-xl font-bold text-slate-900">My Screens</h2>
           <p className="mt-0.5 text-sm text-slate-500">
             Manage your published and draft TV screens.
           </p>
         </div>
-        <Link
-          href="/dashboard/screen-builder"
-          className="flex items-center gap-2 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 px-5 py-2.5 text-sm font-bold text-white shadow-sm shadow-amber-500/20 hover:from-amber-600 hover:to-orange-600 transition-all"
+        <button
+          onClick={onCreateNew}
+          className="flex items-center gap-2 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 px-5 py-2.5 text-sm font-bold text-white shadow-sm shadow-amber-500/20 hover:from-amber-600 hover:to-orange-600 transition-all cursor-pointer"
         >
           <Plus className="h-4 w-4" />
           New Screen
-        </Link>
+        </button>
       </div>
 
       {error && (
-        <div className="mb-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+        <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
           {error}
         </div>
       )}
@@ -148,13 +156,13 @@ export default function MyScreensPage() {
           <p className="mt-1 text-sm text-slate-400">
             Create your first TV screen in the Screen Builder.
           </p>
-          <Link
-            href="/dashboard/screen-builder"
-            className="mt-4 flex items-center gap-2 rounded-xl bg-amber-500 px-6 py-2.5 text-sm font-bold text-white hover:bg-amber-600 transition-all"
+          <button
+            onClick={onCreateNew}
+            className="mt-4 flex items-center gap-2 rounded-xl bg-amber-500 px-6 py-2.5 text-sm font-bold text-white hover:bg-amber-600 transition-all cursor-pointer"
           >
             <Rocket className="h-4 w-4" />
             Open Screen Builder
-          </Link>
+          </button>
         </div>
       ) : (
         <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
@@ -165,7 +173,7 @@ export default function MyScreensPage() {
             return (
               <div
                 key={layout.layoutId}
-                className={`overflow-hidden rounded-2xl border transition-all hover:shadow-md ${
+                className={`overflow-hidden rounded-2xl border transition-all hover:shadow-md bg-white ${
                   isPublished
                     ? "border-emerald-200 shadow-sm"
                     : "border-slate-200"
@@ -206,7 +214,7 @@ export default function MyScreensPage() {
                       <span className="flex-1 truncate text-xs text-slate-600 font-mono">{url}</span>
                       <button
                         onClick={() => copyUrl(url, layout.layoutId)}
-                        className="text-slate-400 hover:text-amber-500 transition-colors flex-shrink-0"
+                        className="text-slate-400 hover:text-amber-500 transition-colors flex-shrink-0 cursor-pointer"
                       >
                         {copiedId === layout.layoutId ? (
                           <Check className="h-3.5 w-3.5 text-emerald-500" />
@@ -227,21 +235,21 @@ export default function MyScreensPage() {
 
                   {/* Actions */}
                   <div className="flex gap-2">
-                    <Link
-                      href="/dashboard/screen-builder"
-                      className="btn-secondary flex-1"
+                    <button
+                      onClick={() => onEditLayout(layout.layoutId)}
+                      className="btn-secondary flex-1 cursor-pointer"
                     >
                       <Pencil className="h-3.5 w-3.5" />
                       Edit
-                    </Link>
+                    </button>
                     {!isPublished && (
-                      <Link
-                        href="/dashboard/screen-builder"
-                        className="btn-primary flex-1"
+                      <button
+                        onClick={() => onEditLayout(layout.layoutId)}
+                        className="btn-primary flex-1 cursor-pointer"
                       >
                         <Rocket className="h-3.5 w-3.5" />
                         Publish
-                      </Link>
+                      </button>
                     )}
                     {isPublished && (
                       <a
@@ -261,6 +269,6 @@ export default function MyScreensPage() {
           })}
         </div>
       )}
-    </DashboardShell>
+    </div>
   );
 }

@@ -4,6 +4,7 @@ import "./common.scss";
 import { Roboto, Tenor_Sans } from "next/font/google";
 import { AuthProvider } from "@/context/AuthContext";
 import { SpotRateProvider } from "@/context/SpotRateContext";
+import { CurrencyProvider } from "@/context/CurrencyContext";
 
 const roboto = Roboto({
   subsets: ["latin"],
@@ -34,7 +35,9 @@ export default function RootLayout({
     <html lang="en">
       <body className={`antialiased ${roboto.className} ${tenorSans.variable}`}>
         <AuthProvider>
-          <SpotRateProvider>{children}</SpotRateProvider>
+          <SpotRateProvider>
+            <CurrencyProvider>{children}</CurrencyProvider>
+          </SpotRateProvider>
         </AuthProvider>
       </body>
     </html>

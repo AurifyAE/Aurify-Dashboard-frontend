@@ -1,33 +1,27 @@
 "use client";
 
-import React, { useEffect, useMemo, useState } from "react";
-import DashboardShell from "@/components/dashboard/DashboardShell";
+import React, { useEffect, useState } from "react";
 import {
   marketplaceApi,
-  type MarketplaceTheme,
   type Merchant,
 } from "@/lib/api/marketplace";
 import {
-  Building2,
-  Check,
-  ChevronRight,
-  Globe,
-  Mail,
-  MapPin,
-  MessageCircle,
-  Monitor,
-  Palette,
-  Phone,
-  Smartphone,
-  Sparkles,
-  Store,
-  Rocket,
   AlertCircle,
-  Clock,
-  CheckCircle2,
-  XCircle,
   ArrowLeft,
   ArrowRight,
+  Check,
+  CheckCircle2,
+  Clock,
+  Globe,
+  Loader2,
+  Mail,
+  MessageCircle,
+  Monitor,
+  Phone,
+  Rocket,
+  Smartphone,
+  Store,
+  XCircle,
 } from "lucide-react";
 
 const BUSINESS_TYPES = [
@@ -207,9 +201,8 @@ function ApprovalTimeline({ status }: { status: string }) {
   );
 }
 
-export default function MarketplacePage() {
+export default function MerchantProfileTab() {
   const [merchant, setMerchant] = useState<Merchant | null>(null);
-  const [themes, setThemes] = useState<MarketplaceTheme[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [step, setStep] = useState(1);
@@ -232,10 +225,10 @@ export default function MarketplacePage() {
   });
 
   useEffect(() => {
-    Promise.all([marketplaceApi.myMerchant(), marketplaceApi.themes()])
-      .then(([m, t]) => {
+    marketplaceApi
+      .myMerchant()
+      .then((m) => {
         setMerchant(m);
-        setThemes(t);
         if (m) {
           setForm((prev) => ({
             ...prev,
@@ -266,7 +259,7 @@ export default function MarketplacePage() {
     try {
       const saved = await marketplaceApi.registerMerchant(form);
       setMerchant(saved);
-      setMessage("Registration submitted! Awaiting admin approval.");
+      setMessage("Registration updated successfully!");
       setMessageType("success");
     } catch (err) {
       setMessage(err instanceof Error ? err.message : "Registration failed");
@@ -281,21 +274,24 @@ export default function MarketplacePage() {
 
   const labelClass = "block mb-1.5 text-xs font-semibold uppercase tracking-wide text-slate-500";
 
+  if (loading) {
+    return (
+      <div className="flex flex-col items-center justify-center py-20 text-slate-400">
+        <Loader2 className="h-8 w-8 animate-spin mb-3" />
+        <p className="text-sm">Loading profile settings...</p>
+      </div>
+    );
+  }
+
   return (
-    <DashboardShell className="space-y-6">
-      {/* Header */}
+    <div className="space-y-6">
       <div className="flex flex-col gap-1 lg:flex-row lg:items-center lg:justify-between">
         <div>
-          <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-widest text-blue-600">
-            <Store className="h-3.5 w-3.5" />
-            TV Screen Builder & Marketplace
-          </div>
-          <h1 className="mt-1.5 text-2xl font-bold text-slate-900">
-            Merchant Registration
-          </h1>
+          <h2 className="text-xl font-bold text-slate-900">
+            Merchant Settings & Registration
+          </h2>
           <p className="mt-0.5 text-sm text-slate-500">
-            Register your business to unlock TV screen management, themes, and
-            live screen publishing.
+            Configure your business services, showroom TV branding colors, and contact info.
           </p>
         </div>
         {merchant && (
@@ -353,7 +349,7 @@ export default function MarketplacePage() {
               key={s.id}
               type="button"
               onClick={() => setStep(s.id)}
-              className={`flex flex-1 items-center justify-center gap-2 px-4 py-4 text-sm font-semibold transition-all ${
+              className={`flex flex-1 items-center justify-center gap-2 px-4 py-4 text-sm font-semibold transition-all cursor-pointer ${
                 step === s.id
                   ? "border-b-2 border-blue-600 bg-white text-blue-700"
                   : step > s.id
@@ -382,12 +378,11 @@ export default function MarketplacePage() {
           {step === 1 && (
             <div className="space-y-6">
               <div>
-                <h2 className="text-lg font-bold text-slate-900">
+                <h3 className="text-lg font-bold text-slate-900">
                   Company Information
-                </h2>
+                </h3>
                 <p className="mt-1 text-sm text-slate-500">
-                  Tell us about your business. This info appears on your TV
-                  screens.
+                  Business info displayed across showroom screens.
                 </p>
               </div>
               <div className="grid gap-4 sm:grid-cols-2">
@@ -519,7 +514,7 @@ export default function MarketplacePage() {
                 <button
                   type="button"
                   onClick={() => setStep(2)}
-                  className="btn-primary"
+                  className="btn-primary cursor-pointer"
                 >
                   Next: Choose Services
                   <ArrowRight className="h-4 w-4" />
@@ -532,12 +527,11 @@ export default function MarketplacePage() {
           {step === 2 && (
             <div className="space-y-6">
               <div>
-                <h2 className="text-lg font-bold text-slate-900">
+                <h3 className="text-lg font-bold text-slate-900">
                   Select Services
-                </h2>
+                </h3>
                 <p className="mt-1 text-sm text-slate-500">
-                  Choose the services your business requires. You can update
-                  these later.
+                  Choose the services your business requires.
                 </p>
               </div>
               <div className="grid gap-4 sm:grid-cols-3">
@@ -556,7 +550,7 @@ export default function MarketplacePage() {
                           },
                         }))
                       }
-                      className={`relative flex flex-col items-start gap-3 rounded-2xl border-2 p-5 text-left transition-all ${
+                      className={`relative flex flex-col items-start gap-3 rounded-2xl border-2 p-5 text-left transition-all cursor-pointer ${
                         selected
                           ? "border-blue-400 bg-blue-50/50 shadow-sm"
                           : "border-slate-200 bg-white hover:border-slate-300"
@@ -592,7 +586,7 @@ export default function MarketplacePage() {
                 <button
                   type="button"
                   onClick={() => setStep(1)}
-                  className="btn-secondary"
+                  className="btn-secondary cursor-pointer"
                 >
                   <ArrowLeft className="h-4 w-4" />
                   Back
@@ -600,7 +594,7 @@ export default function MarketplacePage() {
                 <button
                   type="button"
                   onClick={() => setStep(3)}
-                  className="btn-primary"
+                  className="btn-primary cursor-pointer"
                 >
                   Next: Branding
                   <ArrowRight className="h-4 w-4" />
@@ -613,21 +607,20 @@ export default function MarketplacePage() {
           {step === 3 && (
             <div className="space-y-6">
               <div>
-                <h2 className="text-lg font-bold text-slate-900">
+                <h3 className="text-lg font-bold text-slate-900">
                   Brand Identity
-                </h2>
+                </h3>
                 <p className="mt-1 text-sm text-slate-500">
-                  Define your brand colors and typography. These will be applied
-                  across your TV screens.
+                  Define showroom TV screen branding colors.
                 </p>
               </div>
 
               <div className="grid gap-6 lg:grid-cols-2">
                 {/* Color Pickers */}
                 <div className="space-y-4">
-                  <h3 className="text-sm font-semibold text-slate-700">
+                  <h4 className="text-sm font-semibold text-slate-700">
                     Color Palette
-                  </h3>
+                  </h4>
                   {[
                     {
                       key: "primaryColor",
@@ -648,18 +641,18 @@ export default function MarketplacePage() {
                     <div key={field.key} className="flex items-center gap-4">
                       <div className="relative">
                         <input
-                          type="color"
-                          value={(form.branding as any)[field.key]}
-                          onChange={(e) =>
-                            setForm((prev) => ({
-                              ...prev,
-                              branding: {
-                                ...prev.branding,
-                                [field.key]: e.target.value,
-                              },
-                            }))
-                          }
-                          className="h-12 w-12 cursor-pointer rounded-xl border-2 border-slate-200 p-0.5"
+                           type="color"
+                           value={(form.branding as any)[field.key]}
+                           onChange={(e) =>
+                             setForm((prev) => ({
+                               ...prev,
+                               branding: {
+                                 ...prev.branding,
+                                 [field.key]: e.target.value,
+                               },
+                             }))
+                           }
+                           className="h-12 w-12 cursor-pointer rounded-xl border-2 border-slate-200 p-0.5"
                         />
                       </div>
                       <div className="flex-1">
@@ -677,9 +670,9 @@ export default function MarketplacePage() {
 
                 {/* Live Preview */}
                 <div className="space-y-4">
-                  <h3 className="text-sm font-semibold text-slate-700">
+                  <h4 className="text-sm font-semibold text-slate-700">
                     Live Preview
-                  </h3>
+                  </h4>
                   <div
                     className="relative overflow-hidden rounded-2xl p-5 shadow-inner"
                     style={{
@@ -774,7 +767,7 @@ export default function MarketplacePage() {
                 <button
                   type="button"
                   onClick={() => setStep(2)}
-                  className="btn-secondary"
+                  className="btn-secondary cursor-pointer"
                 >
                   <ArrowLeft className="h-4 w-4" />
                   Back
@@ -782,12 +775,12 @@ export default function MarketplacePage() {
                 <button
                   type="button"
                   onClick={register}
-                  disabled={saving || loading}
-                  className="btn-primary px-8"
+                  disabled={saving}
+                  className="btn-primary px-8 cursor-pointer"
                 >
                   {saving ? (
                     <>
-                      <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white" />
+                      <Loader2 className="h-4 w-4 animate-spin mr-2" />
                       Submitting...
                     </>
                   ) : (
@@ -802,54 +795,6 @@ export default function MarketplacePage() {
           )}
         </div>
       </div>
-
-      {/* Theme Preview Section */}
-      {themes.length > 0 && (
-        <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-          <div className="mb-4 flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <Palette className="h-5 w-5 text-blue-600" />
-              <h2 className="font-bold text-slate-900">Featured Themes</h2>
-            </div>
-            <a
-              href="/dashboard/theme-marketplace"
-              className="flex items-center gap-1 text-sm font-semibold text-blue-600 hover:text-blue-700 transition-colors"
-            >
-              View All
-              <ChevronRight className="h-4 w-4" />
-            </a>
-          </div>
-          <div className="grid gap-3 sm:grid-cols-3 lg:grid-cols-5">
-            {themes.slice(0, 5).map((theme) => (
-              <div
-                key={theme._id}
-                className="group relative overflow-hidden rounded-xl border border-slate-100 hover:border-slate-200 transition-all"
-              >
-                <div
-                  className="flex aspect-video items-center justify-center text-xs font-bold"
-                  style={{
-                    background: theme.colors?.secondary || "#111827",
-                    color: theme.colors?.primary || "#d4a017",
-                  }}
-                >
-                  <div className="text-center">
-                    <div className="text-lg">◆</div>
-                    <div className="mt-1 text-[10px] opacity-80">
-                      {theme.name}
-                    </div>
-                  </div>
-                </div>
-                <div className="p-2.5">
-                  <p className="text-xs font-semibold text-slate-800 truncate">
-                    {theme.name}
-                  </p>
-                  <p className="text-[10px] text-slate-400">{theme.category}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-    </DashboardShell>
+    </div>
   );
 }
