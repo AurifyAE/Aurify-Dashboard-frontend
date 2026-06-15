@@ -3,16 +3,49 @@
 import React, { useState, useEffect } from "react";
 import DashboardShell from "@/components/dashboard/DashboardShell";
 import Image from "next/image";
-import { Edit2, AlertCircle, Check, CheckCircle2, Loader2, Plus, Save, Sparkles, TrendingDown, TrendingUp, X, Edit, Trash2 } from "lucide-react";
+import {
+  Edit2,
+  AlertCircle,
+  Check,
+  CheckCircle2,
+  Loader2,
+  Plus,
+  Save,
+  Sparkles,
+  TrendingDown,
+  TrendingUp,
+  X,
+  Edit,
+  Trash2,
+} from "lucide-react";
 import { Input } from "@/components/ui/input";
-import { useSpotRate, MetalLiveData, SpreadSettings } from "@/context/SpotRateContext";
+import {
+  useSpotRate,
+  MetalLiveData,
+  SpreadSettings,
+} from "@/context/SpotRateContext";
 import { marketplaceApi, type MerchantCommodity } from "@/lib/api/marketplace";
 import Swal from "sweetalert2";
 
 const METALS = [
-  { key: "GOLD", label: "Gold", color: "#d4a017", bg: "bg-blue-50 border-blue-200 text-blue-700" },
-  { key: "SILVER", label: "Silver", color: "#94a3b8", bg: "bg-slate-50 border-slate-200 text-slate-600" },
-  { key: "PLATINUM", label: "Platinum", color: "#7c3aed", bg: "bg-indigo-50 border-indigo-200 text-indigo-700" },
+  {
+    key: "GOLD",
+    label: "Gold",
+    color: "#d4a017",
+    bg: "bg-blue-50 border-blue-200 text-blue-700",
+  },
+  {
+    key: "SILVER",
+    label: "Silver",
+    color: "#94a3b8",
+    bg: "bg-slate-50 border-slate-200 text-slate-600",
+  },
+  {
+    key: "PLATINUM",
+    label: "Platinum",
+    color: "#7c3aed",
+    bg: "bg-indigo-50 border-indigo-200 text-indigo-700",
+  },
 ];
 
 const UNITS = ["GM", "KG", "OZ", "TTB", "PC"];
@@ -49,7 +82,9 @@ function SpotRateContent() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [savingCommodity, setSavingCommodity] = useState(false);
   const [message, setMessage] = useState("");
-  const [messageType, setMessageType] = useState<"success" | "error">("success");
+  const [messageType, setMessageType] = useState<"success" | "error">(
+    "success",
+  );
   const [showForm, setShowForm] = useState(false);
   const [activeMetal, setActiveMetal] = useState("ALL");
 
@@ -58,9 +93,9 @@ function SpotRateContent() {
     marketplaceApi
       .commodities()
       .then(setItems)
-      .catch((err) => { 
-        setMessage(err.message); 
-        setMessageType("error"); 
+      .catch((err) => {
+        setMessage(err.message);
+        setMessageType("error");
       });
 
   useEffect(() => {
@@ -80,10 +115,10 @@ function SpotRateContent() {
 
   // Save commodity (Create or Edit)
   const saveCommodity = async () => {
-    if (!form.name.trim()) { 
-      setMessage("Product name is required."); 
-      setMessageType("error"); 
-      return; 
+    if (!form.name.trim()) {
+      setMessage("Product name is required.");
+      setMessageType("error");
+      return;
     }
     setSavingCommodity(true);
     try {
@@ -114,8 +149,8 @@ function SpotRateContent() {
     } catch (err) {
       setMessage(err instanceof Error ? err.message : "Save failed");
       setMessageType("error");
-    } finally { 
-      setSavingCommodity(false); 
+    } finally {
+      setSavingCommodity(false);
     }
   };
 
@@ -165,7 +200,11 @@ function SpotRateContent() {
         });
         await loadCommodities();
       } catch (err) {
-        Swal.fire("Error", err instanceof Error ? err.message : "Deletion failed", "error");
+        Swal.fire(
+          "Error",
+          err instanceof Error ? err.message : "Deletion failed",
+          "error",
+        );
       }
     }
   };
@@ -183,7 +222,18 @@ function SpotRateContent() {
   };
 
   // Real-time preview calculators using live WebSocket feeds
-  const calculatePreviewPrice = (item: { metal: string; weight: number; purity: string; buyPremium: number; buyCharge: number; sellPremium: number; sellCharge: number }, type: "buy" | "sell") => {
+  const calculatePreviewPrice = (
+    item: {
+      metal: string;
+      weight: number;
+      purity: string;
+      buyPremium: number;
+      buyCharge: number;
+      sellPremium: number;
+      sellCharge: number;
+    },
+    type: "buy" | "sell",
+  ) => {
     let baseSpot = 0;
     const metal = item.metal.toUpperCase();
     if (metal === "GOLD") {
@@ -197,9 +247,11 @@ function SpotRateContent() {
     const premium = type === "buy" ? item.buyPremium : item.sellPremium;
     const charge = type === "buy" ? item.buyCharge : item.sellCharge;
     const purityFactor = Number(item.purity) / 1000;
-    
+
     // Convert base spot and apply premium in AED
-    const price = ((baseSpot + premium) / 31.1035) * 3.674 * item.weight * purityFactor + charge;
+    const price =
+      ((baseSpot + premium) / 31.1035) * 3.674 * item.weight * purityFactor +
+      charge;
     return price.toFixed(2);
   };
 
@@ -209,10 +261,14 @@ function SpotRateContent() {
   const placeholder = (v: string | number | undefined, fallback = "—") =>
     v !== undefined && v !== null && v !== 0 ? String(v) : fallback;
 
-  const filteredItems = activeMetal === "ALL" ? items : items.filter((i) => i.metal === activeMetal);
+  const filteredItems =
+    activeMetal === "ALL"
+      ? items
+      : items.filter((i) => i.metal === activeMetal);
   const inputClass =
     "w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm text-slate-800 placeholder-slate-400 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all";
-  const labelClass = "block mb-1.5 text-xs font-semibold uppercase tracking-wide text-slate-500";
+  const labelClass =
+    "block mb-1.5 text-xs font-semibold uppercase tracking-wide text-slate-500";
 
   // TradingCard component
   const TradingCard = ({
@@ -483,9 +539,12 @@ function SpotRateContent() {
               <Sparkles className="h-3.5 w-3.5" />
               Commodity Builder
             </div>
-            <h2 className="text-xl font-bold text-slate-900">Merchant Commodities</h2>
+            <h2 className="text-xl font-bold text-slate-900">
+              Merchant Commodities
+            </h2>
             <p className="mt-0.5 text-sm text-slate-500">
-              Configure gold, silver, and platinum products with live real-time price calculation templates.
+              Configure gold, silver, and platinum products with live real-time
+              price calculation templates.
             </p>
           </div>
           <button
@@ -499,19 +558,37 @@ function SpotRateContent() {
             }}
             className="btn-primary"
           >
-            {showForm ? <X className="h-4 w-4" /> : <Plus className="h-4 w-4" />}
-            {showForm ? "Cancel" : editingId ? "Edit Commodity" : "Add Commodity"}
+            {showForm ? (
+              <X className="h-4 w-4" />
+            ) : (
+              <Plus className="h-4 w-4" />
+            )}
+            {showForm
+              ? "Cancel"
+              : editingId
+                ? "Edit Commodity"
+                : "Add Commodity"}
           </button>
         </div>
 
         {/* Message Banner */}
         {message && (
-          <div className={`mb-5 flex items-center gap-2 rounded-xl border px-4 py-3 text-sm ${
-            messageType === "success" ? "border-emerald-200 bg-emerald-50 text-emerald-800" : "border-red-200 bg-red-50 text-red-800"
-          }`}>
-            {messageType === "success" ? <CheckCircle2 className="h-4 w-4" /> : <AlertCircle className="h-4 w-4" />}
+          <div
+            className={`mb-5 flex items-center gap-2 rounded-xl border px-4 py-3 text-sm ${
+              messageType === "success"
+                ? "border-emerald-200 bg-emerald-50 text-emerald-800"
+                : "border-red-200 bg-red-50 text-red-800"
+            }`}
+          >
+            {messageType === "success" ? (
+              <CheckCircle2 className="h-4 w-4" />
+            ) : (
+              <AlertCircle className="h-4 w-4" />
+            )}
             {message}
-            <button onClick={() => setMessage("")} className="ml-auto"><X className="h-3.5 w-3.5 opacity-50 hover:opacity-100" /></button>
+            <button onClick={() => setMessage("")} className="ml-auto">
+              <X className="h-3.5 w-3.5 opacity-50 hover:opacity-100" />
+            </button>
           </div>
         )}
 
@@ -520,13 +597,22 @@ function SpotRateContent() {
           {showForm && (
             <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm h-fit">
               <h2 className="mb-5 flex items-center gap-2 font-bold text-slate-900">
-                {editingId ? <Edit className="h-4 w-4 text-blue-500" /> : <Plus className="h-4 w-4 text-blue-500" />}
+                {editingId ? (
+                  <Edit className="h-4 w-4 text-blue-500" />
+                ) : (
+                  <Plus className="h-4 w-4 text-blue-500" />
+                )}
                 {editingId ? "Edit Commodity" : "Create Commodity"}
               </h2>
               <div className="space-y-4">
                 <div>
                   <label className={labelClass}>Product Name *</label>
-                  <input className={inputClass} placeholder="e.g. Gold Bar 999" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
+                  <input
+                    className={inputClass}
+                    placeholder="e.g. Gold Bar 999"
+                    value={form.name}
+                    onChange={(e) => setForm({ ...form, name: e.target.value })}
+                  />
                 </div>
 
                 {/* Metal Selector */}
@@ -544,7 +630,10 @@ function SpotRateContent() {
                             : "border-slate-200 text-slate-500 hover:border-slate-300"
                         }`}
                       >
-                        <span className="h-2.5 w-2.5 rounded-full" style={{ background: m.color }} />
+                        <span
+                          className="h-2.5 w-2.5 rounded-full"
+                          style={{ background: m.color }}
+                        />
                         {m.label}
                       </button>
                     ))}
@@ -554,29 +643,63 @@ function SpotRateContent() {
                 <div className="grid grid-cols-2 gap-3">
                   <div>
                     <label className={labelClass}>Purity</label>
-                    <select className={inputClass} value={form.purity} onChange={(e) => setForm({ ...form, purity: e.target.value })}>
-                      {PURITIES.map((p) => <option key={p}>{p}</option>)}
+                    <select
+                      className={inputClass}
+                      value={form.purity}
+                      onChange={(e) =>
+                        setForm({ ...form, purity: e.target.value })
+                      }
+                    >
+                      {PURITIES.map((p) => (
+                        <option key={p}>{p}</option>
+                      ))}
                     </select>
                   </div>
                   <div>
                     <label className={labelClass}>Unit</label>
-                    <select className={inputClass} value={form.unit} onChange={(e) => setForm({ ...form, unit: e.target.value })}>
-                      {UNITS.map((u) => <option key={u}>{u}</option>)}
+                    <select
+                      className={inputClass}
+                      value={form.unit}
+                      onChange={(e) =>
+                        setForm({ ...form, unit: e.target.value })
+                      }
+                    >
+                      {UNITS.map((u) => (
+                        <option key={u}>{u}</option>
+                      ))}
                     </select>
                   </div>
                   <div>
                     <label className={labelClass}>Weight</label>
-                    <input type="number" min="0" step="0.01" className={inputClass} value={form.weight} onChange={(e) => setForm({ ...form, weight: Number(e.target.value) })} />
+                    <input
+                      type="number"
+                      min="0"
+                      step="0.01"
+                      className={inputClass}
+                      value={form.weight}
+                      onChange={(e) =>
+                        setForm({ ...form, weight: Number(e.target.value) })
+                      }
+                    />
                   </div>
                   <div>
                     <label className={labelClass}>Image URL</label>
-                    <input className={inputClass} placeholder="https://..." value={form.image} onChange={(e) => setForm({ ...form, image: e.target.value })} />
+                    <input
+                      className={inputClass}
+                      placeholder="https://..."
+                      value={form.image}
+                      onChange={(e) =>
+                        setForm({ ...form, image: e.target.value })
+                      }
+                    />
                   </div>
                 </div>
 
                 {/* Premium & Charge */}
                 <div className="rounded-xl border border-slate-100 bg-slate-50 p-4 space-y-3">
-                  <p className="text-xs font-bold uppercase tracking-wide text-slate-500">Pricing Adjustments</p>
+                  <p className="text-xs font-bold uppercase tracking-wide text-slate-500">
+                    Pricing Adjustments
+                  </p>
                   <div className="grid grid-cols-2 gap-3">
                     {[
                       { key: "buyPremium", label: "Buy Premium" },
@@ -591,7 +714,12 @@ function SpotRateContent() {
                           step="0.01"
                           className={inputClass}
                           value={(form as any)[field.key]}
-                          onChange={(e) => setForm({ ...form, [field.key]: Number(e.target.value) })}
+                          onChange={(e) =>
+                            setForm({
+                              ...form,
+                              [field.key]: Number(e.target.value),
+                            })
+                          }
                         />
                       </div>
                     ))}
@@ -600,23 +728,37 @@ function SpotRateContent() {
 
                 {/* Live Price Preview */}
                 <div className="rounded-xl bg-slate-900 p-4 text-white">
-                  <p className="text-xs font-bold uppercase tracking-wide opacity-50 mb-3">Real-Time Price Preview (AED)</p>
+                  <p className="text-xs font-bold uppercase tracking-wide opacity-50 mb-3">
+                    Real-Time Price Preview (AED)
+                  </p>
                   <div className="grid grid-cols-2 gap-4">
                     <div className="text-center">
                       <div className="flex items-center justify-center gap-1 text-emerald-400 mb-1">
                         <TrendingUp className="h-3 w-3" />
-                        <span className="text-[10px] font-bold uppercase">Buy Rate</span>
+                        <span className="text-[10px] font-bold uppercase">
+                          Buy Rate
+                        </span>
                       </div>
-                      <p className="text-xl font-bold text-white">{previewBuy}</p>
-                      <p className="text-[9px] opacity-40">Dynamic based on live feed</p>
+                      <p className="text-xl font-bold text-white">
+                        {previewBuy}
+                      </p>
+                      <p className="text-[9px] opacity-40">
+                        Dynamic based on live feed
+                      </p>
                     </div>
                     <div className="text-center">
                       <div className="flex items-center justify-center gap-1 text-red-400 mb-1">
                         <TrendingDown className="h-3 w-3" />
-                        <span className="text-[10px] font-bold uppercase">Sell Rate</span>
+                        <span className="text-[10px] font-bold uppercase">
+                          Sell Rate
+                        </span>
                       </div>
-                      <p className="text-xl font-bold text-white">{previewSell}</p>
-                      <p className="text-[9px] opacity-40">Dynamic based on live feed</p>
+                      <p className="text-xl font-bold text-white">
+                        {previewSell}
+                      </p>
+                      <p className="text-[9px] opacity-40">
+                        Dynamic based on live feed
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -624,17 +766,23 @@ function SpotRateContent() {
                 {/* Active Toggle */}
                 <div className="flex items-center justify-between rounded-xl border border-slate-100 bg-slate-50 px-4 py-3">
                   <div>
-                    <p className="text-sm font-semibold text-slate-700">Active</p>
+                    <p className="text-sm font-semibold text-slate-700">
+                      Active
+                    </p>
                     <p className="text-xs text-slate-400">Show on TV screens</p>
                   </div>
                   <button
                     type="button"
                     role="switch"
                     aria-checked={form.active}
-                    onClick={() => setForm((prev) => ({ ...prev, active: !prev.active }))}
+                    onClick={() =>
+                      setForm((prev) => ({ ...prev, active: !prev.active }))
+                    }
                     className={`relative h-6 w-11 rounded-full transition-all ${form.active ? "bg-blue-600" : "bg-slate-300"}`}
                   >
-                    <span className={`absolute top-1 h-4 w-4 rounded-full bg-white shadow transition-all ${form.active ? "left-6" : "left-1"}`} />
+                    <span
+                      className={`absolute top-1 h-4 w-4 rounded-full bg-white shadow transition-all ${form.active ? "left-6" : "left-1"}`}
+                    />
                   </button>
                 </div>
 
@@ -644,8 +792,16 @@ function SpotRateContent() {
                   disabled={savingCommodity}
                   className="btn-primary w-full"
                 >
-                  {savingCommodity ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
-                  {savingCommodity ? "Saving..." : editingId ? "Save Changes" : "Save Commodity"}
+                  {savingCommodity ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <Save className="h-4 w-4" />
+                  )}
+                  {savingCommodity
+                    ? "Saving..."
+                    : editingId
+                      ? "Save Changes"
+                      : "Save Commodity"}
                 </button>
               </div>
             </div>
@@ -661,10 +817,14 @@ function SpotRateContent() {
                   type="button"
                   onClick={() => setActiveMetal(m)}
                   className={`rounded-full px-4 py-1.5 text-xs font-bold transition-all ${
-                    activeMetal === m ? "bg-blue-600 text-white shadow-sm" : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+                    activeMetal === m
+                      ? "bg-blue-600 text-white shadow-sm"
+                      : "bg-slate-100 text-slate-600 hover:bg-slate-200"
                   }`}
                 >
-                  {m === "ALL" ? `All (${items.length})` : `${m} (${items.filter((i) => i.metal === m).length})`}
+                  {m === "ALL"
+                    ? `All (${items.length})`
+                    : `${m} (${items.filter((i) => i.metal === m).length})`}
                 </button>
               ))}
             </div>
@@ -672,11 +832,17 @@ function SpotRateContent() {
             {filteredItems.length === 0 ? (
               <div className="flex flex-col items-center justify-center rounded-2xl border-2 border-dashed border-slate-200 bg-slate-50/60 py-16 text-center">
                 <Sparkles className="h-10 w-10 text-slate-300 mb-3" />
-                <p className="font-semibold text-slate-500">No commodities yet</p>
-                <p className="mt-1 text-sm text-slate-400">Add your first commodity using the button above.</p>
+                <p className="font-semibold text-slate-500">
+                  No commodities yet
+                </p>
+                <p className="mt-1 text-sm text-slate-400">
+                  Add your first commodity using the button above.
+                </p>
               </div>
             ) : (
-              <div className={`grid gap-4 ${showForm ? "sm:grid-cols-1 md:grid-cols-2" : "sm:grid-cols-2 lg:grid-cols-3"}`}>
+              <div
+                className={`grid gap-4 ${showForm ? "sm:grid-cols-1 md:grid-cols-2" : "sm:grid-cols-2 lg:grid-cols-3"}`}
+              >
                 {filteredItems.map((item) => {
                   const metal = METALS.find((m) => m.key === item.metal);
                   const dynamicBuyPrice = calculatePreviewPrice(item, "buy");
@@ -686,7 +852,9 @@ function SpotRateContent() {
                     <article
                       key={item._id}
                       className={`overflow-hidden rounded-2xl border bg-white p-4 transition-all hover:shadow-sm flex flex-col justify-between ${
-                        item.active ? "border-slate-200 shadow-sm" : "border-slate-100 opacity-60"
+                        item.active
+                          ? "border-slate-200 shadow-sm"
+                          : "border-slate-100 opacity-60"
                       }`}
                     >
                       <div>
@@ -699,14 +867,21 @@ function SpotRateContent() {
                               {item.metal.slice(0, 2)}
                             </div>
                             <div>
-                              <p className="font-bold text-slate-900 line-clamp-1">{item.name}</p>
-                              <p className="text-[11px] text-slate-400">{item.metal} · {item.purity} · {item.weight} {item.unit}</p>
+                              <p className="font-bold text-slate-900 line-clamp-1">
+                                {item.name}
+                              </p>
+                              <p className="text-[11px] text-slate-400">
+                                {item.metal} · {item.purity} · {item.weight}{" "}
+                                {item.unit}
+                              </p>
                             </div>
                           </div>
                           <button
                             onClick={() => handleToggleActive(item)}
                             className={`rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase cursor-pointer transition-all ${
-                              item.active ? "bg-emerald-100 text-emerald-700 hover:bg-emerald-200" : "bg-slate-100 text-slate-500 hover:bg-slate-200"
+                              item.active
+                                ? "bg-emerald-100 text-emerald-700 hover:bg-emerald-200"
+                                : "bg-slate-100 text-slate-500 hover:bg-slate-200"
                             }`}
                           >
                             {item.active ? "Active" : "Inactive"}
@@ -716,12 +891,20 @@ function SpotRateContent() {
                         {/* Live dynamic buy / sell display */}
                         <div className="grid grid-cols-2 gap-2 mb-3">
                           <div className="rounded-lg bg-emerald-50/50 border border-emerald-100 p-2 text-center">
-                            <p className="text-[9px] font-bold uppercase text-emerald-600 mb-0.5">Live Buy</p>
-                            <p className="text-sm font-bold text-emerald-700">{dynamicBuyPrice}</p>
+                            <p className="text-[9px] font-bold uppercase text-emerald-600 mb-0.5">
+                              Live Buy
+                            </p>
+                            <p className="text-sm font-bold text-emerald-700">
+                              {dynamicBuyPrice}
+                            </p>
                           </div>
                           <div className="rounded-lg bg-red-50/50 border border-red-100 p-2 text-center">
-                            <p className="text-[9px] font-bold uppercase text-red-500 mb-0.5">Live Sell</p>
-                            <p className="text-sm font-bold text-red-600">{dynamicSellPrice}</p>
+                            <p className="text-[9px] font-bold uppercase text-red-500 mb-0.5">
+                              Live Sell
+                            </p>
+                            <p className="text-sm font-bold text-red-600">
+                              {dynamicSellPrice}
+                            </p>
                           </div>
                         </div>
 
@@ -729,11 +912,15 @@ function SpotRateContent() {
                         <div className="border-t border-slate-100 pt-2.5 space-y-1 text-[11px] text-slate-500">
                           <div className="flex justify-between">
                             <span>Premiums (B/S):</span>
-                            <span className="font-medium">+{item.buyPremium} / +{item.sellPremium}</span>
+                            <span className="font-medium">
+                              +{item.buyPremium} / +{item.sellPremium}
+                            </span>
                           </div>
                           <div className="flex justify-between">
                             <span>Charges (B/S):</span>
-                            <span className="font-medium">{item.buyCharge} / {item.sellCharge}</span>
+                            <span className="font-medium">
+                              {item.buyCharge} / {item.sellCharge}
+                            </span>
                           </div>
                         </div>
                       </div>
