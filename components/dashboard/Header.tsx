@@ -53,7 +53,7 @@ const Header = () => {
           {/* Notification */}
           <Button
             size="icon"
-            className="bg-slate-300 cursor-pointer hover:bg-slate-200 rounded-xl"
+            className="bg-white cursor-pointer hover:bg-slate-200 rounded-xl"
           >
             <Bell className="h-5 w-5 text-slate-600" />
           </Button>

@@ -19,9 +19,6 @@ interface MyScreensTabProps {
 }
 
 function MiniScreenPreview({
-  primaryColor = "#d4a017",
-  secondaryColor = "#111827",
-  accentColor = "#38bdf8",
   companyName = "Company",
 }: {
   primaryColor?: string;
@@ -30,58 +27,60 @@ function MiniScreenPreview({
   companyName?: string;
 }) {
   return (
-    <div
-      className="aspect-video w-full overflow-hidden rounded-xl"
-      style={{ background: secondaryColor }}
-    >
-      <div
-        className="flex items-center justify-between px-3 py-2"
-        style={{ borderBottom: `1px solid ${primaryColor}30` }}
-      >
-        <span className="text-[9px] font-bold" style={{ color: primaryColor }}>
-          {companyName.toUpperCase()}
-        </span>
-        <span
-          className="rounded px-1.5 py-0.5 text-[7px] font-bold"
-          style={{ background: accentColor, color: secondaryColor }}
-        >
-          LIVE
-        </span>
-      </div>
-      <div className="grid grid-cols-2 gap-1 px-2 py-1.5">
-        {["GOLD", "SILVER"].map((m, i) => (
-          <div
-            key={m}
-            className="rounded px-2 py-1"
-            style={{
-              background: `${i === 0 ? primaryColor : accentColor}18`,
-              borderLeft: `2px solid ${i === 0 ? primaryColor : accentColor}`,
-            }}
-          >
-            <div
-              className="text-[7px] font-bold"
-              style={{ color: i === 0 ? primaryColor : accentColor }}
-            >
-              {m}
+    <div className="aspect-video w-full overflow-hidden rounded-xl bg-[#c58434] relative border border-slate-300 flex flex-col justify-between">
+      {/* Background styling to mimic bright gold gradient */}
+      <div className="absolute inset-0 bg-gradient-to-br from-[#f8d082] via-[#e59d45] to-[#8c4c1a] pointer-events-none opacity-90" />
+      
+      {/* Top Main Section */}
+      <div className="flex flex-1 p-2 gap-2 relative z-10 h-[calc(100%-12px)]">
+        {/* Left Side: Logo & Commodity Table */}
+        <div className="w-1/2 flex flex-col gap-1">
+          <div className="text-[7px] font-bold text-white mb-1 drop-shadow-md text-center bg-white/20 rounded p-0.5 backdrop-blur-sm">{companyName.toUpperCase()}</div>
+          
+          <div className="rounded-[4px] border border-white/40 bg-white/10 backdrop-blur-md p-1 flex-1 flex flex-col shadow-inner">
+            <div className="grid grid-cols-4 text-[4px] font-bold text-white mb-1 border-b border-white/40 pb-0.5">
+              <span>COMMODITY</span><span className="text-center">UNIT</span><span className="text-center">BUY</span><span className="text-center">SELL</span>
             </div>
-            <div className="text-[10px] font-bold text-white">
-              {i === 0 ? "2,345" : "28.4"}
-            </div>
+            {["Gold 24K", "Gold Kilobar", "Silver"].map((item, i) => (
+              <div key={i} className="grid grid-cols-4 text-[4px] font-bold text-white py-0.5 border-b border-white/20 last:border-0 drop-shadow-sm">
+                <span className="truncate">{item}</span><span className="text-center">1 GM</span><span className="text-center">509.4</span><span className="text-center">509.5</span>
+              </div>
+            ))}
           </div>
-        ))}
-      </div>
-      <div className="px-2">
-        <div className="text-[6px] font-semibold opacity-40 text-white grid grid-cols-4 gap-0.5 mb-0.5">
-          <span>ITEM</span><span>WT</span><span>BUY</span><span>SELL</span>
         </div>
-        {["Gold Bar", "Gold Coin"].map((item) => (
-          <div key={item} className="grid grid-cols-4 gap-0.5 text-[5.5px] text-white/70 py-0.5" style={{ borderTop: `1px solid ${primaryColor}12` }}>
-            <span>{item}</span><span>1g</span><span>224</span><span>225</span>
-          </div>
-        ))}
+
+        {/* Right Side: Clocks & Metal Panels */}
+        <div className="w-1/2 flex flex-col gap-1">
+           {/* Mini Clocks */}
+           <div className="flex justify-around items-center h-2 mt-1">
+             {["INDIA", "UAE", "USA"].map(c => <span key={c} className="text-[3px] text-white font-bold drop-shadow-md">{c} --:--</span>)}
+           </div>
+
+           {/* Gold Panel */}
+           <div className="rounded-[6px] border border-white/50 bg-gradient-to-r from-[#faefb5] to-[#e4bc75] p-1.5 flex items-center justify-between shadow-lg">
+             <div className="text-[5px] font-extrabold text-[#966116]">GOLD</div>
+             <div className="flex gap-1">
+                <div className="text-[4px] font-bold text-white bg-[#33cc33] px-1 py-0.5 rounded shadow">BID 4317</div>
+                <div className="text-[4px] font-bold text-white bg-[#33cc33] px-1 py-0.5 rounded shadow">ASK 4318</div>
+             </div>
+           </div>
+
+           {/* Silver Panel */}
+           <div className="rounded-[6px] border border-white/50 bg-gradient-to-r from-[#f0f0f0] to-[#b0b0b0] p-1.5 flex items-center justify-between shadow-lg">
+             <div className="text-[5px] font-extrabold text-[#555]">SILVER</div>
+             <div className="flex gap-1">
+                <div className="text-[4px] font-bold text-white border border-white/80 px-1 py-0.5 rounded">BID 69.2</div>
+                <div className="text-[4px] font-bold text-white border border-white/80 px-1 py-0.5 rounded">ASK 69.4</div>
+             </div>
+           </div>
+        </div>
       </div>
-      <div className="mt-1 px-2 py-1 text-[5.5px] font-semibold" style={{ background: primaryColor, color: secondaryColor }}>
-        📢 Market update: Gold prices remain strong
+
+      {/* Bottom News Ticker */}
+      <div className="h-[10px] bg-white border-t border-white flex items-center px-1 relative z-10 overflow-hidden">
+        <div className="text-[4px] font-bold text-slate-800 whitespace-nowrap">
+          {companyName} updates • Live Market Prices • Welcome to our showroom
+        </div>
       </div>
     </div>
   );

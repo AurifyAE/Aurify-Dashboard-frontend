@@ -1,8 +1,9 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import Link from "next/link";
 import LiveClock from "@/components/LiveClock";
+import ScreenLayout from "@/components/live-screen/ScreenLayout";
 import {
   marketplaceApi,
   type Merchant,
@@ -91,6 +92,30 @@ interface ScreenBuilderTabProps {
   setEditingLayoutId: (id: string | undefined) => void;
   setActiveTab: (tab: string) => void;
   onSaveSuccess?: () => void;
+}
+
+function TVPreviewRenderer({ data }: { data: any }) {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [scale, setScale] = useState(0.5);
+
+  useEffect(() => {
+    if (!containerRef.current) return;
+    const ro = new ResizeObserver((entries) => {
+      for (let entry of entries) {
+        setScale(entry.contentRect.width / window.innerWidth);
+      }
+    });
+    ro.observe(containerRef.current);
+    return () => ro.disconnect();
+  }, []);
+
+  return (
+    <div ref={containerRef} className="aspect-video w-full overflow-hidden rounded-2xl bg-black relative shadow-inner">
+      <div style={{ position: 'absolute', top: 0, left: 0, width: '100vw', height: '56.25vw', transform: `scale(${scale})`, transformOrigin: 'top left' }}>
+        <ScreenLayout data={data} isPreview={true} />
+      </div>
+    </div>
+  );
 }
 
 export default function ScreenBuilderTab({
@@ -678,82 +703,7 @@ export default function ScreenBuilderTab({
           </div>
 
           {/* TV Screen */}
-          <div
-            className="aspect-video overflow-hidden rounded-2xl p-5 text-white shadow-inner"
-            style={{ background: effectiveSecondary }}
-          >
-            <div className="flex h-full flex-col gap-3">
-              {draft.sectionOrder.map((sectionId) => {
-                if (sectionId === "header") {
-                  return (
-                    <div key={sectionId} className="flex items-start justify-between">
-                      <div>
-                        {draft.showName && (
-                          <div className="text-2xl font-bold" style={{ color: effectivePrimary }}>
-                            {merchant?.companyName || "Your Company"}
-                          </div>
-                        )}
-                        <div className="text-sm opacity-60">
-                          {draft.selectedLayout} · {selectedTheme?.name || "No theme"}
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        {draft.widgets.includes("Clock") && (
-                          <div className="rounded-lg px-3 py-1.5 text-sm" style={{ background: `${effectivePrimary}22` }}>
-                            <LiveClock />
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  );
-                }
-                if (sectionId === "spotRates" && draft.widgets.includes("Spot Rates")) {
-                  return (
-                    <div key={sectionId} className="grid grid-cols-2 gap-3">
-                      {[
-                        { label: "GOLD", bid: "2,345.60", ask: "2,346.10", color: effectivePrimary },
-                        { label: "SILVER", bid: "28.40", ask: "28.45", color: effectiveAccent },
-                      ].map((metal) => (
-                        <div key={metal.label} className="rounded-xl p-4" style={{ background: `${metal.color}15`, borderLeft: `3px solid ${metal.color}` }}>
-                          <div className="text-xs font-bold mb-1" style={{ color: metal.color }}>{metal.label}</div>
-                          <div className="text-2xl font-bold">{metal.bid}</div>
-                          <div className="text-xs opacity-50">ASK: {metal.ask}</div>
-                        </div>
-                      ))}
-                    </div>
-                  );
-                }
-                if (sectionId === "commodities" && draft.widgets.includes("Commodity Table")) {
-                  return (
-                    <div key={sectionId} className="rounded-xl p-4" style={{ background: "rgba(255,255,255,0.05)" }}>
-                      <div className="text-xs font-bold mb-2 opacity-60">COMMODITIES</div>
-                      <div className="space-y-1.5 text-sm">
-                        {[
-                          ["Gold Bar 999", "1g", "224.80", "225.20"],
-                          ["Gold Coin", "8g", "182.40", "183.00"],
-                        ].map(([name, wt, buy, sell]) => (
-                          <div key={name} className="grid grid-cols-4 gap-2 py-1" style={{ borderTop: `1px solid ${effectivePrimary}20` }}>
-                            <span className="col-span-1 opacity-80">{name}</span>
-                            <span className="opacity-50">{wt}</span>
-                            <span style={{ color: effectivePrimary }}>{buy}</span>
-                            <span style={{ color: effectiveAccent }}>{sell}</span>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  );
-                }
-                if (sectionId === "news" && draft.widgets.includes("News")) {
-                  return (
-                    <div key={sectionId} className="mt-auto rounded-lg px-4 py-2 text-sm font-semibold" style={{ background: effectivePrimary, color: effectiveSecondary }}>
-                      📢 Market update · Gold prices rally · Special offers available
-                    </div>
-                  );
-                }
-                return null;
-              })}
-            </div>
-          </div>
+          <TVPreviewRenderer data={{ merchant, theme: selectedTheme, layout: draft, commodities: merchant?.commodities || [], news: merchant?.news || [] }} />
 
           {/* Saved Drafts */}
           {layouts.length > 0 && (
