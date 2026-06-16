@@ -81,25 +81,25 @@ function ScreenConsoleContent() {
   return (
     <DashboardShell>
       <div className="space-y-6">
-        {/* Banner with Gradient & Glassmorphism */}
-        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-slate-900 via-slate-800 to-slate-950 p-6 shadow-lg border border-slate-800">
-          <div className="absolute inset-0 opacity-10 bg-[radial-gradient(circle_at_30%_50%,#d4a017,transparent_45%),radial-gradient(circle_at_70%_50%,#3051bb,transparent_45%)]" />
+        {/* Page Header Bar */}
+        <div className="relative overflow-hidden rounded-2xl bg-white p-6 shadow-sm border border-blue-100">
+          <div className="absolute inset-0 opacity-5 bg-[radial-gradient(circle_at_100%_0%,#3b82f6,transparent_30%),radial-gradient(circle_at_0%_100%,#60a5fa,transparent_30%)]" />
           <div className="relative flex flex-col gap-4 md:flex-row md:items-center md:justify-between z-10">
             <div>
-              <h1 className="text-2xl font-extrabold text-white tracking-tight flex items-center gap-2.5">
-                <span className="bg-gradient-to-r from-amber-400 to-amber-600 bg-clip-text text-transparent">
+              <h1 className="text-2xl font-extrabold text-slate-800 tracking-tight flex items-center gap-2.5">
+                <span className="text-blue-600">
                   Screens & Themes
                 </span>
                 <span className="text-slate-400 text-lg font-light">Console</span>
               </h1>
-              <p className="mt-1 text-sm text-slate-400 max-w-2xl">
+              <p className="mt-1 text-sm text-slate-500 max-w-2xl">
                 Unifying template builders, theme installations, live TV previews, and business brandings.
               </p>
             </div>
             {activeTab !== "builder" && (
               <button
                 onClick={handleCreateNew}
-                className="flex items-center gap-2 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 px-5 py-2.5 text-sm font-bold text-white shadow-md shadow-amber-500/20 transition-all cursor-pointer transform hover:-translate-y-0.5"
+                className="flex items-center gap-2 rounded-xl bg-blue-600 hover:bg-blue-700 px-5 py-2.5 text-sm font-bold text-white shadow-sm transition-all cursor-pointer transform hover:-translate-y-0.5"
               >
                 <Tv className="h-4 w-4" />
                 Launch Builder

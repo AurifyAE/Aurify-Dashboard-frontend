@@ -131,7 +131,7 @@ export default function MyScreensTab({ onEditLayout, onCreateNew }: MyScreensTab
         </div>
         <button
           onClick={onCreateNew}
-          className="flex items-center gap-2 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 px-5 py-2.5 text-sm font-bold text-white shadow-sm shadow-amber-500/20 hover:from-amber-600 hover:to-orange-600 transition-all cursor-pointer"
+          className="flex items-center gap-2 rounded-xl bg-blue-600 px-5 py-2.5 text-sm font-bold text-white shadow-sm hover:bg-blue-700 transition-all cursor-pointer"
         >
           <Plus className="h-4 w-4" />
           New Screen
@@ -158,7 +158,7 @@ export default function MyScreensTab({ onEditLayout, onCreateNew }: MyScreensTab
           </p>
           <button
             onClick={onCreateNew}
-            className="mt-4 flex items-center gap-2 rounded-xl bg-amber-500 px-6 py-2.5 text-sm font-bold text-white hover:bg-amber-600 transition-all cursor-pointer"
+            className="mt-4 flex items-center gap-2 rounded-xl bg-blue-600 px-6 py-2.5 text-sm font-bold text-white hover:bg-blue-700 transition-all cursor-pointer"
           >
             <Rocket className="h-4 w-4" />
             Open Screen Builder
@@ -214,7 +214,7 @@ export default function MyScreensTab({ onEditLayout, onCreateNew }: MyScreensTab
                       <span className="flex-1 truncate text-xs text-slate-600 font-mono">{url}</span>
                       <button
                         onClick={() => copyUrl(url, layout.layoutId)}
-                        className="text-slate-400 hover:text-amber-500 transition-colors flex-shrink-0 cursor-pointer"
+                        className="text-slate-400 hover:text-blue-600 transition-colors flex-shrink-0 cursor-pointer"
                       >
                         {copiedId === layout.layoutId ? (
                           <Check className="h-3.5 w-3.5 text-emerald-500" />
@@ -226,7 +226,7 @@ export default function MyScreensTab({ onEditLayout, onCreateNew }: MyScreensTab
                         href={url}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-slate-400 hover:text-amber-500 transition-colors flex-shrink-0"
+                        className="text-slate-400 hover:text-blue-600 transition-colors flex-shrink-0"
                       >
                         <ExternalLink className="h-3.5 w-3.5" />
                       </a>
