@@ -53,22 +53,10 @@ function ScreenConsoleContent() {
       icon: Monitor,
     },
     {
-      id: "builder" as TabId,
-      label: "Interactive Builder",
-      description: "Customize layouts & widgets",
-      icon: Tv,
-    },
-    {
       id: "themes" as TabId,
       label: "Theme Marketplace",
       description: "Browse premium display themes",
       icon: Palette,
-    },
-    {
-      id: "profile" as TabId,
-      label: "Branding Settings",
-      description: "Business profile & colors",
-      icon: Settings2,
     },
     {
       id: "others" as TabId,
@@ -108,49 +96,7 @@ function ScreenConsoleContent() {
           </div>
         </div>
 
-        {/* Premium Tab Bar Menu */}
-        <div className="flex border border-slate-200 bg-slate-50/50 rounded-2xl p-1 overflow-x-auto scrollbar-none gap-1">
-          {tabsConfig.map((tab) => {
-            const IconComp = tab.icon;
-            const isSelected = activeTab === tab.id;
-            return (
-              <button
-                key={tab.id}
-                type="button"
-                onClick={() => {
-                  setActiveTab(tab.id);
-                  if (tab.id !== "builder") {
-                    setEditingLayoutId(undefined); // Clear editing if leaving builder
-                  }
-                }}
-                className={`flex flex-col md:flex-row items-center md:items-start gap-2.5 rounded-xl px-4 py-3 text-left transition-all min-w-[120px] md:min-w-[180px] flex-1 cursor-pointer select-none ${
-                  isSelected
-                    ? "bg-white text-blue-700 shadow-sm border border-slate-100"
-                    : "text-slate-500 hover:bg-slate-100/50 hover:text-slate-800"
-                }`}
-              >
-                <div className={`p-1.5 rounded-lg flex items-center justify-center ${
-                  isSelected ? "bg-blue-50 text-blue-700" : "bg-slate-200/50 text-slate-500"
-                }`}>
-                  <IconComp className="h-4 w-4" />
-                </div>
-                <div className="hidden md:block min-w-0">
-                  <span className={`text-xs font-bold block leading-tight ${isSelected ? "text-blue-700" : "text-slate-700"}`}>
-                    {tab.label}
-                  </span>
-                  <span className="text-[10px] text-slate-400 truncate block mt-0.5">
-                    {tab.description}
-                  </span>
-                </div>
-                <span className="md:hidden text-[10px] font-bold mt-1 text-center truncate w-full">
-                  {tab.label}
-                </span>
-              </button>
-            );
-          })}
-        </div>
 
-        {/* Tab Content Panels */}
         <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm min-h-[500px]">
           {activeTab === "my-screens" && (
             <MyScreensTab

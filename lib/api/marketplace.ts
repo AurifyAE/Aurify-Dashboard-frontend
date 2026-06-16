@@ -126,6 +126,8 @@ export const marketplaceApi = {
   installTheme: (themeId: string) =>
     request<MerchantTheme>(`/themes/${themeId}/install`, { method: "POST" }),
   layouts: () => request<ScreenLayout[]>("/layouts"),
+  deleteLayout: (layoutId: string) =>
+    request<void>(`/layouts/${layoutId}`, { method: "DELETE" }),
   saveLayout: (body: unknown) =>
     request<ScreenLayout>("/layouts", { method: "PUT", body: JSON.stringify(body) }),
   publishLayout: (layoutId: string, body: unknown) =>

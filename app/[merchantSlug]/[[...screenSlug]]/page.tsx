@@ -1,5 +1,6 @@
 import { fetchLiveScreen } from "@/lib/api/marketplace";
-import DipanjaliLayout from "@/components/live-screen/ScreenLayout";
+import Theme1Layout from "@/components/live-screen/theme1/Theme1Layout";
+import Theme2Layout from "@/components/live-screen/theme2/Theme2Layout";
 
 type PageProps = {
   params: Promise<{ merchantSlug: string; screenSlug?: string[] }>;
@@ -62,7 +63,8 @@ export default async function LiveScreenPage({ params }: PageProps) {
   const accent = colors.accent || merchant.branding?.accentColor || "#38bdf8";
   const visible = merchant.visibility || {};
 
-  return (
-    <DipanjaliLayout data={data} />
-  );
+  if (data?.layout?.selectedLayout === "theme2") {
+    return <Theme2Layout data={data} />;
+  }
+  return <Theme1Layout data={data} />;
 }

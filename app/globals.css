@@ -1,5 +1,14 @@
 @import "tailwindcss";
 
+@font-face {
+  font-family: "Scaver";
+  src:
+    url("/fonts/Scaver-Regular.woff2") format("woff2"),
+    url("/fonts/Scaver-Regular.woff") format("woff");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
 /* ============================= */
 /* TAILWIND V4 THEME            */
 /* ============================= */

@@ -11,7 +11,10 @@ import {
   Pencil,
   Plus,
   Rocket,
+  Trash2,
 } from "lucide-react";
+import ThemeMarketplaceTab from "./ThemeMarketplaceTab";
+import OthersScreensTab from "./OthersScreensTab";
 
 interface MyScreensTabProps {
   onEditLayout: (layoutId: string) => void;
@@ -110,8 +113,20 @@ export default function MyScreensTab({ onEditLayout, onCreateNew }: MyScreensTab
       await navigator.clipboard.writeText(url);
       setCopiedId(id);
       setTimeout(() => setCopiedId(null), 2000);
-    } catch {
-      setCopiedId(null);
+    } catch (err) {
+      console.error("Failed to copy:", err);
+    }
+  };
+
+  const handleDelete = async (layoutId: string, name: string) => {
+    if (window.confirm(`Are you sure you want to delete the screen "${name}"? This action cannot be undone.`)) {
+      try {
+        await marketplaceApi.deleteLayout(layoutId);
+        setLayouts((prev) => prev.filter((l) => l.layoutId !== layoutId));
+      } catch (err) {
+        console.error("Failed to delete layout:", err);
+        setError("Failed to delete layout. Please try again.");
+      }
     }
   };
 
@@ -261,6 +276,13 @@ export default function MyScreensTab({ onEditLayout, onCreateNew }: MyScreensTab
                         View Live
                       </a>
                     )}
+                    <button
+                      onClick={() => handleDelete(layout.layoutId, layout.name)}
+                      className="btn-secondary flex-1 border-red-200 text-red-600 hover:bg-red-50 hover:border-red-300"
+                      title="Delete Screen"
+                    >
+                      <Trash2 className="h-3.5 w-3.5" />
+                    </button>
                   </div>
                 </div>
               </div>
@@ -268,6 +290,17 @@ export default function MyScreensTab({ onEditLayout, onCreateNew }: MyScreensTab
           })}
         </div>
       )}
+
+      {/* Embedded Tabs */}
+      <div className="mt-16 border-t border-slate-200 pt-10">
+        <h2 className="text-xl font-bold text-slate-800 mb-6">Theme Marketplace</h2>
+        <ThemeMarketplaceTab onThemeInstalled={() => onCreateNew()} />
+      </div>
+
+      <div className="mt-16 border-t border-slate-200 pt-10 pb-10">
+        <h2 className="text-xl font-bold text-slate-800 mb-6">Showroom Screens</h2>
+        <OthersScreensTab />
+      </div>
     </div>
   );
 }
