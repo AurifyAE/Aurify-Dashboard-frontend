@@ -54,11 +54,6 @@ const navItems: NavItem[] = [
     icon: BarChart2,
   },
   {
-    title: "Commodities",
-    href: "/dashboard/merchant-commodities",
-    icon: ShoppingBag,
-  },
-  {
     title: "Screens & Marketplace",
     href: "/dashboard/screen-builder",
     icon: Tv,

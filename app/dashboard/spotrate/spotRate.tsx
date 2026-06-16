@@ -29,6 +29,7 @@ import axiosInstance from "../../axios/axiosInstance";
 import { useCurrency } from "@/context/CurrencyContext";
 import DashboardShell from "@/components/dashboard/DashboardShell";
 import AddCommodityModal from "./AddCommodityModal";
+import { API_URL, API_KEY, SOCKET_SECRET } from "@/lib/env";
 
 interface CurrencySelectorProps {
   onCurrencyChange: (currency: string, exchangeRate: number) => void;
@@ -88,47 +89,21 @@ interface MetalTheme {
   glow: string;
 }
 
+const defaultBlueTheme: MetalTheme = {
+  color: "#3b82f6",
+  text: "text-blue-600",
+  bg: "bg-blue-50/50",
+  border: "border-blue-200/50",
+  accent: "bg-blue-500",
+  glow: "focus:ring-blue-500/20 focus:border-blue-500",
+};
+
 const metalThemes: Record<string, MetalTheme> = {
-  gold: {
-    color: "#d4a017",
-    text: "text-amber-600",
-    bg: "bg-amber-50/50",
-    border: "border-amber-200/50",
-    accent: "bg-amber-500",
-    glow: "focus:ring-amber-500/20 focus:border-amber-500",
-  },
-  silver: {
-    color: "#94a3b8",
-    text: "text-slate-600",
-    bg: "bg-slate-50/50",
-    border: "border-slate-200/50",
-    accent: "bg-slate-500",
-    glow: "focus:ring-slate-500/20 focus:border-slate-500",
-  },
-  platinum: {
-    color: "#7c3aed",
-    text: "text-violet-600",
-    bg: "bg-violet-50/50",
-    border: "border-violet-200/50",
-    accent: "bg-violet-500",
-    glow: "focus:ring-violet-500/20 focus:border-violet-500",
-  },
-  copper: {
-    color: "#ea580c",
-    text: "text-orange-600",
-    bg: "bg-orange-50/50",
-    border: "border-orange-200/50",
-    accent: "bg-orange-500",
-    glow: "focus:ring-orange-500/20 focus:border-orange-500",
-  },
-  default: {
-    color: "#3b82f6",
-    text: "text-blue-600",
-    bg: "bg-blue-50/50",
-    border: "border-blue-200/50",
-    accent: "bg-blue-500",
-    glow: "focus:ring-blue-500/20 focus:border-blue-500",
-  }
+  gold: defaultBlueTheme,
+  silver: defaultBlueTheme,
+  platinum: defaultBlueTheme,
+  copper: defaultBlueTheme,
+  default: defaultBlueTheme,
 };
 
 interface PriceCardProps {
@@ -584,6 +559,14 @@ const SpotRate: React.FC = () => {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [commodityToDelete, setCommodityToDelete] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const availableMetals = useMemo(() => ["Gold", "Silver", "Platinum", "Copper"], []);
+  const [visibleMetals, setVisibleMetals] = useState<string[]>(["Gold", "Silver"]);
+
+  const handleToggleMetal = useCallback((metal: string) => {
+    setVisibleMetals(prev => 
+      prev.includes(metal) ? prev.filter(m => m !== metal) : [...prev, metal]
+    );
+  }, []);
 
   const getSpreadOrMarginFromDB = useCallback(
     (metal: string, type: string) => {
@@ -618,10 +601,23 @@ const SpotRate: React.FC = () => {
       setIsLoading(true);
       const userName = localStorage.getItem("userName");
       const [serverURLResponse, adminDataResponse] = await Promise.all([
-        axiosInstance.get("/server-url"),
+        fetch(`${API_URL}/get-server`, {
+          headers: { "Content-Type": "application/json", "X-Secret-Key": API_KEY },
+          credentials: "include",
+        }).then(res => res.json()),
         axiosInstance.get(`/data/${userName}`),
       ]);
-      setServerURL(serverURLResponse.data.selectedServerURL);
+      const serverUrlResult = 
+        serverURLResponse?.data?.info?.serverURL ||
+        serverURLResponse?.data?.info?.serverUrl ||
+        serverURLResponse?.data?.serverURL ||
+        serverURLResponse?.data?.serverUrl ||
+        serverURLResponse?.serverURL ||
+        serverURLResponse?.serverUrl ||
+        serverURLResponse?.info?.serverURL ||
+        serverURLResponse?.info?.serverUrl || null;
+        
+      setServerURL(serverUrlResult);
       setAdminId(adminDataResponse.data.data._id);
 
       const uniqueSymbols = [
@@ -838,37 +834,59 @@ const SpotRate: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    const socketSecret = process.env.REACT_APP_SOCKET_SECRET;
+    if (!serverURL) {
+      console.log("Waiting for Server URL for socket connection...");
+      return;
+    }
 
-    if (!socketSecret) {
+    if (!SOCKET_SECRET) {
       console.error("Socket secret is not defined in environment variables");
       return;
     }
+
     const socket = io(serverURL, {
-      query: { secret: socketSecret },
+      query: { secret: SOCKET_SECRET },
       transports: ["websocket"],
+      withCredentials: true,
     });
 
     socket.on("connect", () => {
       socket.emit("request-data", symbols);
     });
 
-    socket.on("market-data", (data: any) => {
-      if (data && data.symbol) {
-        setMarketData((prevData) => ({
-          ...prevData,
-          [data.symbol]: {
-            ...data,
-            bidChanged:
-              prevData[data.symbol] && data.bid !== prevData[data.symbol].bid
-                ? data.bid > prevData[data.symbol].bid
-                  ? "up"
-                  : "down"
-                : null,
-          },
-        }));
+    const SPOT_RATE_EVENT_NAMES = [
+      "market-data",
+      "spotrate",
+      "spot-rate",
+      "spot-rates",
+      "rates",
+      "data",
+    ] as const;
+
+    const handleSpotRatePayload = (data: any) => {
+      // Normalize array payloads if any
+      const payloads = Array.isArray(data) ? data : [data];
+      for (const item of payloads) {
+        if (item && item.symbol) {
+          setMarketData((prevData) => ({
+            ...prevData,
+            [item.symbol]: {
+              ...item,
+              bidChanged:
+                prevData[item.symbol] && item.bid !== prevData[item.symbol].bid
+                  ? item.bid > prevData[item.symbol].bid
+                    ? "up"
+                    : "down"
+                  : null,
+            },
+          }));
+        }
       }
-    });
+    };
+
+    for (const eventName of SPOT_RATE_EVENT_NAMES) {
+      socket.on(eventName, handleSpotRatePayload);
+    }
 
     socket.on("error", (err: any) => {
       console.error("Socket error:", err);
@@ -1089,17 +1107,17 @@ const SpotRate: React.FC = () => {
   return (
     <DashboardShell className="space-y-6 pb-12">
       {/* Page Header Bar */}
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-slate-900 via-slate-800 to-slate-950 p-6 shadow-lg border border-slate-800">
-        <div className="absolute inset-0 opacity-10 bg-[radial-gradient(circle_at_30%_50%,#d4a017,transparent_45%),radial-gradient(circle_at_70%_50%,#3051bb,transparent_45%)]" />
+      <div className="relative overflow-hidden rounded-2xl bg-white p-6 shadow-sm border border-blue-100">
+        <div className="absolute inset-0 opacity-5 bg-[radial-gradient(circle_at_100%_0%,#3b82f6,transparent_30%),radial-gradient(circle_at_0%_100%,#60a5fa,transparent_30%)]" />
         <div className="relative flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between z-10">
           <div>
-            <h1 className="text-2xl font-extrabold text-white tracking-tight flex items-center gap-2.5">
-              <span className="bg-gradient-to-r from-amber-400 to-amber-600 bg-clip-text text-transparent">
+            <h1 className="text-2xl font-extrabold text-slate-800 tracking-tight flex items-center gap-2.5">
+              <span className="text-blue-600">
                 Spot Rates & Spreads
               </span>
               <span className="text-slate-400 text-lg font-light">Console</span>
             </h1>
-            <p className="mt-1 text-sm text-slate-400 max-w-2xl">
+            <p className="mt-1 text-sm text-slate-500 max-w-2xl">
               Configure spreads, margins, and manage your commodity catalog with live price calculations.
             </p>
           </div>
@@ -1110,22 +1128,42 @@ const SpotRate: React.FC = () => {
       </div>
 
       {/* Spreads & Charts Section */}
+      <div className="flex items-center gap-2 mt-4 px-1">
+        <span className="text-sm font-semibold text-slate-600 mr-2">Visible Spot Rates:</span>
+        {availableMetals.map((m) => {
+          const isActive = visibleMetals.includes(m);
+          return (
+            <button
+              key={m}
+              onClick={() => handleToggleMetal(m)}
+              className={`px-3 py-1.5 rounded-full text-xs font-bold transition-all ${
+                isActive 
+                  ? "bg-blue-600 text-white shadow-sm border border-transparent" 
+                  : "bg-slate-100 text-slate-500 border border-slate-200 hover:bg-slate-200"
+              }`}
+            >
+              {m}
+            </button>
+          );
+        })}
+      </div>
+
       {isLoading ? (
         renderLoadingSkeleton()
       ) : (
         <div className="grid gap-6 grid-cols-1 md:grid-cols-2">
-          {uniqueMetals.map((metal, index) => (
+          {visibleMetals.map((metal, index) => (
             <div
               key={metal}
               className={`col-span-1 ${
-                index === uniqueMetals.length - 1 && uniqueMetals.length % 2 !== 0
+                index === visibleMetals.length - 1 && visibleMetals.length % 2 !== 0
                   ? "md:col-span-2"
                   : ""
               }`}
             >
               <div
                 className={`grid gap-4 ${
-                  index === uniqueMetals.length - 1 && uniqueMetals.length % 2 !== 0
+                  index === visibleMetals.length - 1 && visibleMetals.length % 2 !== 0
                     ? "md:grid-cols-2"
                     : "grid-cols-1"
                 }`}
@@ -1179,7 +1217,7 @@ const SpotRate: React.FC = () => {
           Live Spot Conversions (1 Gram)
         </h2>
         <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
-          {uniqueMetals.map((metal) => {
+          {visibleMetals.map((metal) => {
             const theme = metalThemes[metal.toLowerCase()] || metalThemes.default;
             const usdVal = isLoading
               ? "—"
