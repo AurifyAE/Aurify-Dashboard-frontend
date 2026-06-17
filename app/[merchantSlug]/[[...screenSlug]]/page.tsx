@@ -1,6 +1,7 @@
 import { fetchLiveScreen } from "@/lib/api/marketplace";
 import Theme1Layout from "@/components/live-screen/theme1/Theme1Layout";
 import Theme2Layout from "@/components/live-screen/theme2/Theme2Layout";
+import DeviceTracker from "@/components/live-screen/DeviceTracker";
 
 type PageProps = {
   params: Promise<{ merchantSlug: string; screenSlug?: string[] }>;
@@ -64,7 +65,17 @@ export default async function LiveScreenPage({ params }: PageProps) {
   const visible = merchant.visibility || {};
 
   if (data?.layout?.selectedLayout === "theme2") {
-    return <Theme2Layout data={data} />;
+    return (
+      <>
+        <DeviceTracker merchantId={merchant.merchantId} screenSlug={layout.screenSlug} />
+        <Theme2Layout data={data} />
+      </>
+    );
   }
-  return <Theme1Layout data={data} />;
+  return (
+    <>
+      <DeviceTracker merchantId={merchant.merchantId} screenSlug={layout.screenSlug} />
+      <Theme1Layout data={data} />
+    </>
+  );
 }

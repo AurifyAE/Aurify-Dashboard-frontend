@@ -3,7 +3,13 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Box, Typography } from "@mui/material";
 
-const LiveSpotRate = ({ goldData, silverData }: { goldData: any; silverData: any }) => {
+interface LiveSpotRateProps {
+  goldData: any;
+  silverData: any;
+  colors?: any;
+}
+
+const LiveSpotRate = ({ goldData, silverData, colors = {} }: LiveSpotRateProps) => {
   const [goldBidDir, setGoldBidDir] = useState("neutral");
   const [goldAskDir, setGoldAskDir] = useState("neutral");
   const [silverBidDir, setSilverBidDir] = useState("neutral");
@@ -63,6 +69,11 @@ const LiveSpotRate = ({ goldData, silverData }: { goldData: any; silverData: any
     const { bgColor, border, color } = getColors(dir);
     const hasPulse = dir !== "neutral";
 
+    const type = label;
+    const isBuy = type === "BID";
+    const bgFallback = isBuy ? "linear-gradient(180deg, rgba(20,8,2,0.8) 0%, rgba(40,15,5,0.9) 100%)" : "linear-gradient(180deg, rgba(40,15,5,0.8) 0%, rgba(20,8,2,0.9) 100%)";
+    const textFallback = isBuy ? "#20c997" : "#ff4d4d";
+
     return (
       <Box
         sx={{
@@ -70,13 +81,15 @@ const LiveSpotRate = ({ goldData, silverData }: { goldData: any; silverData: any
           flex: 1,
           mb: ".5vw",
           overflow: "hidden",
+          background: (isBuy ? colors.buyBg : colors.sellBg) || bgFallback,
+          borderRadius: "1vw",
           ...(hasPulse && {
             animation: dir === "rise" ? "pulseRise 0.8s ease-out" : "pulseFall 0.8s ease-out",
             bgcolor: dir === "rise" ? "0 0 0 0 rgba(0,255,157,0.6)" : "0 0 0 0 rgba(255,51,102,0.6)",
           }),
         }}
       >
-        <Typography sx={{ fontSize: { xs: "15px", sm: "2.5vw", md: "1.5vw" }, letterSpacing: "0.25vw", color: "#fff" }}>
+        <Typography sx={{ fontSize: { xs: "15px", sm: "2.5vw", md: "1.5vw" }, letterSpacing: "0.25vw", color: "#fff", pl: "1vw" }}>
           {label}
         </Typography>
         <Typography
@@ -86,7 +99,7 @@ const LiveSpotRate = ({ goldData, silverData }: { goldData: any; silverData: any
             letterSpacing: "0.18vw",
             textAlign: "center",
             bgcolor: bgColor,
-            color: color,
+            color: (isBuy ? colors.buyText : colors.sellText) || textFallback,
             border: border,
             borderRadius: "1vw",
             fontVariantNumeric: "tabular-nums",

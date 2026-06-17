@@ -8,13 +8,14 @@ import {
   ExternalLink,
   Loader2,
   Monitor,
+  MoreVertical,
   Pencil,
+  Play,
   Plus,
   Rocket,
   Trash2,
 } from "lucide-react";
-import ThemeMarketplaceTab from "./ThemeMarketplaceTab";
-import OthersScreensTab from "./OthersScreensTab";
+import Swal from "sweetalert2";
 
 interface MyScreensTabProps {
   onEditLayout: (layoutId: string) => void;
@@ -119,19 +120,39 @@ export default function MyScreensTab({ onEditLayout, onCreateNew }: MyScreensTab
   };
 
   const handleDelete = async (layoutId: string, name: string) => {
-    if (window.confirm(`Are you sure you want to delete the screen "${name}"? This action cannot be undone.`)) {
+    const result = await Swal.fire({
+      title: "Delete Screen?",
+      text: `Are you sure you want to delete "${name}"? This action cannot be undone.`,
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#ef4444",
+      cancelButtonColor: "#64748b",
+      confirmButtonText: "Yes, delete it!"
+    });
+
+    if (result.isConfirmed) {
       try {
         await marketplaceApi.deleteLayout(layoutId);
         setLayouts((prev) => prev.filter((l) => l.layoutId !== layoutId));
+        Swal.fire({
+          title: "Deleted!",
+          text: "Your screen has been deleted.",
+          icon: "success",
+          timer: 2000,
+          showConfirmButton: false
+        });
       } catch (err) {
         console.error("Failed to delete layout:", err);
-        setError("Failed to delete layout. Please try again.");
+        Swal.fire("Error", "Failed to delete screen. Please try again.", "error");
       }
     }
   };
 
-  const liveUrl = (layout: ScreenLayout) =>
-    `https://screen.aurify.ae/${layout.screenSlug}`;
+  const liveUrl = (layout: any) => {
+    const isLocal = typeof window !== "undefined" && window.location.hostname === "localhost";
+    const baseUrl = isLocal ? "http://localhost:3000" : "https://screen.aurify.ae";
+    return `${baseUrl}/${layout.merchantSlug || 'merchant'}/${layout.screenSlug}`;
+  };
 
   return (
     <div className="space-y-6">
@@ -290,17 +311,6 @@ export default function MyScreensTab({ onEditLayout, onCreateNew }: MyScreensTab
           })}
         </div>
       )}
-
-      {/* Embedded Tabs */}
-      <div className="mt-16 border-t border-slate-200 pt-10">
-        <h2 className="text-xl font-bold text-slate-800 mb-6">Theme Marketplace</h2>
-        <ThemeMarketplaceTab onThemeInstalled={() => onCreateNew()} />
-      </div>
-
-      <div className="mt-16 border-t border-slate-200 pt-10 pb-10">
-        <h2 className="text-xl font-bold text-slate-800 mb-6">Showroom Screens</h2>
-        <OthersScreensTab />
-      </div>
     </div>
   );
 }

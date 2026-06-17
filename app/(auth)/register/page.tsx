@@ -22,6 +22,12 @@ type RegisterForm = {
   phone?: string;
   password: string;
   confirmPassword: string;
+  logo?: string;
+  services: {
+    tvDisplay: boolean;
+    website: boolean;
+    mobileApp: boolean;
+  };
 };
 
 export default function RegisterPage() {
@@ -34,6 +40,12 @@ export default function RegisterPage() {
     phone: undefined,
     password: "",
     confirmPassword: "",
+    logo: undefined,
+    services: {
+      tvDisplay: true, // Default checked
+      website: false,
+      mobileApp: false,
+    },
   });
 
   const [showPassword, setShowPassword] = useState(false);
@@ -41,6 +53,20 @@ export default function RegisterPage() {
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
   const [apiError, setApiError] = useState<string>("");
   const [isLoading, setIsLoading] = useState(false);
+  const [isScrolledToBottom, setIsScrolledToBottom] = useState(false);
+  const formRef = React.useRef<HTMLFormElement>(null);
+
+  const handleScroll = () => {
+    if (formRef.current) {
+      const { scrollTop, scrollHeight, clientHeight } = formRef.current;
+      setIsScrolledToBottom(scrollTop + clientHeight >= scrollHeight - 10);
+    }
+  };
+
+  // Initial check
+  React.useEffect(() => {
+    handleScroll();
+  }, [form.logo]); // Re-check if logo adds height
 
   const updateField = <K extends keyof RegisterForm>(
     key: K,
@@ -115,6 +141,17 @@ export default function RegisterPage() {
         : "border-[#D1D5DB] focus:ring-[#4A90E2] focus:border-[#4A90E2]"
     }`;
 
+  const handleLogoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setForm((prev) => ({ ...prev, logo: reader.result as string }));
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   return (
     <div className="h-screen flex overflow-hidden">
       {/* Left */}
@@ -158,7 +195,14 @@ export default function RegisterPage() {
             </div>
           )}
 
-          <form onSubmit={handleRegister} className="space-y-5" noValidate>
+          <div className="relative">
+            <form
+              ref={formRef}
+              onScroll={handleScroll}
+              onSubmit={handleRegister}
+              className="space-y-5 mb-6 max-h-[60dvh] overflow-y-auto scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-transparent pr-2"
+              noValidate
+            >
             {/* Company Name */}
             <div>
               <label className="block text-[13px] font-medium text-[#374151] mb-2">
@@ -174,6 +218,30 @@ export default function RegisterPage() {
                 <p className="mt-1 text-[12px] text-red-500">
                   {fieldErrors.companyName}
                 </p>
+              )}
+            </div>
+
+            {/* Company Logo */}
+            <div>
+              <label className="block text-[13px] font-medium text-[#374151] mb-2">
+                Company Logo (Optional)
+              </label>
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleLogoUpload}
+                className="w-full text-[13px] text-[#6B7280] file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+              />
+              {form.logo && (
+                <div className="mt-3">
+                  <Image
+                    src={form.logo}
+                    alt="Preview"
+                    width={80}
+                    height={40}
+                    className="object-contain"
+                  />
+                </div>
               )}
             </div>
 
@@ -297,11 +365,50 @@ export default function RegisterPage() {
               )}
             </div>
 
+            {/* Requested Services */}
+            <div>
+              <label className="block text-[13px] font-medium text-[#374151] mb-3">
+                Requested Services <span className="text-red-500">*</span>
+              </label>
+              <div className="flex gap-6">
+                {[
+                  { id: "tvDisplay", label: "TV Screen" },
+                  { id: "website", label: "Website" },
+                  { id: "mobileApp", label: "Mobile App" },
+                ].map((service) => (
+                  <label
+                    key={service.id}
+                    className="flex items-center gap-2 cursor-pointer"
+                  >
+                    <input
+                      type="checkbox"
+                      checked={
+                        form.services[service.id as keyof typeof form.services]
+                      }
+                      onChange={(e) =>
+                        setForm((prev) => ({
+                          ...prev,
+                          services: {
+                            ...prev.services,
+                            [service.id]: e.target.checked,
+                          },
+                        }))
+                      }
+                      className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500 border-gray-300"
+                    />
+                    <span className="text-[13px] text-[#374151] font-medium">
+                      {service.label}
+                    </span>
+                  </label>
+                ))}
+              </div>
+            </div>
+
             {/* Submit */}
             <button
               type="submit"
               disabled={isLoading}
-              className="relative w-full overflow-hidden py-[17px] rounded-[6px] text-white text-[13px] tracking-[0.26em] uppercase flex items-center justify-center gap-[10px] transition-[filter] duration-300 hover:brightness-[1.08] active:scale-[0.994] disabled:opacity-70 disabled:cursor-not-allowed group"
+              className="sticky bottom-0 w-full overflow-hidden py-[17px] rounded-[6px] text-white text-[13px] tracking-[0.26em] uppercase flex items-center justify-center gap-[10px] transition-[filter] duration-300 hover:brightness-[1.08] active:scale-[0.994] disabled:opacity-70 disabled:cursor-not-allowed group"
               style={{
                 fontFamily: "'Tenor Sans', serif",
                 background:
@@ -341,6 +448,16 @@ export default function RegisterPage() {
               )}
             </button>
           </form>
+
+          {/* Scroll Down Indicator */}
+          {!isScrolledToBottom && (
+            <div className="absolute bottom-[80px] left-1/2 -translate-x-1/2 pointer-events-none animate-bounce bg-white/80 p-1.5 rounded-full shadow-sm border border-slate-100 backdrop-blur-sm">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-slate-400">
+                <path d="M6 9l6 6 6-6"/>
+              </svg>
+            </div>
+          )}
+          </div>
 
           {/* Login Link */}
           <div className="text-center pt-4">

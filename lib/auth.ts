@@ -79,6 +79,12 @@ export const apiRegister = async (data: {
   phone?: string;
   password: string;
   confirmPassword: string;
+  logo?: string;
+  services?: {
+    tvDisplay: boolean;
+    website: boolean;
+    mobileApp: boolean;
+  };
 }): Promise<AuthResponse> => {
   const res = await fetch(`${BASE_URL}/api/auth/register`, {
     method: "POST",

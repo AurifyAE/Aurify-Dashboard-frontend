@@ -30,6 +30,7 @@ import {
   ShoppingBag,
   Store,
   Tv,
+  Users,
 } from "lucide-react";
 
 type LucideIcon = React.ComponentType<{ className?: string; size?: number }>;
@@ -47,26 +48,37 @@ const navItems: NavItem[] = [
     title: "Dashboard",
     href: "/dashboard",
     icon: LayoutDashboard,
+    roles: ["user"],
   },
   {
     title: "Spot Rate",
     href: "/dashboard/spotrate",
     icon: BarChart2,
+    roles: ["user"],
   },
   {
     title: "Screens & Marketplace",
     href: "/dashboard/screen-builder",
     icon: Tv,
+    roles: ["user"],
   },
   {
     title: "News Management",
     href: "/dashboard/news-management",
     icon: Megaphone,
+    roles: ["user"],
   },
   {
     title: "Profile",
     href: "/dashboard/merchant-profile",
     icon: Building2,
+    roles: ["user"],
+  },
+  {
+    title: "Client Management",
+    href: "/dashboard/admin/clients",
+    icon: Users,
+    roles: ["admin", "super_admin"],
   },
 ];
 

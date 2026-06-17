@@ -33,6 +33,12 @@ interface AuthContextValue {
     phone?: string;
     password: string;
     confirmPassword: string;
+    logo?: string;
+    services?: {
+      tvDisplay: boolean;
+      website: boolean;
+      mobileApp: boolean;
+    };
   }) => Promise<AuthResponse>;
   logout: () => void;
 }
@@ -63,7 +69,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (response.success && response.token && response.user) {
         setToken(response.token);
         setUser(response.user);
-        router.push("/dashboard");
+        if (response.user.role === "admin" || response.user.role === "super_admin") {
+          router.push("/dashboard/admin/clients");
+        } else {
+          router.push("/dashboard");
+        }
       }
       return response;
     },
@@ -77,6 +87,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       phone?: string;
       password: string;
       confirmPassword: string;
+      logo?: string;
+      services?: {
+        tvDisplay: boolean;
+        website: boolean;
+        mobileApp: boolean;
+      };
     }): Promise<AuthResponse> => {
       const response = await apiRegister(data);
       if (response.success && response.token && response.user) {

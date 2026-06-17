@@ -47,9 +47,10 @@ interface CommodityTableProps {
   items: any[];
   goldData: any;
   silverData: any;
+  colors?: any;
 }
 
-const CommodityTable = ({ items, goldData, silverData }: CommodityTableProps) => {
+const CommodityTable = ({ items, goldData, silverData, colors = {} }: CommodityTableProps) => {
   const getSpot = (metal: string) => {
     const lower = metal?.toLowerCase() || "";
     if (lower.includes("gold") || lower.includes("minted")) return goldData;
@@ -108,25 +109,23 @@ const CommodityTable = ({ items, goldData, silverData }: CommodityTableProps) =>
       <Box
         sx={{
           display: "grid",
-          gridTemplateColumns: "1.4fr 0.8fr 0.8fr 0.8fr",
-          py: "0.9vw",
-          px: "1.5vw",
-          alignItems: "end",
-          borderRadius: "1vw",
-          background: "linear-gradient(180deg, rgba(40,15,5,0.55) 0%, rgba(20,8,2,0.45) 100%)",
-          backdropFilter: "blur(0.35vw)",
-          border: "0.1vw solid rgba(255, 210, 170, 0.32)",
-          margin: ".4vw",
-          boxShadow: `inset 0 0 0.08vw rgba(255,255,255,0.15), 0 0 0.8vw rgba(255,140,60,0.08)`,
+          gridTemplateColumns: "2.5fr 1fr 1fr 1fr",
+          gap: "0.2vw",
+          background: colors.tableHeaderBg || "linear-gradient(90deg, rgba(35,18,10,0.9) 0%, rgba(55,25,12,0.95) 50%, rgba(35,18,10,0.9) 100%)",
+          padding: "1vw 1.5vw",
+          borderRadius: "0.8vw",
+          border: "0.05vw solid rgba(255, 210, 170, 0.2)",
+          boxShadow: "0 0.4vw 1vw rgba(0,0,0,0.4)",
+          mb: "0.8vw",
         }}
       >
-        {["COMMODITY", "UNIT", "BUY AED", "SELL AED"].map((header, i) => (
+        {["ITEM", "WT", "BUY", "SELL"].map((header, i) => (
           <Typography
-            key={i}
+            key={header}
             sx={{
               fontSize: { xs: "14px", lg: "1.2vw", xl: "1.3vw" },
               fontWeight: 600,
-              color: "#fff",
+              color: colors.tableText || "#e2c08d",
               textAlign: i < 2 ? "start" : "center",
               letterSpacing: i === 0 ? "0.04vw" : "0",
             }}
@@ -149,9 +148,6 @@ const CommodityTable = ({ items, goldData, silverData }: CommodityTableProps) =>
             backdropFilter: "blur(5px)",
             borderRadius: "1vw",
             margin: ".4vw",
-            background: "linear-gradient(180deg, rgba(40,15,5,0.55) 0%, rgba(20,8,2,0.45) 100%)",
-            border: "0.1vw solid rgba(255, 210, 170, 0.32)",
-            boxShadow: `inset 0 0 0.08vw rgba(255,255,255,0.15), 0 0 0.8vw rgba(255,140,60,0.08)`,
           }}
         >
           {rows.map((row, index) => (
@@ -159,18 +155,18 @@ const CommodityTable = ({ items, goldData, silverData }: CommodityTableProps) =>
               <Box
                 sx={{
                   display: "grid",
-                  gridTemplateColumns: "1.4fr 0.8fr 0.8fr 0.8fr",
+                  gridTemplateColumns: "2.5fr 1fr 1fr 1fr",
+                  gap: "0.2vw",
                   alignItems: "center",
-                  py: ".7vw",
-                  px: "1.5vw",
-                  height: "100%",
-                  "&::after": {
-                    content: '""',
-                    position: "absolute",
-                    bottom: 0,
-                    width: "100%",
-                    height: "1px",
-                    background: "linear-gradient(to right, transparent 5%, rgba(255, 210, 170, 0.76),transparent 95%)",
+                  background: colors.tableRowBg || "linear-gradient(90deg, rgba(20,10,5,0.85) 0%, rgba(35,15,8,0.9) 50%, rgba(20,10,5,0.85) 100%)",
+                  padding: "1vw 1.5vw",
+                  borderRadius: "0.6vw",
+                  border: "0.05vw solid rgba(255,255,255,0.05)",
+                  transition: "all 0.3s ease",
+                  "&:hover": {
+                    background: "linear-gradient(90deg, rgba(45,22,12,0.95) 0%, rgba(65,30,15,1) 50%, rgba(45,22,12,0.95) 100%)",
+                    transform: "scale(1.01)",
+                    border: "0.05vw solid rgba(212, 160, 23, 0.4)",
                   },
                 }}
               >
@@ -178,7 +174,7 @@ const CommodityTable = ({ items, goldData, silverData }: CommodityTableProps) =>
                   sx={{
                     fontSize: { xs: "14px", sm: "12px", lg: "1.6vw", xl: "1.4vw" },
                     fontWeight: 800,
-                    color: "#fff",
+                    color: colors.tableText || "#fff",
                     display: "grid",
                     alignItems: "center",
                     justifyContent: "start",
@@ -189,20 +185,20 @@ const CommodityTable = ({ items, goldData, silverData }: CommodityTableProps) =>
                   }}
                 >
                   {row.metal_name || row.metal}
-                  <Typography sx={{ fontSize: { xs: "12px", sm: "10px", lg: "1.2vw" }, fontWeight: 400, color: "#fff" }}>
+                  <Typography sx={{ fontSize: { xs: "12px", sm: "10px", lg: "1.2vw" }, fontWeight: 400, color: colors.tableText || "#fff" }}>
                     {getPurityLabel(row.purity)}
                   </Typography>
                 </Typography>
 
-                <Typography sx={{ fontSize: { xs: "14px", lg: "1.3vw", xl: "1.4vw" }, color: "#fff", textAlign: "start" }}>
+                <Typography sx={{ fontSize: { xs: "14px", lg: "1.3vw", xl: "1.4vw" }, color: colors.tableText || "#fff", textAlign: "start" }}>
                   {row.unit}
                 </Typography>
 
-                <Typography sx={{ fontSize: { xs: "14px", lg: "1.5vw", xl: "1.4vw" }, fontWeight: 600, color: "#fff" }}>
+                <Typography sx={{ fontSize: { xs: "14px", lg: "1.4vw", xl: "1.5vw" }, fontWeight: 600, color: colors.tableText || "#fff", textAlign: "center" }}>
                   {formatPrice(row.bid)}
                 </Typography>
 
-                <Typography sx={{ fontSize: { xs: "14px", lg: "1.5vw", xl: "1.4vw" }, fontWeight: 600, color: "#fff" }}>
+                <Typography sx={{ fontSize: { xs: "14px", lg: "1.4vw", xl: "1.5vw" }, fontWeight: 600, color: colors.tableText || "#fff", textAlign: "center" }}>
                   {formatPrice(row.ask)}
                 </Typography>
               </Box>

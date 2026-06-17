@@ -40,8 +40,35 @@ const WIDGETS = [
 ];
 
 const LAYOUTS = [
-  { id: "theme1", label: "Theme 1 (Classic)" },
-  { id: "theme2", label: "Theme 2 (Modern)" },
+  { 
+    id: "theme1", 
+    label: "Theme 1 (Classic)",
+    colors: [
+      { key: "primary", label: "Primary", default: "#d4a017" },
+      { key: "secondary", label: "Secondary", default: "#111827" },
+      { key: "accent", label: "Accent", default: "#38bdf8" },
+      { key: "backgroundColor", label: "Background", default: "#140b10" },
+      { key: "tableHeaderBg", label: "Table Header Bg", default: "#280f05" },
+      { key: "tableRowBg", label: "Table Row Bg", default: "#140802" },
+      { key: "tableText", label: "Table Text", default: "#ffffff" },
+      { key: "buyBg", label: "Buy Box Bg", default: "#280f05" },
+      { key: "buyText", label: "Buy Text", default: "#20c997" },
+      { key: "sellBg", label: "Sell Box Bg", default: "#280f05" },
+      { key: "sellText", label: "Sell Text", default: "#ff4d4d" },
+      { key: "clockText", label: "Clock Text", default: "#ffffff" },
+      { key: "newsBg", label: "News Bg", default: "#111827" },
+      { key: "newsText", label: "News Text", default: "#ffffff" },
+    ]
+  },
+  { 
+    id: "theme2", 
+    label: "Theme 2 (Modern)",
+    colors: [
+      { key: "primary", label: "Primary", default: "#d4a017" },
+      { key: "secondary", label: "Secondary", default: "#111827" },
+      { key: "accent", label: "Accent", default: "#38bdf8" },
+    ]
+  },
 ];
 
 const SECTIONS = [
@@ -52,10 +79,9 @@ const SECTIONS = [
 ];
 
 const STEPS = [
-  { id: 1, label: "Screen Setup", icon: Settings2 },
-  { id: 2, label: "Theme", icon: Palette },
-  { id: 3, label: "Customize", icon: Tv },
-  { id: 4, label: "Preview & Publish", icon: Monitor },
+  { id: 1, label: "Setup & Theme", icon: Settings2 },
+  { id: 2, label: "Customize", icon: Palette },
+  { id: 3, label: "Go Live", icon: Monitor },
 ];
 
 type DraftState = {
@@ -67,23 +93,24 @@ type DraftState = {
   widgets: string[];
   sectionOrder: string[];
   assignedDevices: string;
-  colorOverride: { primary: string; secondary: string; accent: string };
+  colorOverride: Record<string, string>;
   showLogo: boolean;
   showName: boolean;
   logoUrl?: string;
   backgroundUrl?: string;
+  newsHeading?: string;
 };
 
 const defaultDraft: DraftState = {
   layoutId: "",
   name: "Main Showroom Screen",
   screenSlug: "main",
-  selectedLayout: "Layout A",
+  selectedLayout: "theme1",
   themeId: "",
   widgets: ["Spot Rates", "Commodity Table", "News", "Clock"],
   sectionOrder: ["header", "spotRates", "commodities", "news"],
   assignedDevices: "TV 1, TV 2",
-  colorOverride: { primary: "", secondary: "", accent: "" },
+  colorOverride: { primary: "#d4a017", secondary: "#111827", accent: "#38bdf8", backgroundColor: "#140b10", tableHeaderBg: "#280f05", tableRowBg: "#140802", tableText: "#ffffff", buyBg: "#280f05", buyText: "#20c997", sellBg: "#280f05", sellText: "#ff4d4d", clockText: "#ffffff", newsBg: "#111827", newsText: "#ffffff" },
   showLogo: true,
   showName: true,
   logoUrl: "",
@@ -115,9 +142,19 @@ const TVPreviewRenderer = ({ data }: { data: any }) => {
 
   const enhancedData = {
     ...data,
+    layout: {
+      ...data.layout,
+      styles: {
+        ...(data.layout?.styles || {}),
+        colorOverride: data.layout?.colorOverride || data.layout?.styles?.colorOverride,
+        showLogo: data.layout?.showLogo,
+        showName: data.layout?.showName,
+      }
+    },
     merchant: {
       ...data.merchant,
       logo: data.layout?.logoUrl || data.merchant?.logo,
+      companyName: data.layout?.newsHeading || data.merchant?.companyName,
     },
     theme: {
       ...data.theme,
@@ -161,6 +198,7 @@ export default function ScreenBuilderTab({
   const [merchant, setMerchant] = useState<Merchant | null>(null);
   const [themes, setThemes] = useState<MerchantTheme[]>([]);
   const [layouts, setLayouts] = useState<ScreenLayout[]>([]);
+  const [news, setNews] = useState<any[]>([]);
   const [message, setMessage] = useState("");
   const [messageType, setMessageType] = useState<"info" | "success" | "error">("info");
   const [previewSize, setPreviewSize] = useState<"1920x1080" | "3840x2160">("1920x1080");
@@ -188,14 +226,16 @@ export default function ScreenBuilderTab({
   const load = async () => {
     setLoading(true);
     try {
-      const [m, installed, savedLayouts] = await Promise.all([
+      const [m, installed, savedLayouts, newsItems] = await Promise.all([
         marketplaceApi.myMerchant(),
         marketplaceApi.installedThemes(),
         marketplaceApi.layouts(),
+        marketplaceApi.news().catch(() => []),
       ]);
       setMerchant(m);
       setThemes(installed);
       setLayouts(savedLayouts);
+      setNews(newsItems);
 
       const currentThemeId = installed[0]?.themeId || "";
 
@@ -207,6 +247,7 @@ export default function ScreenBuilderTab({
             name: target.name,
             screenSlug: target.screenSlug,
             selectedLayout: (target.header as any)?.layout || "theme1",
+            newsHeading: (target.header as any)?.newsHeading || "",
             themeId: target.themeId || currentThemeId,
             widgets: target.widgets?.length ? target.widgets : defaultDraft.widgets,
             sectionOrder: (target.body as any)?.sectionOrder || defaultDraft.sectionOrder,
@@ -265,11 +306,11 @@ export default function ScreenBuilderTab({
   };
 
   const buildPayload = (themeId: string) => ({
-    layoutId: draft.layoutId || undefined,
-    name: draft.name.trim(),
-    screenSlug: draft.screenSlug.trim(),
+    layoutId: draft.layoutId,
+    name: draft.name,
+    screenSlug: draft.screenSlug,
     themeId,
-    header: { company: merchant?.companyName, layout: draft.selectedLayout },
+    header: { company: merchant?.companyName, layout: draft.selectedLayout, newsHeading: draft.newsHeading },
     body: { previewSize, sectionOrder: draft.sectionOrder },
     sidebar: {},
     footer: { ticker: "enabled" },
@@ -435,7 +476,7 @@ export default function ScreenBuilderTab({
       )}
 
       <div className="grid gap-6 xl:grid-cols-[380px_1fr]">
-        <aside className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+        <aside className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sticky top-6 h-fit max-h-[70dvh] overflow-y-auto">
           {/* STEP 1 */}
           {step === 1 && (
             <div className="space-y-4">
@@ -445,17 +486,85 @@ export default function ScreenBuilderTab({
                 <input className={inputClass} placeholder="e.g. Main Showroom" value={draft.name} onChange={(e) => setDraft({ ...draft, name: e.target.value })} />
               </div>
               <div>
+                <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-500">News Heading</label>
+                <input className={inputClass} placeholder="e.g. Live Updates" value={draft.newsHeading || ""} onChange={(e) => setDraft({ ...draft, newsHeading: e.target.value })} />
+              </div>
+              <div>
                 <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-500">URL Slug</label>
                 <input className={inputClass} placeholder="main" value={draft.screenSlug} onChange={(e) => setDraft({ ...draft, screenSlug: e.target.value })} />
               </div>
               <div>
                 <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-500">Assigned Devices</label>
-                <input className={inputClass} placeholder="TV 1, TV 2" value={draft.assignedDevices} onChange={(e) => setDraft({ ...draft, assignedDevices: e.target.value })} />
+                <div className="flex gap-2 flex-wrap">
+                  {["TV 1", "TV 2", "TV 3", "TV 4", "TV 5", "Lobby Display", "Window Display"].map((device) => {
+                    const devicesArray = draft.assignedDevices.split(",").map(d => d.trim()).filter(Boolean);
+                    const isSelected = devicesArray.includes(device);
+                    return (
+                      <label key={device} className={`flex items-center gap-2 p-2 rounded-xl border text-sm cursor-pointer transition-colors ${isSelected ? 'border-blue-500 bg-blue-50 text-blue-700' : 'border-slate-200 hover:bg-slate-50'}`}>
+                        <input
+                          type="checkbox"
+                          className="hidden"
+                          checked={isSelected}
+                          onChange={(e) => {
+                            let newDevices = [...devicesArray];
+                            if (e.target.checked) newDevices.push(device);
+                            else newDevices = newDevices.filter(d => d !== device);
+                            setDraft({ ...draft, assignedDevices: newDevices.join(", ") });
+                          }}
+                        />
+                        <div className={`h-4 w-4 rounded border flex items-center justify-center ${isSelected ? 'bg-blue-600 border-blue-600' : 'border-slate-300'}`}>
+                          {isSelected && <Check className="h-3 w-3 text-white" />}
+                        </div>
+                        {device}
+                      </label>
+                    );
+                  })}
+                </div>
+              </div>
+              {/* Theme Selection */}
+              <div className="pt-4 border-t border-slate-100">
+                <h3 className="font-bold text-slate-800 text-sm mb-3">Select Layout Theme</h3>
+                <div className="space-y-3">
+                  {LAYOUTS.map((l) => (
+                    <button
+                      key={l.id}
+                      type="button"
+                      onClick={() => setDraft({ ...draft, selectedLayout: l.id })}
+                      className={`w-full flex items-center justify-between rounded-xl border-2 p-4 text-left transition-all ${
+                        draft.selectedLayout === l.id
+                          ? "border-blue-500 bg-blue-50/50"
+                          : "border-slate-100 hover:border-slate-200"
+                      }`}
+                    >
+                      <div>
+                        <span className="font-bold text-slate-800 block text-sm">{l.label}</span>
+                        <span className="text-xs text-slate-500">
+                          {l.id === "theme1" ? "Classic Dipanjali layout with gradients" : "Modern Zivora layout with glassmorphism"}
+                        </span>
+                      </div>
+                      {draft.selectedLayout === l.id && (
+                        <div className="h-5 w-5 rounded-full bg-blue-600 flex items-center justify-center">
+                          <Check className="h-3 w-3 text-white" />
+                        </div>
+                      )}
+                    </button>
+                  ))}
+                </div>
               </div>
 
-              {/* Branding Section */}
-              <div className="pt-4 border-t border-slate-100 space-y-4">
-                <h3 className="font-bold text-slate-800 text-sm">Branding & Assets</h3>
+              <button type="button" onClick={() => setStep(2)} className="btn-primary w-full mt-4">
+                Next: Customize Screen <ArrowRight className="h-4 w-4" />
+              </button>
+            </div>
+          )}
+
+          {/* STEP 2 */}
+          {step === 2 && (
+            <div className="space-y-4">
+              <h3 className="font-bold text-slate-800 text-sm">Customize Details</h3>
+              
+              <div className="space-y-4">
+                <h4 className="font-semibold text-slate-700 text-xs uppercase tracking-wide">Branding & Assets</h4>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-500">Upload Logo</label>
@@ -467,18 +576,23 @@ export default function ScreenBuilderTab({
                   </div>
                 </div>
                 
-                <div className="grid grid-cols-3 gap-2">
-                  <div>
-                    <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-500">Primary Color</label>
-                    <input type="color" className="h-8 w-full cursor-pointer rounded-lg border-none" value={draft.colorOverride.primary || "#d4a017"} onChange={(e) => setDraft({ ...draft, colorOverride: { ...draft.colorOverride, primary: e.target.value } })} />
-                  </div>
-                  <div>
-                    <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-500">Secondary</label>
-                    <input type="color" className="h-8 w-full cursor-pointer rounded-lg border-none" value={draft.colorOverride.secondary || "#111827"} onChange={(e) => setDraft({ ...draft, colorOverride: { ...draft.colorOverride, secondary: e.target.value } })} />
-                  </div>
-                  <div>
-                    <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-500">Accent</label>
-                    <input type="color" className="h-8 w-full cursor-pointer rounded-lg border-none" value={draft.colorOverride.accent || "#38bdf8"} onChange={(e) => setDraft({ ...draft, colorOverride: { ...draft.colorOverride, accent: e.target.value } })} />
+                <div className="pt-2">
+                  <label className="mb-2 block text-xs font-semibold uppercase tracking-wide text-slate-500">Advanced Colors</label>
+                  <div className="flex gap-3 flex-wrap">
+                    {(LAYOUTS.find(l => l.id === (draft.selectedLayout === "Layout A" ? "theme1" : draft.selectedLayout))?.colors || []).map(color => (
+                      <div key={color.key} className="bg-slate-50 rounded-xl p-1.5 border border-slate-100 flex flex-col gap-1">
+                        <label className="text-[10px] font-bold uppercase tracking-wide text-slate-500">{color.label}</label>
+                        <div className="flex items-center gap-2">
+                          <input 
+                            type="color" 
+                            className="h-8 w-8 cursor-pointer rounded bg-transparent border-0 p-0" 
+                            value={draft.colorOverride[color.key] || color.default} 
+                            onChange={(e) => setDraft({ ...draft, colorOverride: { ...draft.colorOverride, [color.key]: e.target.value } })} 
+                          />
+                          <span className="text-xs font-mono text-slate-600">{draft.colorOverride[color.key] || color.default}</span>
+                        </div>
+                      </div>
+                    ))}
                   </div>
                 </div>
               </div>
@@ -504,42 +618,6 @@ export default function ScreenBuilderTab({
                 </div>
               </div>
 
-              <button type="button" onClick={() => setStep(2)} className="btn-primary w-full mt-4">
-                Next: Select Layout Theme <ArrowRight className="h-4 w-4" />
-              </button>
-            </div>
-          )}
-
-          {/* STEP 2 */}
-          {step === 2 && (
-            <div className="space-y-4">
-              <h3 className="font-bold text-slate-800 text-sm">Select Layout Theme</h3>
-              <div className="space-y-3">
-                {LAYOUTS.map((l) => (
-                  <button
-                    key={l.id}
-                    type="button"
-                    onClick={() => setDraft({ ...draft, selectedLayout: l.id })}
-                    className={`w-full flex items-center justify-between rounded-xl border-2 p-4 text-left transition-all ${
-                      draft.selectedLayout === l.id
-                        ? "border-blue-500 bg-blue-50/50"
-                        : "border-slate-100 hover:border-slate-200"
-                    }`}
-                  >
-                    <div>
-                      <span className="font-bold text-slate-800 block text-sm">{l.label}</span>
-                      <span className="text-xs text-slate-500">
-                        {l.id === "theme1" ? "Classic Dipanjali layout with gradients" : "Modern Zivora layout with glassmorphism"}
-                      </span>
-                    </div>
-                    {draft.selectedLayout === l.id && (
-                      <div className="h-5 w-5 rounded-full bg-blue-600 flex items-center justify-center">
-                        <Check className="h-3 w-3 text-white" />
-                      </div>
-                    )}
-                  </button>
-                ))}
-              </div>
               <div className="flex gap-2 pt-2">
                 <button type="button" onClick={() => setStep(1)} className="btn-secondary">
                   <ArrowLeft className="h-4 w-4" /> Back
@@ -600,8 +678,8 @@ export default function ScreenBuilderTab({
                 <button type="button" onClick={() => setStep(2)} className="btn-secondary">
                   <ArrowLeft className="h-4 w-4" /> Back
                 </button>
-                <button type="button" onClick={save} disabled={saving} className="btn-primary flex-1">
-                  <Rocket className="h-4 w-4" /> Publish Now
+                <button type="button" onClick={publish} disabled={saving || !canGoLive} className="btn-primary flex-1">
+                  <Rocket className="h-4 w-4" /> Go Live
                 </button>
               </div>
             </div>
@@ -609,7 +687,7 @@ export default function ScreenBuilderTab({
         </aside>
 
         {/* Right: TV Preview */}
-        <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+        <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm  h-fit">
           <div className="mb-4 flex items-center justify-between">
             <div className="flex items-center gap-2 font-bold text-slate-900">
               <Monitor className="h-5 w-5 text-blue-600" />
@@ -622,7 +700,7 @@ export default function ScreenBuilderTab({
 
           {/* TV Screen */}
           {/* @ts-ignore */}
-          <TVPreviewRenderer data={{ merchant, theme: selectedTheme, layout: draft, commodities: (merchant as any)?.commodities || [], news: (merchant as any)?.news || [] }} />
+          <TVPreviewRenderer data={{ merchant, theme: selectedTheme, layout: draft, commodities: (merchant as any)?.commodities || [], news: news }} />
 
           {/* Saved Drafts */}
           {layouts.length > 0 && (

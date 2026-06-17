@@ -10,7 +10,7 @@ const clockConfig = [
   { key: "usa", label: "USA", timeZone: "America/New_York", flag: "/images/usa.png" },
 ];
 
-const WorldClockHorizontal = () => {
+const WorldClockHorizontal = ({ colors = {} }: { colors?: any }) => {
   const [times, setTimes] = useState<Record<string, string>>({});
   const [mounted, setMounted] = useState(false);
 
@@ -46,10 +46,10 @@ const WorldClockHorizontal = () => {
             <img src={clock.flag} alt={clock.label} style={{ width: "100%", height: "auto" }} onError={(e) => { e.currentTarget.style.display = 'none' }} />
           </Box>
           <Box sx={{ display: "flex", alignItems: "start", flexDirection: "column" }}>
-            <Typography sx={{ fontSize: { xs: "14px", lg: "1vw" }, fontWeight: 500, color: "#fff" }}>
+            <Typography sx={{ color: colors.clockText || "#fff", fontSize: { xs: "8px", lg: "0.6vw" }, fontWeight: "600", textTransform: "uppercase" }}>
               {clock.label}
             </Typography>
-            <Typography sx={{ fontSize: { xs: "14px", lg: "1vw" }, color: "#fff" }}>
+            <Typography sx={{ fontSize: { xs: "14px", lg: "1vw" }, color: colors.clockText || "#fff" }}>
               {times[clock.key] || "--:--"}
             </Typography>
           </Box>

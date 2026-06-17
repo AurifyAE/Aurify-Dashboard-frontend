@@ -52,12 +52,7 @@ function ScreenConsoleContent() {
       description: "Manage your active TV displays",
       icon: Monitor,
     },
-    {
-      id: "themes" as TabId,
-      label: "Theme Marketplace",
-      description: "Browse premium display themes",
-      icon: Palette,
-    },
+
     {
       id: "others" as TabId,
       label: "Showroom Screens",
@@ -84,15 +79,6 @@ function ScreenConsoleContent() {
                 Unifying template builders, theme installations, live TV previews, and business brandings.
               </p>
             </div>
-            {activeTab !== "builder" && (
-              <button
-                onClick={handleCreateNew}
-                className="flex items-center gap-2 rounded-xl bg-blue-600 hover:bg-blue-700 px-5 py-2.5 text-sm font-bold text-white shadow-sm transition-all cursor-pointer transform hover:-translate-y-0.5"
-              >
-                <Tv className="h-4 w-4" />
-                Launch Builder
-              </button>
-            )}
           </div>
         </div>
 
@@ -110,15 +96,11 @@ function ScreenConsoleContent() {
               editingLayoutId={editingLayoutId}
               setEditingLayoutId={setEditingLayoutId}
               setActiveTab={(tab) => setActiveTab(tab as TabId)}
-              onSaveSuccess={() => {}}
+              onSaveSuccess={() => setActiveTab("my-screens")}
             />
           )}
 
-          {activeTab === "themes" && (
-            <ThemeMarketplaceTab
-              onThemeInstalled={() => setActiveTab("builder")}
-            />
-          )}
+
 
           {activeTab === "profile" && (
             <MerchantProfileTab />

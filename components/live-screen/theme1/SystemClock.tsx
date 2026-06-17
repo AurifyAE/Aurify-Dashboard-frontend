@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { Box, Typography } from "@mui/material";
 
-const SystemClock = () => {
+const SystemClock = ({ colors = {} }: { colors?: any }) => {
   const [timeData, setTimeData] = useState({ day: "", date: "", time: "" });
   const [mounted, setMounted] = useState(false);
 
@@ -31,10 +31,10 @@ const SystemClock = () => {
   return (
     <Box sx={{ width: "100%", display: "flex", justifyContent: "center", alignItems: "center" }}>
       <Box sx={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "1vw", width: "100%", padding: "0vw 2.5vw", borderRadius: "20px" }}>
-        <Typography sx={{ fontSize: { xs: "12px", sm: "2vw" }, fontWeight: 400, letterSpacing: "2px", color: "#fff" }}>
+        <Typography sx={{ fontSize: { xs: "12px", sm: "2vw" }, fontWeight: 400, letterSpacing: "2px", color: colors.clockText || "#fff" }}>
           {timeData.date || "-- --- ----"}
         </Typography>
-        <Typography sx={{ fontSize: { xs: "12px", sm: "1vw" }, color: "#fff", letterSpacing: "2px" }}>
+        <Typography sx={{ fontSize: { xs: "12px", sm: "1vw" }, color: colors.clockText || "#fff", letterSpacing: "2px" }}>
           {timeData.day || "-----"}
         </Typography>
       </Box>

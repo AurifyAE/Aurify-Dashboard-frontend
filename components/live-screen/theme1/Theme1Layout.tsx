@@ -27,6 +27,7 @@ export default function Theme1Layout({
   ];
   const showLogo = layout?.styles?.showLogo ?? true;
   const showName = layout?.styles?.showName ?? true;
+  const colors = layout?.styles?.colorOverride || {};
   const [serverURL, setServerURL] = useState("");
   const [marketData, setMarketData] = useState<Record<string, any>>({});
   const symbols = ["GOLD", "SILVER"];
@@ -152,7 +153,7 @@ export default function Theme1Layout({
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        backgroundColor: "#140b10",
+        backgroundColor: colors.backgroundColor || "#140b10",
         position: "relative",
       }}
     >
@@ -190,6 +191,7 @@ export default function Theme1Layout({
           zIndex: 1,
           position: "relative",
           m: 0,
+          gap: "0",
           p: "0 2vw",
           display: "flex",
           alignItems: "center",
@@ -203,7 +205,6 @@ export default function Theme1Layout({
             alignItems: "center",
             flexDirection: "column",
             justifyContent: "space-between",
-            padding: "1vw",
             gap: "1vw",
           }}
         >
@@ -223,7 +224,7 @@ export default function Theme1Layout({
             ) : showName ? (
               <Typography
                 variant="h4"
-                sx={{ color: "#d4a017", fontWeight: "bold" }}
+                sx={{ color: colors.primary || "#d4a017", fontWeight: "bold" }}
               >
                 {merchant?.companyName || "Merchant"}
               </Typography>
@@ -234,22 +235,23 @@ export default function Theme1Layout({
               items={displayCommodities}
               goldData={goldData}
               silverData={silverData}
+              colors={colors}
             />
           )}
         </Grid>
 
         <Grid
           size={{ xs: 12, md: 6 }}
-          sx={{ padding: "1vw", gap: "1vw", display: "grid" }}
+          sx={{ gap: "1vw", display: "grid" }}
         >
           {widgets.includes("Clock") && (
             <>
-              <WorldClockHorizontal />
-              <SystemClock />
+              <WorldClockHorizontal colors={colors} />
+              <SystemClock colors={colors} />
             </>
           )}
           {widgets.includes("Spot Rates") && (
-            <LiveSpotRate goldData={goldData} silverData={silverData} />
+            <LiveSpotRate goldData={goldData} silverData={silverData} colors={colors} />
           )}
           <PoweredByAurify />
         </Grid>
@@ -266,7 +268,7 @@ export default function Theme1Layout({
               left: "0",
             }}
           >
-            <NewsTicker newsItems={news} merchantName={merchant?.companyName} />
+            <NewsTicker newsItems={news} merchantName={merchant?.companyName} colors={colors} />
           </Grid>
         )}
       </Grid>
