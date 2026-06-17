@@ -105,17 +105,17 @@ export default function LoginPage() {
   return (
     <div className="h-screen flex overflow-hidden">
       {/* Left Side */}
-      <div className="hidden lg:flex lg:w-3/5 bg-[#CBCFD4] relative">
-        <div className="bg_overlay">
+      <div className="hidden relative overflow-hidden lg:flex lg:w-3/5 bg-[#000000]">
+        <div className="">
           <Image
-            src={"/images/background.svg"}
+            src={"/images/bg.png"}
             height={800}
             width={1000}
             alt=""
+            className="w-full h-full   object-cover"
           />
         </div>
       </div>
-
       {/* Right Side - Login Form */}
       <div className="w-full lg:w-2/5 flex items-center justify-center bg-white relative">
         <div className="w-full max-w-[500px] px-8 py-12">

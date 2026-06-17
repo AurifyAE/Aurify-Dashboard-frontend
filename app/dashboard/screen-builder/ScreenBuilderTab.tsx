@@ -281,7 +281,7 @@ export default function ScreenBuilderTab({
     | { colors?: { primary?: string; secondary?: string; accent?: string } }
     | undefined;
 
-  const canGoLive = Boolean(merchant?.status === "Active" && draft.themeId && draft.name.trim());
+  const canGoLive = Boolean(merchant?.status === "Active" && draft.selectedLayout && draft.name.trim());
 
   const moveSection = (targetSection: string) => {
     if (!draggedSection || draggedSection === targetSection) return;
@@ -331,12 +331,7 @@ export default function ScreenBuilderTab({
       setStep(1);
       return;
     }
-    const themeId = draft.themeId || themes[0]?.themeId;
-    if (!themeId) {
-      showMessage("Install a theme from Theme Marketplace first.", "error");
-      setStep(2);
-      return;
-    }
+    const themeId = draft.themeId || themes[0]?.themeId || "default";
     setSaving(true);
     try {
       const saved = await marketplaceApi.saveLayout(buildPayload(themeId));
@@ -658,7 +653,7 @@ export default function ScreenBuilderTab({
                 <p className="text-sm font-semibold text-slate-800 mb-3">Publish Checklist</p>
                 {[
                   { label: "Screen name set", done: Boolean(draft.name.trim()) },
-                  { label: "Theme selected", done: Boolean(draft.themeId) },
+                  { label: "Theme selected", done: Boolean(draft.selectedLayout) },
                   { label: "Merchant approved", done: merchant?.status === "Active" },
                 ].map((item) => (
                   <div key={item.label} className="flex items-center gap-2 text-sm">
