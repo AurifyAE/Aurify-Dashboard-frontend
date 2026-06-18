@@ -415,7 +415,7 @@ export default function RegisterPage() {
                 style={{
                   fontFamily: "'Tenor Sans', serif",
                   background:
-                    "linear-gradient(90deg,#5393ca 0%, #3051bb 50%, #5393ca 100%)",
+                    "linear-gradient(90deg, #163db9 0%, #6287df 100%)",
                   border: "none",
                 }}
               >

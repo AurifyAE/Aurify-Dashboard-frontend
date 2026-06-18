@@ -35,4 +35,8 @@ export const adminApi = {
     const response = await axiosInstance.delete(`/admin/users/${id}`);
     return response.data;
   },
+  resetPassword: async (id: string, newPassword: string) => {
+    const response = await axiosInstance.post(`/admin/users/${id}/reset-password`, { newPassword });
+    return response.data;
+  },
 };

@@ -17,6 +17,13 @@ import {
   Trash2,
   X,
 } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 const TYPES = [
   { key: "Market News", color: "bg-blue-100 text-blue-700" },
@@ -152,15 +159,25 @@ export default function NewsManagementPage() {
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className={labelClass}>Type</label>
-                  <select className={inputClass} value={form.type} onChange={(e) => setForm({ ...form, type: e.target.value })}>
-                    {TYPES.map((t) => <option key={t.key}>{t.key}</option>)}
-                  </select>
+                  <Select value={form.type} onValueChange={(v) => setForm({ ...form, type: v })}>
+                    <SelectTrigger className={inputClass + " h-[42px] px-4"}>
+                      <SelectValue placeholder="Select type" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {TYPES.map((t) => <SelectItem key={t.key} value={t.key}>{t.key}</SelectItem>)}
+                    </SelectContent>
+                  </Select>
                 </div>
                 <div>
                   <label className={labelClass}>Placement</label>
-                  <select className={inputClass} value={form.placement} onChange={(e) => setForm({ ...form, placement: e.target.value })}>
-                    {PLACEMENTS.map((p) => <option key={p.key}>{p.label}</option>)}
-                  </select>
+                  <Select value={form.placement} onValueChange={(v) => setForm({ ...form, placement: v })}>
+                    <SelectTrigger className={inputClass + " h-[42px] px-4"}>
+                      <SelectValue placeholder="Select placement" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {PLACEMENTS.map((p) => <SelectItem key={p.key} value={p.key}>{p.label}</SelectItem>)}
+                    </SelectContent>
+                  </Select>
                 </div>
               </div>
               <div>

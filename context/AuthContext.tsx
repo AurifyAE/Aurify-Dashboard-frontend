@@ -8,7 +8,7 @@ import React, {
   useCallback,
   ReactNode,
 } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import {
   AuthUser,
   AuthResponse,
@@ -18,6 +18,7 @@ import {
   decodeToken,
   apiLogin,
   apiRegister,
+  apiGetMe,
 } from "@/lib/auth";
 
 // ─── Context Types ────────────────────────────────────────────────────────────
@@ -51,17 +52,51 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [isLoading, setIsLoading] = useState(true);
   const [hasHydrated, setHasHydrated] = useState(false);
   const router = useRouter();
+  const pathname = usePathname();
 
-  // Hydrate user from stored token on mount
+  const forceRegisterRedirect = useCallback(() => {
+    removeToken();
+    setUser(null);
+    router.push("/login?alert=deleted");
+  }, [router]);
+
+  // Hydrate and verify user on mount, route change, and interval
   useEffect(() => {
-    const token = getToken();
-    if (token) {
-      const decoded = decodeToken(token);
-      setUser(decoded);
-    }
-    setIsLoading(false);
-    setHasHydrated(true);
-  }, []);
+    const checkAuthStatus = async () => {
+      const token = getToken();
+      if (!token) {
+        setIsLoading(false);
+        setHasHydrated(true);
+        return;
+      }
+      
+      // Fast initial hydration
+      if (!hasHydrated) {
+        const decoded = decodeToken(token);
+        setUser(decoded);
+        setHasHydrated(true);
+      }
+
+      try {
+        const res = await apiGetMe(token);
+        if (res.success && res.user) {
+          setUser(res.user);
+        } else {
+          // If token is invalid or user is deleted/suspended
+          forceRegisterRedirect();
+        }
+      } catch (err) {
+        console.error("Auth check failed:", err);
+      }
+      setIsLoading(false);
+    };
+
+    checkAuthStatus();
+
+    // Poll every 10 seconds to catch admin deletions instantly
+    const interval = setInterval(checkAuthStatus, 10000);
+    return () => clearInterval(interval);
+  }, [pathname, forceRegisterRedirect, hasHydrated]);
 
   const login = useCallback(
     async (email: string, password: string): Promise<AuthResponse> => {

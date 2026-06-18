@@ -23,6 +23,13 @@ import {
   Store,
   XCircle,
 } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 const BUSINESS_TYPES = [
   "Jewellery Shop",
@@ -399,17 +406,21 @@ export default function MerchantProfileTab() {
                 </div>
                 <div>
                   <label className={labelClass}>Business Type</label>
-                  <select
-                    className={inputClass}
+                  <Select
                     value={form.businessType}
-                    onChange={(e) =>
-                      setForm({ ...form, businessType: e.target.value })
+                    onValueChange={(val) =>
+                      setForm({ ...form, businessType: val })
                     }
                   >
-                    {BUSINESS_TYPES.map((t) => (
-                      <option key={t}>{t}</option>
-                    ))}
-                  </select>
+                    <SelectTrigger className={inputClass + " h-[42px] px-4"}>
+                      <SelectValue placeholder="Select type" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {BUSINESS_TYPES.map((t) => (
+                        <SelectItem key={t} value={t}>{t}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
                 <div>
                   <label className={labelClass}>Logo URL</label>
@@ -739,26 +750,29 @@ export default function MerchantProfileTab() {
                   {/* Font Family */}
                   <div>
                     <label className={labelClass}>Font Family</label>
-                    <select
-                      className={inputClass}
+                    <Select
                       value={form.branding.fontFamily}
-                      onChange={(e) =>
+                      onValueChange={(val) =>
                         setForm((prev) => ({
                           ...prev,
                           branding: {
                             ...prev.branding,
-                            fontFamily: e.target.value,
+                            fontFamily: val,
                           },
                         }))
                       }
-                      style={{ fontFamily: form.branding.fontFamily }}
                     >
-                      {FONT_FAMILIES.map((f) => (
-                        <option key={f} style={{ fontFamily: f }}>
-                          {f}
-                        </option>
-                      ))}
-                    </select>
+                      <SelectTrigger className={inputClass + " h-[42px] px-4"} style={{ fontFamily: form.branding.fontFamily }}>
+                        <SelectValue placeholder="Select font" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {FONT_FAMILIES.map((f) => (
+                          <SelectItem key={f} value={f} style={{ fontFamily: f }}>
+                            {f}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </div>
                 </div>
               </div>

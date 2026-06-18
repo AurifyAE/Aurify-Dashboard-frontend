@@ -1,10 +1,11 @@
 "use client";
 
-import React, { useState, FormEvent } from "react";
+import React, { useState, FormEvent, useEffect } from "react";
 import Image from "next/image";
 import { Eye, EyeOff } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import Swal from "sweetalert2";
+import { useSearchParams } from "next/navigation";
 
 interface FieldErrors {
   email?: string;
@@ -13,6 +14,7 @@ interface FieldErrors {
 
 export default function LoginPage() {
   const { login } = useAuth();
+  const searchParams = useSearchParams();
 
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
@@ -20,6 +22,17 @@ export default function LoginPage() {
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
   const [apiError, setApiError] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
+
+  useEffect(() => {
+    if (searchParams?.get("alert") === "deleted") {
+      Swal.fire({
+        icon: "warning",
+        title: "Session Expired",
+        text: "Your account has been suspended or deleted by the administrator.",
+        confirmButtonColor: "#4A90E2",
+      });
+    }
+  }, [searchParams]);
 
   // ── Client-side validation ─────────────────────────────────────────────────
   const validate = (): boolean => {
@@ -232,8 +245,7 @@ export default function LoginPage() {
               className="relative w-full overflow-hidden bg-transparent py-[17px] rounded-[6px] text-white text-[13px] tracking-[0.26em] uppercase flex items-center justify-center gap-[10px] transition-[filter] duration-300 hover:brightness-[1.08] active:scale-[0.994] group"
               style={{
                 fontFamily: "'Tenor Sans', serif",
-                background:
-                  "linear-gradient(90deg,#5393ca 0%, #3051bb 50%, #5393ca 100%)",
+                background: "linear-gradient(90deg, #163db9 0%, #6287df 100%)",
                 border: "none",
               }}
             >

@@ -93,3 +93,14 @@ export const apiRegister = async (data: {
   });
   return res.json();
 };
+
+export const apiGetMe = async (token: string): Promise<AuthResponse> => {
+  const res = await fetch(`${BASE_URL}/api/auth/me`, {
+    method: "GET",
+    headers: { 
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}` 
+    },
+  });
+  return res.json();
+};

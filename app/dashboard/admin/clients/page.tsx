@@ -5,6 +5,13 @@ import DashboardShell from "@/components/dashboard/DashboardShell";
 import { adminApi, AdminMerchant } from "@/lib/api/admin";
 import Swal from "sweetalert2";
 import { Users, Search, Edit2, Calendar, Monitor, Tv, Trash2 } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 export default function AdminClientsPage() {
   const [merchants, setMerchants] = useState<AdminMerchant[]>([]);
@@ -34,22 +41,54 @@ export default function AdminClientsPage() {
     if (!editingMerchant) return;
 
     try {
-      await adminApi.updateMerchant(editingMerchant._id, {
+      const dataToSave = {
         status: editingMerchant.status,
         maxScreens: editingMerchant.maxScreens,
         maxDevices: editingMerchant.maxDevices,
         serviceEndDate: editingMerchant.serviceEndDate,
         services: editingMerchant.services,
         additionalFeatures: editingMerchant.additionalFeatures,
-        allowedCommodities: editingMerchant.allowedCommodities,
-      });
+        allowedCommodities: editingMerchant.allowedCommodities
+      };
 
-      Swal.fire("Saved", "Merchant updated successfully", "success");
+      const updated = await adminApi.updateMerchant(editingMerchant._id, dataToSave);
+      setMerchants(merchants.map(m => m._id === updated._id ? updated : m));
       setEditingMerchant(null);
       fetchMerchants();
     } catch (err) {
       console.error(err);
       Swal.fire("Error", "Failed to update merchant", "error");
+    }
+  };
+
+  const handleResetPassword = async (id: string) => {
+    const { value: newPassword } = await Swal.fire({
+      title: 'Reset Password',
+      input: 'password',
+      inputLabel: 'New Password',
+      inputPlaceholder: 'Enter new password (min 8 chars)',
+      inputAttributes: {
+        minlength: '8',
+        autocapitalize: 'off',
+        autocorrect: 'off'
+      },
+      showCancelButton: true,
+      confirmButtonColor: '#3b82f6',
+      confirmButtonText: 'Reset Password',
+      inputValidator: (value) => {
+        if (!value || value.length < 8) {
+          return 'Password must be at least 8 characters!';
+        }
+      }
+    });
+
+    if (newPassword) {
+      try {
+        await adminApi.resetPassword(id, newPassword);
+        Swal.fire('Success', 'Password reset successfully', 'success');
+      } catch (err: any) {
+        Swal.fire('Error', err.response?.data?.message || 'Failed to reset password', 'error');
+      }
     }
   };
 
@@ -208,12 +247,20 @@ export default function AdminClientsPage() {
             <form onSubmit={handleSave} className="p-6 pb-0 space-y-8 max-h-[80vh] overflow-y-auto">
               
               {/* User Details Grid */}
-              <div className="bg-slate-50 p-5 rounded-xl border border-slate-100 grid grid-cols-2 gap-4 text-sm">
+              <div className="bg-slate-50 p-5 rounded-xl border border-slate-100 grid grid-cols-2 gap-4 text-sm relative">
                 <div><span className="text-slate-500 font-medium">Company:</span> <span className="text-slate-800 font-semibold">{editingMerchant.companyName}</span></div>
                 <div><span className="text-slate-500 font-medium">Email:</span> <span className="text-slate-800 font-semibold">{editingMerchant.email}</span></div>
                 <div><span className="text-slate-500 font-medium">Phone:</span> <span className="text-slate-800 font-semibold">{editingMerchant.phone || 'N/A'}</span></div>
                 <div><span className="text-slate-500 font-medium">WhatsApp:</span> <span className="text-slate-800 font-semibold">{editingMerchant.whatsapp || 'N/A'}</span></div>
                 <div className="col-span-2"><span className="text-slate-500 font-medium">Address:</span> <span className="text-slate-800 font-semibold">{editingMerchant.address || 'N/A'}</span></div>
+                
+                <button
+                  type="button"
+                  onClick={() => handleResetPassword(editingMerchant._id)}
+                  className="absolute top-4 right-4 bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 hover:text-blue-600 font-medium text-xs px-3 py-1.5 rounded-lg shadow-sm transition-all"
+                >
+                  Reset Password
+                </button>
               </div>
 
               {/* Grid 1: Status & Limits */}
@@ -223,15 +270,19 @@ export default function AdminClientsPage() {
                   <div className="space-y-4">
                     <div>
                       <label className="block text-sm font-semibold text-slate-700 mb-1.5">Account Status</label>
-                      <select
+                      <Select
                         value={editingMerchant.status}
-                        onChange={(e) => setEditingMerchant({ ...editingMerchant, status: e.target.value })}
-                        className="w-full rounded-xl border border-slate-200 px-4 py-2.5 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none"
+                        onValueChange={(val) => setEditingMerchant({ ...editingMerchant, status: val })}
                       >
-                        <option value="Pending">Pending</option>
-                        <option value="Active">Active</option>
-                        <option value="Suspended">Suspended</option>
-                      </select>
+                        <SelectTrigger className="w-full rounded-xl border border-slate-200 px-4 h-[42px] text-sm focus:ring-1 focus:ring-blue-500">
+                          <SelectValue placeholder="Select status" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="Pending">Pending</SelectItem>
+                          <SelectItem value="Active">Active</SelectItem>
+                          <SelectItem value="Suspended">Suspended</SelectItem>
+                        </SelectContent>
+                      </Select>
                     </div>
                     <div>
                       <label className="block text-sm font-semibold text-slate-700 mb-1.5">Service End Date</label>

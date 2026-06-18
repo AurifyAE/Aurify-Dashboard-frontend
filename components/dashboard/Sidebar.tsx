@@ -75,6 +75,12 @@ const navItems: NavItem[] = [
     roles: ["user"],
   },
   {
+    title: "Account Settings",
+    href: "/dashboard/settings",
+    icon: Settings2,
+    roles: ["user", "admin", "super_admin"],
+  },
+  {
     title: "Client Management",
     href: "/dashboard/admin/clients",
     icon: Users,
