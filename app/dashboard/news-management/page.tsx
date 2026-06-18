@@ -17,13 +17,7 @@ import {
   Trash2,
   X,
 } from "lucide-react";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Select, MenuItem } from "@mui/material";
 
 const TYPES = [
   { key: "Market News", color: "bg-blue-100 text-blue-700" },
@@ -159,24 +153,46 @@ export default function NewsManagementPage() {
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className={labelClass}>Type</label>
-                  <Select value={form.type} onValueChange={(v) => setForm({ ...form, type: v })}>
-                    <SelectTrigger className={inputClass + " h-[42px] px-4"}>
-                      <SelectValue placeholder="Select type" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {TYPES.map((t) => <SelectItem key={t.key} value={t.key}>{t.key}</SelectItem>)}
-                    </SelectContent>
+                  <Select 
+                    value={form.type} 
+                    onChange={(e) => setForm({ ...form, type: e.target.value as string })}
+                    displayEmpty
+                    fullWidth
+                    size="small"
+                    sx={{
+                      borderRadius: '0.75rem',
+                      height: '42px',
+                      fontSize: '0.875rem',
+                      backgroundColor: '#fff',
+                      '& .MuiOutlinedInput-notchedOutline': { borderColor: '#e2e8f0' },
+                      '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: '#cbd5e1' },
+                      '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: '#3b82f6', borderWidth: '1px' }
+                    }}
+                  >
+                    <MenuItem value="" disabled>Select type</MenuItem>
+                    {TYPES.map((t) => <MenuItem key={t.key} value={t.key}>{t.key}</MenuItem>)}
                   </Select>
                 </div>
                 <div>
                   <label className={labelClass}>Placement</label>
-                  <Select value={form.placement} onValueChange={(v) => setForm({ ...form, placement: v })}>
-                    <SelectTrigger className={inputClass + " h-[42px] px-4"}>
-                      <SelectValue placeholder="Select placement" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {PLACEMENTS.map((p) => <SelectItem key={p.key} value={p.key}>{p.label}</SelectItem>)}
-                    </SelectContent>
+                  <Select 
+                    value={form.placement} 
+                    onChange={(e) => setForm({ ...form, placement: e.target.value as string })}
+                    displayEmpty
+                    fullWidth
+                    size="small"
+                    sx={{
+                      borderRadius: '0.75rem',
+                      height: '42px',
+                      fontSize: '0.875rem',
+                      backgroundColor: '#fff',
+                      '& .MuiOutlinedInput-notchedOutline': { borderColor: '#e2e8f0' },
+                      '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: '#cbd5e1' },
+                      '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: '#3b82f6', borderWidth: '1px' }
+                    }}
+                  >
+                    <MenuItem value="" disabled>Select placement</MenuItem>
+                    {PLACEMENTS.map((p) => <MenuItem key={p.key} value={p.key}>{p.label}</MenuItem>)}
                   </Select>
                 </div>
               </div>

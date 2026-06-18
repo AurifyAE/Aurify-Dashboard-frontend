@@ -5,13 +5,7 @@ import DashboardShell from "@/components/dashboard/DashboardShell";
 import { adminApi, AdminMerchant } from "@/lib/api/admin";
 import Swal from "sweetalert2";
 import { Users, Search, Edit2, Calendar, Monitor, Tv, Trash2 } from "lucide-react";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Select, MenuItem } from "@mui/material";
 
 export default function AdminClientsPage() {
   const [merchants, setMerchants] = useState<AdminMerchant[]>([]);
@@ -268,20 +262,31 @@ export default function AdminClientsPage() {
                 <div>
                   <h3 className="text-base font-bold text-slate-800 mb-4 pb-2 border-b border-slate-100">Account & Limits</h3>
                   <div className="space-y-4">
-                    <div>
-                      <label className="block text-sm font-semibold text-slate-700 mb-1.5">Account Status</label>
+                    <div className="bg-orange-50/80 border border-orange-200 p-4 rounded-xl relative overflow-hidden">
+                      <div className="absolute top-0 left-0 w-1 h-full bg-orange-500" />
+                      <label className="flex items-center gap-2 text-sm font-bold text-orange-900 mb-2">
+                        Account Status
+                       
+                      </label>
                       <Select
                         value={editingMerchant.status}
-                        onValueChange={(val) => setEditingMerchant({ ...editingMerchant, status: val })}
+                        onChange={(e) => setEditingMerchant({ ...editingMerchant, status: e.target.value as string })}
+                        fullWidth
+                        size="small"
+                        sx={{
+                          borderRadius: '0.75rem',
+                          height: '42px',
+                          fontSize: '0.875rem',
+                          backgroundColor: '#fff',
+                          boxShadow: '0 1px 2px rgba(0,0,0,0.05)',
+                          '& .MuiOutlinedInput-notchedOutline': { borderColor: '#fed7aa' },
+                          '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: '#fdba74' },
+                          '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: '#f97316', borderWidth: '2px' }
+                        }}
                       >
-                        <SelectTrigger className="w-full rounded-xl border border-slate-200 px-4 h-[42px] text-sm focus:ring-1 focus:ring-blue-500">
-                          <SelectValue placeholder="Select status" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="Pending">Pending</SelectItem>
-                          <SelectItem value="Active">Active</SelectItem>
-                          <SelectItem value="Suspended">Suspended</SelectItem>
-                        </SelectContent>
+                        <MenuItem value="Pending">Pending</MenuItem>
+                        <MenuItem value="Active">Active</MenuItem>
+                        <MenuItem value="Suspended">Suspended</MenuItem>
                       </Select>
                     </div>
                     <div>

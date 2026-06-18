@@ -23,13 +23,7 @@ import {
   Store,
   XCircle,
 } from "lucide-react";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Select, MenuItem } from "@mui/material";
 
 const BUSINESS_TYPES = [
   "Jewellery Shop",
@@ -408,18 +402,26 @@ export default function MerchantProfileTab() {
                   <label className={labelClass}>Business Type</label>
                   <Select
                     value={form.businessType}
-                    onValueChange={(val) =>
-                      setForm({ ...form, businessType: val })
+                    onChange={(e) =>
+                      setForm({ ...form, businessType: e.target.value as string })
                     }
+                    displayEmpty
+                    fullWidth
+                    size="small"
+                    sx={{
+                      borderRadius: '0.75rem',
+                      height: '42px',
+                      fontSize: '0.875rem',
+                      backgroundColor: '#fff',
+                      '& .MuiOutlinedInput-notchedOutline': { borderColor: '#e2e8f0' },
+                      '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: '#cbd5e1' },
+                      '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: '#3b82f6', borderWidth: '1px' }
+                    }}
                   >
-                    <SelectTrigger className={inputClass + " h-[42px] px-4"}>
-                      <SelectValue placeholder="Select type" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {BUSINESS_TYPES.map((t) => (
-                        <SelectItem key={t} value={t}>{t}</SelectItem>
-                      ))}
-                    </SelectContent>
+                    <MenuItem value="" disabled>Select type</MenuItem>
+                    {BUSINESS_TYPES.map((t) => (
+                      <MenuItem key={t} value={t}>{t}</MenuItem>
+                    ))}
                   </Select>
                 </div>
                 <div>
@@ -752,26 +754,35 @@ export default function MerchantProfileTab() {
                     <label className={labelClass}>Font Family</label>
                     <Select
                       value={form.branding.fontFamily}
-                      onValueChange={(val) =>
+                      onChange={(e) =>
                         setForm((prev) => ({
                           ...prev,
                           branding: {
                             ...prev.branding,
-                            fontFamily: val,
+                            fontFamily: e.target.value as string,
                           },
                         }))
                       }
+                      displayEmpty
+                      fullWidth
+                      size="small"
+                      sx={{
+                        borderRadius: '0.75rem',
+                        height: '42px',
+                        fontSize: '0.875rem',
+                        backgroundColor: '#fff',
+                        fontFamily: form.branding.fontFamily,
+                        '& .MuiOutlinedInput-notchedOutline': { borderColor: '#e2e8f0' },
+                        '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: '#cbd5e1' },
+                        '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: '#3b82f6', borderWidth: '1px' }
+                      }}
                     >
-                      <SelectTrigger className={inputClass + " h-[42px] px-4"} style={{ fontFamily: form.branding.fontFamily }}>
-                        <SelectValue placeholder="Select font" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {FONT_FAMILIES.map((f) => (
-                          <SelectItem key={f} value={f} style={{ fontFamily: f }}>
-                            {f}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
+                      <MenuItem value="" disabled>Select font</MenuItem>
+                      {FONT_FAMILIES.map((f) => (
+                        <MenuItem key={f} value={f} style={{ fontFamily: f }}>
+                          {f}
+                        </MenuItem>
+                      ))}
                     </Select>
                   </div>
                 </div>
