@@ -5,6 +5,7 @@ import { Dialog, DialogTitle, DialogContent, DialogActions, Button, TextField, S
 import CloseIcon from '@mui/icons-material/Close';
 import axiosInstance from '../../axios/axiosInstance';
 import { Snackbar, Alert } from '@mui/material';
+import { useAuth } from "@/context/AuthContext";
 
 interface AddCommodityModalProps {
   open: boolean;
@@ -70,6 +71,7 @@ const AddCommodityModal: React.FC<AddCommodityModalProps> = ({
   const [commodities, setCommodities] = useState<any[]>([]);
   const [adminId, setAdminId] = useState('');
   const [error, setError] = useState<string | null>(null);
+  const { user } = useAuth();
 
   const exchangeRates = useMemo<Record<string, number>>(() => ({
     AED: 3.674,
@@ -121,9 +123,9 @@ const AddCommodityModal: React.FC<AddCommodityModalProps> = ({
   useEffect(() => {
     const fetchAdminId = async () => {
       try {
-        const userName = localStorage.getItem('userName');
+        const userName = user?.email;
         if (!userName) {
-          console.error('userName not found in localStorage.');
+          // Suppress error log to avoid console noise if user is not yet logged in or uses different auth
           return;
         }
         const response = await axiosInstance.get(`/data/${userName}`);
@@ -138,7 +140,7 @@ const AddCommodityModal: React.FC<AddCommodityModalProps> = ({
     };
 
     fetchAdminId();
-  }, []);
+  }, [user?.email]);
 
   useEffect(() => {
     if (initialData && (isEditing || open)) {
@@ -223,7 +225,7 @@ const AddCommodityModal: React.FC<AddCommodityModalProps> = ({
 
   useEffect(() => {
     const fetchCommodities = async () => {
-      const userName = localStorage.getItem('userName');
+      const userName = user?.email;
       if (!userName) {
         setError('User not logged in');
         return;
@@ -252,7 +254,7 @@ const AddCommodityModal: React.FC<AddCommodityModalProps> = ({
     };
 
     fetchCommodities();
-  }, []);
+  }, [user?.email]);
 
   const handleSave = useCallback(async () => {
     const requiredFields: (keyof FormData)[] = ['metal', 'purity', 'unit', 'weight'];
@@ -355,17 +357,15 @@ const AddCommodityModal: React.FC<AddCommodityModalProps> = ({
       }}
       maxWidth="sm"
       fullWidth
-      {...({
-        PaperProps: {
-          sx: {
-            borderRadius: '20px',
-            boxShadow: '0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1)',
-          }
+      PaperProps={{
+        sx: {
+          borderRadius: '20px',
+          boxShadow: '0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1)',
         }
-      } as any)}
+      }}
     >
       <DialogTitle sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #f1f5f9', px: 3, py: 2.5 }}>
-        <Typography variant="h6" sx={{ fontWeight: 'extrabold', color: '#1e293b' }}>
+        <Typography component="div" variant="h6" sx={{ fontWeight: 'extrabold', color: '#1e293b' }}>
           {isEditMode ? 'Edit Commodity Template' : 'Add New Commodity Template'}
         </Typography>
         <IconButton onClick={onClose} size="small" sx={{ color: '#94a3b8', hover: { color: '#64748b' } }}>
@@ -450,7 +450,7 @@ const AddCommodityModal: React.FC<AddCommodityModalProps> = ({
               onChange={handleChange}
               fullWidth
               size="small"
-              {...({ inputProps: { min: 0, max: 1000, step: 0.1 } } as any)}
+              inputProps={{ min: 0, max: 1000, step: 0.1 }}
               required
               sx={inputStyle}
             />

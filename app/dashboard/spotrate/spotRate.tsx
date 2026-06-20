@@ -27,6 +27,7 @@ import "react-toastify/dist/ReactToastify.css";
 import io from "socket.io-client";
 import axiosInstance from "../../axios/axiosInstance";
 import { useCurrency } from "@/context/CurrencyContext";
+import { useAuth } from "@/context/AuthContext";
 import DashboardShell from "@/components/dashboard/DashboardShell";
 import AddCommodityModal from "./AddCommodityModal";
 import { API_URL, API_KEY, SOCKET_SECRET } from "@/lib/env";
@@ -519,7 +520,7 @@ const TradingViewWidget: React.FC<TradingViewWidgetProps> = React.memo(({ symbol
         <div className="w-full h-full">
           <iframe
             scrolling="no"
-            allowTransparency={true}
+            allowtransparency={true}
             frameBorder="0"
             src={`https://www.tradingview-widget.com/embed-widget/symbol-overview/?locale=in#%7B%22symbols%22%3A%5B%5B%22${symbol}%7C1D%22%5D%5D%2C%22chartOnly%22%3Afalse%2C%22width%22%3A%22100%25%22%2C%22height%22%3A%22100%25%22%2C%22colorTheme%22%3A%22light%22%2C%22showVolume%22%3Afalse%2C%22showMA%22%3Afalse%2C%22hideDateRanges%22%3Afalse%2C%22hideMarketStatus%22%3Afalse%2C%22hideSymbolLogo%22%3Afalse%2C%22scalePosition%22%3A%22right%22%2C%22scaleMode%22%3A%22Normal%22%2C%22fontSize%22%3A%2210%22%2C%22chartType%22%3A%22area%22%7D`}
             title="symbol overview TradingView widget"
@@ -545,6 +546,7 @@ const SpotRate: React.FC = () => {
   const [exchangeRate, setExchangeRate] = useState(3.674);
   const [openModal, setOpenModal] = useState(false);
   const { currency, setCurrency } = useCurrency();
+  const { user } = useAuth();
   const [selectedCommodity, setSelectedCommodity] = useState<any>(null);
   const [marketData, setMarketData] = useState<Record<string, any>>({});
   const [error, setError] = useState<string | null>(null);
@@ -599,7 +601,13 @@ const SpotRate: React.FC = () => {
   const fetchData = useCallback(async () => {
     try {
       setIsLoading(true);
-      const userName = localStorage.getItem("userName");
+      const userName = user?.email;
+      
+      if (!userName) {
+        setIsLoading(false);
+        return; // Don't fetch if no userName is present
+      }
+
       const [serverURLResponse, adminDataResponse] = await Promise.all([
         fetch(`${API_URL}/get-server`, {
           headers: { "Content-Type": "application/json", "X-Secret-Key": API_KEY },
@@ -663,7 +671,7 @@ const SpotRate: React.FC = () => {
         setIsLoading(false);
       }, 100);
     }
-  }, []);
+  }, [user?.email]);
 
   useEffect(() => {
     fetchData();
@@ -1271,7 +1279,7 @@ const SpotRate: React.FC = () => {
           <button
             type="button"
             onClick={handleOpenAddModal}
-            className="flex items-center gap-2 rounded-xl bg-gradient-to-r from-blue-600 to-sky-500 hover:from-blue-700 hover:to-sky-600 px-5 py-2.5 text-sm font-bold text-white shadow-md shadow-blue-500/20 transition-all cursor-pointer transform hover:-translate-y-0.5"
+            className="flex items-center gap-2 rounded-xl bg-gradient-to-r from-blue-600 to-sky-500 hover:from-blue-700 hover:to-sky-600 px-5 py-2.5 text-sm font-bold text-white shadow-md shadow-blue-500/20 transition-all cursor-pointer"
           >
             <svg
               className="w-3.5 h-3.5"
