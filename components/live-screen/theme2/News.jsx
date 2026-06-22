@@ -2,7 +2,7 @@
 import React from "react";
 import { Box, Typography } from "@mui/material";
 
-const NewsTicker = ({ newsItems = [], merchantName }) => {
+const NewsTicker = ({ newsItems = [], merchantName, newsHeading }) => {
   // Ensure enough items for smooth scrolling
   const tickerItems =
     newsItems.length <= 1 ? Array(5).fill(newsItems[0]) : newsItems;
@@ -45,7 +45,7 @@ const NewsTicker = ({ newsItems = [], merchantName }) => {
           flexShrink: 0,
         }}
       >
-        {merchantName ? `${merchantName} Updates` : "Company Updates"}
+        {newsHeading || (merchantName ? `${merchantName} Updates` : "Company Updates")}
       </Typography>
 
       {/* SCROLL AREA */}
@@ -79,7 +79,7 @@ const NewsTicker = ({ newsItems = [], merchantName }) => {
                 marginRight: "4vw",
               }}
             >
-              {item?.description || ""}
+              {item?.title ? `${item.title}${item.content ? ` - ${item.content}` : ""}` : ""}
             </Typography>
           ))}
         </Box>

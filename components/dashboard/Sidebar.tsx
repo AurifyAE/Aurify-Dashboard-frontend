@@ -63,12 +63,6 @@ const navItems: NavItem[] = [
     roles: ["user"],
   },
   {
-    title: "News Management",
-    href: "/dashboard/news-management",
-    icon: Megaphone,
-    roles: ["user"],
-  },
-  {
     title: "Profile",
     href: "/dashboard/merchant-profile",
     icon: Building2,

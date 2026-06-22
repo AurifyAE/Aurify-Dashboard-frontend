@@ -156,7 +156,7 @@ export const marketplaceApi = {
 
 export async function fetchLiveScreen(merchantSlug: string, screenSlug = "main") {
   const res = await fetch(`${BACKEND_URL}/api/marketplace/live/${merchantSlug}/${screenSlug}`, {
-    next: { revalidate: 15 },
+    cache: "no-store",
   });
   const json = await res.json().catch(() => ({}));
   if (!res.ok) throw new Error(json.message || "Live screen unavailable");

@@ -224,8 +224,8 @@ const SpotRate = ({ goldData, silverData }) => {
             fontWeight: "700",
           }}
         >
-          <PricePulse label="BID" value={data.bid} dir={bidDir} />
-          LOW <span className="hl-value-low text-red-500">{data.low}</span>
+          <PricePulse label="BID" value={data.bid != null ? Number(data.bid).toFixed(2) : "---"} dir={bidDir} />
+          LOW <span className="hl-value-low text-red-500">{data.low != null ? Number(data.low).toFixed(2) : "---"}</span>
         </Box>
 
         {/* Price Boxes */}
@@ -243,8 +243,8 @@ const SpotRate = ({ goldData, silverData }) => {
             fontWeight: "700",
           }}
         >
-          <PricePulse label="ASK" value={data.ask} dir={askDir} />
-          HIGH <span className="hl-value-high text-[#4dbf00]">{data.high}</span>
+          <PricePulse label="ASK" value={data.ask != null ? Number(data.ask).toFixed(2) : "---"} dir={askDir} />
+          HIGH <span className="hl-value-high text-[#4dbf00]">{data.high != null ? Number(data.high).toFixed(2) : "---"}</span>
         </Box>
       </Box>
     );

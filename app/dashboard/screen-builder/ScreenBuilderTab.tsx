@@ -78,10 +78,14 @@ const SECTIONS = [
   { id: "news", label: "News Ticker" },
 ];
 
+import { Newspaper } from "lucide-react";
+import NewsManagementTab from "./NewsManagementTab";
+
 const STEPS = [
   { id: 1, label: "Setup & Theme", icon: Settings2 },
   { id: 2, label: "Customize", icon: Palette },
-  { id: 3, label: "Go Live", icon: Monitor },
+  { id: 3, label: "News & Content", icon: Newspaper },
+  { id: 4, label: "Go Live", icon: Monitor },
 ];
 
 type DraftState = {
@@ -178,6 +182,9 @@ const TVPreviewRenderer = ({ data }: { data: any }) => {
           left: 0,
         }}
       >
+        <div style={{ position: "absolute", top: 0, left: 0, zIndex: 9999, background: "red", color: "white", padding: "10px", fontSize: "24px", fontWeight: "bold" }}>
+          DEBUG: {enhancedData?.layout?.selectedLayout}
+        </div>
         {enhancedData?.layout?.selectedLayout === "theme2" ? (
           <Theme2Layout data={enhancedData} isPreview={true} />
         ) : (
@@ -359,12 +366,11 @@ export default function ScreenBuilderTab({
     }
     setSaving(true);
     try {
-      let layoutId = draft.layoutId;
-      if (!layoutId) {
-        const saved = await marketplaceApi.saveLayout(buildPayload(draft.themeId));
-        layoutId = saved.layoutId;
-        setEditingLayoutId(layoutId);
-      }
+      // Always save the latest draft state before publishing
+      const saved = await marketplaceApi.saveLayout(buildPayload(draft.themeId));
+      let layoutId = saved.layoutId;
+      setEditingLayoutId(layoutId);
+
       const result = await marketplaceApi.publishLayout(layoutId, {
         assignedDevices: draft.assignedDevices.split(",").map((d) => d.trim()).filter(Boolean),
       });
@@ -480,10 +486,7 @@ export default function ScreenBuilderTab({
                 <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-500">Screen Name</label>
                 <input className={inputClass} placeholder="e.g. Main Showroom" value={draft.name} onChange={(e) => setDraft({ ...draft, name: e.target.value })} />
               </div>
-              <div>
-                <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-500">News Heading</label>
-                <input className={inputClass} placeholder="e.g. Live Updates" value={draft.newsHeading || ""} onChange={(e) => setDraft({ ...draft, newsHeading: e.target.value })} />
-              </div>
+
               <div>
                 <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-500">URL Slug</label>
                 <input className={inputClass} placeholder="main" value={draft.screenSlug} onChange={(e) => setDraft({ ...draft, screenSlug: e.target.value })} />
@@ -618,7 +621,7 @@ export default function ScreenBuilderTab({
                   <ArrowLeft className="h-4 w-4" /> Back
                 </button>
                 <button type="button" onClick={() => setStep(3)} className="btn-primary flex-1">
-                  Next: Preview & Go Live <ArrowRight className="h-4 w-4" />
+                  Next: News & Content <ArrowRight className="h-4 w-4" />
                 </button>
               </div>
             </div>
@@ -626,6 +629,30 @@ export default function ScreenBuilderTab({
 
           {/* STEP 3 */}
           {step === 3 && (
+            <div className="space-y-4">
+              <h3 className="font-bold text-slate-800 text-sm">News & Content</h3>
+              <div>
+                <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-500">Page Content Title (News Heading)</label>
+                <input className={inputClass} placeholder="e.g. Live Updates" value={draft.newsHeading || ""} onChange={(e) => setDraft({ ...draft, newsHeading: e.target.value })} />
+              </div>
+              
+              <div className="border-t border-slate-100 pt-4">
+                <NewsManagementTab isEmbedded={true} />
+              </div>
+
+              <div className="flex gap-2 mt-6">
+                <button type="button" onClick={() => setStep(2)} className="btn-secondary">
+                  <ArrowLeft className="h-4 w-4" /> Back
+                </button>
+                <button type="button" onClick={() => setStep(4)} className="btn-primary flex-1">
+                  Next: Preview & Go Live <ArrowRight className="h-4 w-4" />
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* STEP 4 */}
+          {step === 4 && (
             <div className="space-y-4">
               <h3 className="font-bold text-slate-800 text-sm">Go Live</h3>
 
@@ -670,7 +697,7 @@ export default function ScreenBuilderTab({
               </div>
 
               <div className="flex gap-2">
-                <button type="button" onClick={() => setStep(2)} className="btn-secondary">
+                <button type="button" onClick={() => setStep(3)} className="btn-secondary">
                   <ArrowLeft className="h-4 w-4" /> Back
                 </button>
                 <button type="button" onClick={publish} disabled={saving || !canGoLive} className="btn-primary flex-1">

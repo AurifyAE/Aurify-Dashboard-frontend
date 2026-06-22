@@ -117,10 +117,8 @@ const CommodityTable = ({
 
         return {
           group: item.group,
-          name:
-            item.group === "group1" && item.metal_name
-              ? item.metal_name
-              : item.metal,
+          metal_name: item.name || item.metal_name,
+          name: item.metal,
           purity: item.purity,
           weight: `${item.unit} ${item.weight}`,
           bid,
@@ -144,7 +142,7 @@ const CommodityTable = ({
   // -----table height---
   const tableHeight = isMobile ? "35vw" : "18vw";
   // -----table items number---
-  const tableItemsNumber = isMobile ? 6: 5;
+  const tableItemsNumber = isMobile ? 6 : 5;
 
   /* -----------------------
      TABLE COMPONENT
@@ -287,7 +285,7 @@ const CommodityTable = ({
                     key={index}
                     sx={{
                       display: "grid",
-                      gridTemplateColumns: title === 'Commodity' ? "1.4fr 0.8fr 0.8fr 0.8fr" : "1.4fr 0.8fr   0.8fr",
+                      gridTemplateColumns:  "1.4fr 0.8fr 0.8fr 0.8fr",
                       alignItems: "center",
                       py: ".7vw",
                       px: "1.5vw",
@@ -314,8 +312,8 @@ const CommodityTable = ({
                         },
                       }}
                     >
-                      {row.name}
-                      <Typography
+                      {row.metal_name  ? row.metal_name : row.name}
+                       <Typography
                         sx={{
                           // fontSize: "1vw",
                           fontSize: {

@@ -7,16 +7,18 @@ import ScreenBuilderTab from "./ScreenBuilderTab";
 import ThemeMarketplaceTab from "./ThemeMarketplaceTab";
 import MerchantProfileTab from "./MerchantProfileTab";
 import OthersScreensTab from "./OthersScreensTab";
+import NewsManagementTab from "./NewsManagementTab";
 import {
   Monitor,
   Tv,
   Palette,
   Settings2,
   Tv2,
+  Newspaper,
 } from "lucide-react";
 import { useSearchParams, useRouter } from "next/navigation";
 
-type TabId = "my-screens" | "builder" | "themes" | "profile" | "others";
+type TabId = "my-screens" | "builder" | "themes" | "profile" | "others" | "news";
 
 function ScreenConsoleContent() {
   const router = useRouter();
@@ -30,7 +32,7 @@ function ScreenConsoleContent() {
   // Sync tab from query parameter if provided (e.g. /dashboard/screen-builder?tab=themes)
   useEffect(() => {
     const tabParam = searchParams.get("tab");
-    if (tabParam && ["my-screens", "builder", "themes", "profile", "others"].includes(tabParam)) {
+    if (tabParam && ["my-screens", "builder", "themes", "profile", "others", "news"].includes(tabParam)) {
       setActiveTab(tabParam as TabId);
     }
   }, [searchParams]);
@@ -52,7 +54,12 @@ function ScreenConsoleContent() {
       description: "Manage your active TV displays",
       icon: Monitor,
     },
-
+    {
+      id: "news" as TabId,
+      label: "News Management",
+      description: "Control tickers and announcements",
+      icon: Newspaper,
+    },
     {
       id: "others" as TabId,
       label: "Showroom Screens",
@@ -82,7 +89,6 @@ function ScreenConsoleContent() {
           </div>
         </div>
 
-
         <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm min-h-[500px]">
           {activeTab === "my-screens" && (
             <MyScreensTab
@@ -100,7 +106,9 @@ function ScreenConsoleContent() {
             />
           )}
 
-
+          {activeTab === "news" && (
+            <NewsManagementTab />
+          )}
 
           {activeTab === "profile" && (
             <MerchantProfileTab />

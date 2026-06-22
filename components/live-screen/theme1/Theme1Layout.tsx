@@ -315,6 +315,7 @@ export default function Theme1Layout({
             <NewsTicker
               newsItems={news}
               merchantName={merchant?.companyName}
+              newsHeading={layout?.newsHeading}
               colors={colors}
             />
           </Grid>

@@ -25,7 +25,6 @@ export default function Theme2Layout({ data, isPreview = false }) {
   const [serverURL, setServerURL] = useState(null);
 
   useEffect(() => {
-    if (isPreview) return; // Don't fetch on preview
     const fetchServerURL = async () => {
       try {
         const res = await fetch(`${API_URL}/get-server`, {
@@ -41,7 +40,7 @@ export default function Theme2Layout({ data, isPreview = false }) {
   }, [isPreview]);
 
   useEffect(() => {
-    if (!serverURL || isPreview) return;
+    if (!serverURL) return;
     const socket = io(serverURL, {
       query: { secret: SOCKET_SECRET },
       transports: ["websocket"],
@@ -304,7 +303,11 @@ export default function Theme2Layout({ data, isPreview = false }) {
               p: 0,
             }}
           >
-            <NewsTicker newsItems={news} merchantName={merchant?.companyName} />
+            <NewsTicker
+              newsItems={news}
+              merchantName={merchant?.companyName}
+              newsHeading={layout?.newsHeading}
+            />
           </Grid>
         )}
       </Grid>

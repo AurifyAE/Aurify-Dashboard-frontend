@@ -3,6 +3,9 @@ import Theme1Layout from "@/components/live-screen/theme1/Theme1Layout";
 import Theme2Layout from "@/components/live-screen/theme2/Theme2Layout";
 import DeviceTracker from "@/components/live-screen/DeviceTracker";
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 type PageProps = {
   params: Promise<{ merchantSlug: string; screenSlug?: string[] }>;
 };
