@@ -240,10 +240,7 @@ export default function Theme1Layout({
           )}
         </Grid>
 
-        <Grid
-          size={{ xs: 12, md: 6 }}
-          sx={{ gap: "1vw", display: "grid" }}
-        >
+        <Grid size={{ xs: 12, md: 6 }} sx={{ gap: "1vw", display: "grid" }}>
           {widgets.includes("Clock") && (
             <>
               <WorldClockHorizontal colors={colors} />
@@ -251,7 +248,11 @@ export default function Theme1Layout({
             </>
           )}
           {widgets.includes("Spot Rates") && (
-            <LiveSpotRate goldData={goldData} silverData={silverData} colors={colors} />
+            <LiveSpotRate
+              goldData={goldData}
+              silverData={silverData}
+              colors={colors}
+            />
           )}
           <PoweredByAurify />
         </Grid>
@@ -261,14 +262,18 @@ export default function Theme1Layout({
             size={{ xs: 12 }}
             sx={{
               mt: { xs: "20px", md: "0" },
-              position: { xs: "unset", md: isPreview ? "absolute" : "fixed" },
+              position: "fixed",
               zIndex: 1,
               bottom: "0",
               width: "100%",
               left: "0",
             }}
           >
-            <NewsTicker newsItems={news} merchantName={merchant?.companyName} colors={colors} />
+            <NewsTicker
+              newsItems={news}
+              merchantName={merchant?.companyName}
+              colors={colors}
+            />
           </Grid>
         )}
       </Grid>

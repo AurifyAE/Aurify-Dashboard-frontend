@@ -203,6 +203,8 @@ const SpotRate = ({ goldData, silverData }) => {
             fontWeight: 700,
             color: "#fff",
             letterSpacing: "0.1em",
+            textAlign: 'center',
+
           }}
         >
           {title}
@@ -218,7 +220,7 @@ const SpotRate = ({ goldData, silverData }) => {
               xl: "1.2vw", // large screens
             },
             color: "#fff",
-
+            textAlign: 'center',
             fontWeight: "700",
           }}
         >
@@ -237,6 +239,7 @@ const SpotRate = ({ goldData, silverData }) => {
               xl: "1.2vw", // large screens
             },
             color: "#fff",
+            textAlign: 'center',
             fontWeight: "700",
           }}
         >
