@@ -534,7 +534,7 @@ export default function ScreenBuilderTab({
                       <div>
                         <span className="font-bold text-slate-800 block text-sm">{l.label}</span>
                         <span className="text-xs text-slate-500">
-                          {l.id === "theme1" ? "Classic Dipanjali layout with gradients" : "Modern Zivora layout with glassmorphism"}
+                          {l.id === "theme1" ? "Classic layout with gradients" : "Modern layout with glassmorphism"}
                         </span>
                       </div>
                       {draft.selectedLayout === l.id && (

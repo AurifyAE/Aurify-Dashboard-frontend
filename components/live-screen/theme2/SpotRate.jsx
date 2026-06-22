@@ -80,19 +80,19 @@ const SpotRate = ({ goldData, silverData }) => {
   const getColors = (dir) => {
     if (dir === "rise")
       return {
-        bgColor: "#00c710",
-        border: "1px solid #00c710",
+        bgColor: "#4dbf00",
+        border: "1px solid #4dbf00",
         color: "white",
       };
     if (dir === "fall")
       return {
         bgColor: "#FF0040",
-        border: " 1px solid #ff3366",
+        border: "1px solid #FF0040",
         color: "white",
       };
     return {
       bgColor: "#F0F8FF00",
-      border: " 1px solid #FFFFFF",
+      border: "1px solid #FFFFFF",
       color: "#fff",
     };
   };
@@ -153,7 +153,7 @@ const SpotRate = ({ goldData, silverData }) => {
             letterSpacing: "0.18vw",
             textAlign: "center",
             bgcolor: bgColor,
-            color: color,
+            color: "#fff",
             border: border,
             borderRadius: "1vw",
             fontVariantNumeric: "tabular-nums",

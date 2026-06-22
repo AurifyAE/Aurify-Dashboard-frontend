@@ -76,20 +76,42 @@ export default function Theme1Layout({
     });
 
     socket.on("market-data", (data) => {
+      const updates: any[] = [];
       if (Array.isArray(data)) {
-        data.forEach((item) => {
-          if (item.symbol) {
-            setMarketData((prev) => ({
-              ...prev,
-              [item.symbol]: { ...prev[item.symbol], ...item },
-            }));
+        updates.push(...data);
+      } else if (data && typeof data === "object") {
+        if (data.symbol) {
+          updates.push(data);
+        } else {
+          for (const key of [
+            "Gold",
+            "GOLD",
+            "XAU",
+            "Silver",
+            "SILVER",
+            "XAG",
+          ]) {
+            if (data[key] && typeof data[key] === "object") {
+              updates.push({ symbol: key, ...data[key] });
+            }
           }
+        }
+      }
+
+      if (updates.length > 0) {
+        setMarketData((prev) => {
+          const next = { ...prev };
+          updates.forEach((item) => {
+            if (item.symbol) {
+              const sym = item.symbol.toUpperCase();
+              next[sym] = { ...next[sym], ...item };
+              if (sym === "XAU") next["GOLD"] = { ...next["GOLD"], ...item };
+              if (sym === "XAG")
+                next["SILVER"] = { ...next["SILVER"], ...item };
+            }
+          });
+          return next;
         });
-      } else if (data && data.symbol) {
-        setMarketData((prev) => ({
-          ...prev,
-          [data.symbol]: { ...prev[data.symbol], ...data },
-        }));
       }
     });
 
@@ -103,18 +125,39 @@ export default function Theme1Layout({
     };
   }, [serverURL]);
 
-  const goldData = marketData["GOLD"] || {
-    bid: 2345.6,
-    ask: 2346.1,
-    low: 2340.0,
-    high: 2350.0,
-  };
-  const silverData = marketData["SILVER"] || {
-    bid: 28.4,
-    ask: 28.45,
-    low: 28.0,
-    high: 28.6,
-  };
+  const rawGold = marketData["GOLD"];
+  const goldData = rawGold
+    ? {
+        ...rawGold,
+        ask:
+          rawGold.ask ||
+          (rawGold.bid
+            ? (parseFloat(rawGold.bid) + 0.5).toFixed(2)
+            : undefined),
+      }
+    : {
+        bid: 2345.6,
+        ask: 2346.1,
+        low: 2340.0,
+        high: 2350.0,
+      };
+
+  const rawSilver = marketData["SILVER"];
+  const silverData = rawSilver
+    ? {
+        ...rawSilver,
+        ask:
+          rawSilver.ask ||
+          (rawSilver.bid
+            ? (parseFloat(rawSilver.bid) + 0.05).toFixed(2)
+            : undefined),
+      }
+    : {
+        bid: 28.4,
+        ask: 28.45,
+        low: 28.0,
+        high: 28.6,
+      };
 
   const defaultCommodities = [
     {
@@ -218,7 +261,7 @@ export default function Theme1Layout({
             {showLogo ? (
               <img
                 src={merchant?.logo || "/images/theme1-logo.svg"}
-                alt={merchant?.companyName || "Dipanjali"}
+                alt={merchant?.companyName}
                 style={{ width: "100%", height: "auto", objectFit: "contain" }}
               />
             ) : showName ? (

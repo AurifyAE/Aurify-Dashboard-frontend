@@ -53,20 +53,42 @@ export default function Theme2Layout({ data, isPreview = false }) {
     });
 
     socket.on("market-data", (data) => {
+      const updates = [];
       if (Array.isArray(data)) {
-        data.forEach((item) => {
-          if (item.symbol) {
-            setMarketData((prev) => ({
-              ...prev,
-              [item.symbol]: { ...prev[item.symbol], ...item },
-            }));
+        updates.push(...data);
+      } else if (data && typeof data === "object") {
+        if (data.symbol) {
+          updates.push(data);
+        } else {
+          for (const key of [
+            "Gold",
+            "GOLD",
+            "XAU",
+            "Silver",
+            "SILVER",
+            "XAG",
+          ]) {
+            if (data[key] && typeof data[key] === "object") {
+              updates.push({ symbol: key, ...data[key] });
+            }
           }
+        }
+      }
+
+      if (updates.length > 0) {
+        setMarketData((prev) => {
+          const next = { ...prev };
+          updates.forEach((item) => {
+            if (item.symbol) {
+              const sym = item.symbol.toUpperCase();
+              next[sym] = { ...next[sym], ...item };
+              if (sym === "XAU") next["GOLD"] = { ...next["GOLD"], ...item };
+              if (sym === "XAG")
+                next["SILVER"] = { ...next["SILVER"], ...item };
+            }
+          });
+          return next;
         });
-      } else if (data && data.symbol) {
-        setMarketData((prev) => ({
-          ...prev,
-          [data.symbol]: { ...prev[data.symbol], ...data },
-        }));
       }
     });
 
@@ -75,18 +97,39 @@ export default function Theme2Layout({ data, isPreview = false }) {
     };
   }, [serverURL, isPreview]);
 
-  const goldData = marketData["GOLD"] || {
-    bid: 2345.6,
-    ask: 2346.1,
-    low: 2340.0,
-    high: 2350.0,
-  };
-  const silverData = marketData["SILVER"] || {
-    bid: 28.4,
-    ask: 28.45,
-    low: 28.0,
-    high: 28.6,
-  };
+  const rawGold = marketData["GOLD"];
+  const goldData = rawGold
+    ? {
+        ...rawGold,
+        ask:
+          rawGold.ask ||
+          (rawGold.bid
+            ? (parseFloat(rawGold.bid) + 0.5).toFixed(2)
+            : undefined),
+      }
+    : {
+        bid: 2345.6,
+        ask: 2346.1,
+        low: 2340.0,
+        high: 2350.0,
+      };
+
+  const rawSilver = marketData["SILVER"];
+  const silverData = rawSilver
+    ? {
+        ...rawSilver,
+        ask:
+          rawSilver.ask ||
+          (rawSilver.bid
+            ? (parseFloat(rawSilver.bid) + 0.05).toFixed(2)
+            : undefined),
+      }
+    : {
+        bid: 28.4,
+        ask: 28.45,
+        low: 28.0,
+        high: 28.6,
+      };
 
   const defaultCommodities = [
     {
@@ -169,8 +212,8 @@ export default function Theme2Layout({ data, isPreview = false }) {
           p: "0 2vw",
           alignItems: "center",
           width: "100%",
-          display: 'grid',
-          gridTemplateColumns: 'repeat(2, 1fr)',
+          display: "grid",
+          gridTemplateColumns: "repeat(2, 1fr)",
         }}
       >
         <Grid
@@ -185,6 +228,8 @@ export default function Theme2Layout({ data, isPreview = false }) {
             gap: "1vw",
           }}
         >
+          {widgets.includes("Clock") && <SystemClock />}
+
           {widgets.includes("Commodity Table") && (
             <>
               <CommodityTable
@@ -201,6 +246,7 @@ export default function Theme2Layout({ data, isPreview = false }) {
               />
             </>
           )}
+          {widgets.includes("Clock") && <WorldClockHorizontal />}
         </Grid>
 
         <Grid
@@ -220,8 +266,13 @@ export default function Theme2Layout({ data, isPreview = false }) {
             {showLogo ? (
               <img
                 src={merchant?.logo || "/images/theme2-logo.png"}
-                alt={merchant?.companyName || "Zivora"}
-                style={{ width: "100%", height: "auto", objectFit: "contain" }}
+                alt={merchant?.companyName }
+                style={{
+                  width: "100%",
+                  height: "auto",
+                  objectFit: "contain",
+                  maxHeight: "15vw",
+                }}
               />
             ) : showName ? (
               <Typography
@@ -232,12 +283,7 @@ export default function Theme2Layout({ data, isPreview = false }) {
               </Typography>
             ) : null}
           </Box>
-          {widgets.includes("Clock") && (
-            <>
-              <SystemClock />
-              <WorldClockHorizontal />
-            </>
-          )}
+
           {widgets.includes("Spot Rates") && (
             <SpotRate goldData={goldData} silverData={silverData} />
           )}
@@ -258,7 +304,7 @@ export default function Theme2Layout({ data, isPreview = false }) {
               p: 0,
             }}
           >
-            <NewsTicker newsItems={news} />
+            <NewsTicker newsItems={news} merchantName={merchant?.companyName} />
           </Grid>
         )}
       </Grid>

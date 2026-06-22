@@ -2,7 +2,7 @@
 import React from "react";
 import { Box, Typography } from "@mui/material";
 
-const NewsTicker = ({ newsItems = [] }) => {
+const NewsTicker = ({ newsItems = [], merchantName }) => {
   // Ensure enough items for smooth scrolling
   const tickerItems =
     newsItems.length <= 1 ? Array(5).fill(newsItems[0]) : newsItems;
@@ -45,7 +45,7 @@ const NewsTicker = ({ newsItems = [] }) => {
           flexShrink: 0,
         }}
       >
-        Zivora Updates
+        {merchantName ? `${merchantName} Updates` : "Company Updates"}
       </Typography>
 
       {/* SCROLL AREA */}

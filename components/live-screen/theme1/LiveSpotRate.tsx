@@ -83,13 +83,13 @@ const LiveSpotRate = ({
     if (dir === "rise")
       return {
         bgColor: "#4dbf00",
-        border: "1px solid #008f0c",
+        border: "1px solid #4dbf00",
         color: "white",
       };
     if (dir === "fall")
       return {
         bgColor: "#FF0040",
-        border: "1px solid #ff3366",
+        border: "1px solid #FF0040",
         color: "white",
       };
     return { bgColor: "#F0F8FF00", border: "1px solid #FFFFFF", color: "#fff" };
@@ -112,7 +112,7 @@ const LiveSpotRate = ({
     const bgFallback = isBuy
       ? "linear-gradient(180deg, rgba(20,8,2,0.8) 0%, rgba(40,15,5,0.9) 100%)"
       : "linear-gradient(180deg, rgba(40,15,5,0.8) 0%, rgba(20,8,2,0.9) 100%)";
-    const textFallback = isBuy ? "#20c997" : "#ff4d4d";
+    const textFallback = isBuy ? "#fff" : "#fff";
 
     return (
       <Box
@@ -157,7 +157,7 @@ const LiveSpotRate = ({
             letterSpacing: "0.18vw",
             textAlign: "center",
             bgcolor: bgColor,
-            color: (isBuy ? colors.buyText : colors.sellText) || textFallback,
+            color: "#fff",
             border: border,
             borderRadius: "1vw",
             fontVariantNumeric: "tabular-nums",
@@ -275,6 +275,7 @@ const LiveSpotRate = ({
             },
             color: "#fff",
             fontWeight: "700",
+            textAlign: "center",
           }}
         >
           <PricePulse label="ASK" value={data?.ask} dir={askDir} />

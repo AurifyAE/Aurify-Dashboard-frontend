@@ -64,7 +64,8 @@ export default async function LiveScreenPage({ params }: PageProps) {
   const accent = colors.accent || merchant.branding?.accentColor || "#38bdf8";
   const visible = merchant.visibility || {};
 
-  if (data?.layout?.selectedLayout === "theme2") {
+  const selectedThemeLayout = data?.layout?.header?.layout || data?.layout?.selectedLayout;
+  if (selectedThemeLayout === "theme2") {
     return (
       <>
         <DeviceTracker merchantId={merchant.merchantId} screenSlug={layout.screenSlug} />

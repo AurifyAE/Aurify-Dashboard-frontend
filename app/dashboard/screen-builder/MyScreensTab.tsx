@@ -22,75 +22,12 @@ interface MyScreensTabProps {
   onCreateNew: () => void;
 }
 
-function MiniScreenPreview({
-  companyName = "Company",
-}: {
-  primaryColor?: string;
-  secondaryColor?: string;
-  accentColor?: string;
-  companyName?: string;
-}) {
-  return (
-    <div className="aspect-video w-full overflow-hidden rounded-xl bg-[#c58434] relative border border-slate-300 flex flex-col justify-between">
-      {/* Background styling to mimic bright gold gradient */}
-      <div className="absolute inset-0 bg-gradient-to-br from-[#f8d082] via-[#e59d45] to-[#8c4c1a] pointer-events-none opacity-90" />
-      
-      {/* Top Main Section */}
-      <div className="flex flex-1 p-2 gap-2 relative z-10 h-[calc(100%-12px)]">
-        {/* Left Side: Logo & Commodity Table */}
-        <div className="w-1/2 flex flex-col gap-1">
-          <div className="text-[7px] font-bold text-white mb-1 drop-shadow-md text-center bg-white/20 rounded p-0.5 backdrop-blur-sm">{companyName.toUpperCase()}</div>
-          
-          <div className="rounded-[4px] border border-white/40 bg-white/10 backdrop-blur-md p-1 flex-1 flex flex-col shadow-inner">
-            <div className="grid grid-cols-4 text-[4px] font-bold text-white mb-1 border-b border-white/40 pb-0.5">
-              <span>COMMODITY</span><span className="text-center">UNIT</span><span className="text-center">BUY</span><span className="text-center">SELL</span>
-            </div>
-            {["Gold 24K", "Gold Kilobar", "Silver"].map((item, i) => (
-              <div key={i} className="grid grid-cols-4 text-[4px] font-bold text-white py-0.5 border-b border-white/20 last:border-0 drop-shadow-sm">
-                <span className="truncate">{item}</span><span className="text-center">1 GM</span><span className="text-center">509.4</span><span className="text-center">509.5</span>
-              </div>
-            ))}
-          </div>
-        </div>
+// Removed MiniScreenPreview component
 
-        {/* Right Side: Clocks & Metal Panels */}
-        <div className="w-1/2 flex flex-col gap-1">
-           {/* Mini Clocks */}
-           <div className="flex justify-around items-center h-2 mt-1">
-             {["INDIA", "UAE", "USA"].map(c => <span key={c} className="text-[3px] text-white font-bold drop-shadow-md">{c} --:--</span>)}
-           </div>
-
-           {/* Gold Panel */}
-           <div className="rounded-[6px] border border-white/50 bg-gradient-to-r from-[#faefb5] to-[#e4bc75] p-1.5 flex items-center justify-between shadow-lg">
-             <div className="text-[5px] font-extrabold text-[#966116]">GOLD</div>
-             <div className="flex gap-1">
-                <div className="text-[4px] font-bold text-white bg-[#33cc33] px-1 py-0.5 rounded shadow">BID 4317</div>
-                <div className="text-[4px] font-bold text-white bg-[#33cc33] px-1 py-0.5 rounded shadow">ASK 4318</div>
-             </div>
-           </div>
-
-           {/* Silver Panel */}
-           <div className="rounded-[6px] border border-white/50 bg-gradient-to-r from-[#f0f0f0] to-[#b0b0b0] p-1.5 flex items-center justify-between shadow-lg">
-             <div className="text-[5px] font-extrabold text-[#555]">SILVER</div>
-             <div className="flex gap-1">
-                <div className="text-[4px] font-bold text-white border border-white/80 px-1 py-0.5 rounded">BID 69.2</div>
-                <div className="text-[4px] font-bold text-white border border-white/80 px-1 py-0.5 rounded">ASK 69.4</div>
-             </div>
-           </div>
-        </div>
-      </div>
-
-      {/* Bottom News Ticker */}
-      <div className="h-[10px] bg-white border-t border-white flex items-center px-1 relative z-10 overflow-hidden">
-        <div className="text-[4px] font-bold text-slate-800 whitespace-nowrap">
-          {companyName} updates • Live Market Prices • Welcome to our showroom
-        </div>
-      </div>
-    </div>
-  );
-}
-
-export default function MyScreensTab({ onEditLayout, onCreateNew }: MyScreensTabProps) {
+export default function MyScreensTab({
+  onEditLayout,
+  onCreateNew,
+}: MyScreensTabProps) {
   const [layouts, setLayouts] = useState<ScreenLayout[]>([]);
   const [loading, setLoading] = useState(true);
   const [copiedId, setCopiedId] = useState<string | null>(null);
@@ -127,7 +64,7 @@ export default function MyScreensTab({ onEditLayout, onCreateNew }: MyScreensTab
       showCancelButton: true,
       confirmButtonColor: "#ef4444",
       cancelButtonColor: "#64748b",
-      confirmButtonText: "Yes, delete it!"
+      confirmButtonText: "Yes, delete it!",
     });
 
     if (result.isConfirmed) {
@@ -139,19 +76,26 @@ export default function MyScreensTab({ onEditLayout, onCreateNew }: MyScreensTab
           text: "Your screen has been deleted.",
           icon: "success",
           timer: 2000,
-          showConfirmButton: false
+          showConfirmButton: false,
         });
       } catch (err) {
         console.error("Failed to delete layout:", err);
-        Swal.fire("Error", "Failed to delete screen. Please try again.", "error");
+        Swal.fire(
+          "Error",
+          "Failed to delete screen. Please try again.",
+          "error",
+        );
       }
     }
   };
 
   const liveUrl = (layout: any) => {
-    const isLocal = typeof window !== "undefined" && window.location.hostname === "localhost";
-    const baseUrl = isLocal ? "http://localhost:3000" : "https://screen.aurify.ae";
-    return `${baseUrl}/${layout.merchantSlug || 'merchant'}/${layout.screenSlug}`;
+    const isLocal =
+      typeof window !== "undefined" && window.location.hostname === "localhost";
+    const baseUrl = isLocal
+      ? "http://localhost:3000"
+      : "https://screen.aurify.ae";
+    return `${baseUrl}/${layout.merchantSlug || "merchant"}/${layout.screenSlug}`;
   };
 
   return (
@@ -204,106 +148,118 @@ export default function MyScreensTab({ onEditLayout, onCreateNew }: MyScreensTab
           {layouts.map((layout) => {
             const url = liveUrl(layout);
             const isPublished = layout.status === "published";
-            const styles = layout.styles as any;
             return (
               <div
                 key={layout.layoutId}
-                className={`overflow-hidden rounded-2xl border transition-all hover:shadow-md bg-white ${
+                className={`overflow-hidden flex flex-col rounded-2xl border transition-all hover:shadow-xl bg-white ${
                   isPublished
-                    ? "border-emerald-200 shadow-sm"
-                    : "border-slate-200"
+                    ? "border-emerald-200 shadow-sm hover:border-emerald-300"
+                    : "border-slate-200 hover:border-slate-300"
                 }`}
               >
-                {/* Preview */}
-                <div className="p-3 bg-slate-50">
-                  <MiniScreenPreview
-                    primaryColor={styles?.colorOverride?.primary || styles?.colors?.primary || "#d4a017"}
-                    secondaryColor={styles?.colorOverride?.secondary || styles?.colors?.secondary || "#111827"}
-                    accentColor={styles?.colorOverride?.accent || styles?.colors?.accent || "#38bdf8"}
-                    companyName={(layout as any).header?.company || "Company"}
-                  />
-                </div>
-
-                {/* Info */}
-                <div className="p-4">
-                  <div className="mb-3 flex items-start justify-between gap-2">
-                    <div>
-                      <p className="font-bold text-slate-900">{layout.name}</p>
-                      <p className="text-xs text-slate-400">/{layout.screenSlug}</p>
+                {/* Header / Cover Replacement */}
+                <div
+                  className={`p-5 flex flex-col gap-3 relative ${
+                    isPublished
+                      ? "bg-gradient-to-br from-emerald-500 to-teal-700"
+                      : "bg-gradient-to-br from-slate-700 to-slate-900"
+                  }`}
+                >
+                  <div className="flex justify-between items-start">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-white/10 backdrop-blur-md shadow-sm border border-white/20">
+                      <Monitor className="h-5 w-5 text-white" />
                     </div>
                     <span
-                      className={`rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase ${
+                      className={`rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider border backdrop-blur-md ${
                         isPublished
-                          ? "bg-emerald-100 text-emerald-700"
-                          : "bg-slate-100 text-slate-500"
+                          ? "bg-emerald-400/20 text-white border-emerald-300/30"
+                          : "bg-white/10 text-white border-white/20"
                       }`}
                     >
                       {layout.status}
                     </span>
                   </div>
+                  <div className="mt-2">
+                    <h3
+                      className="font-bold text-lg text-white leading-tight truncate"
+                      title={layout.name}
+                    >
+                      {layout.name}
+                    </h3>
+                    <p className="text-sm text-white/70 font-medium truncate">
+                      /{layout.screenSlug}
+                    </p>
+                  </div>
+                </div>
 
-                  {/* URL */}
-                  {isPublished && (
-                    <div className="mb-3 flex items-center gap-2 rounded-xl bg-slate-50 border border-slate-100 px-3 py-2">
-                      <span className="text-[10px] font-bold uppercase text-slate-400">URL</span>
-                      <span className="flex-1 truncate text-xs text-slate-600 font-mono">{url}</span>
+                {/* Info & Actions */}
+                <div className="p-5 flex-1 flex flex-col">
+                  {isPublished ? (
+                    <div className="mb-5 flex items-center gap-2 rounded-xl bg-slate-50 border border-slate-100 px-3 py-2.5">
+                      <span className="text-[10px] font-bold uppercase text-slate-400">
+                        URL
+                      </span>
+                      <span
+                        className="flex-1 truncate text-xs text-slate-600 font-mono"
+                        title={url}
+                      >
+                        {url}
+                      </span>
                       <button
                         onClick={() => copyUrl(url, layout.layoutId)}
                         className="text-slate-400 hover:text-blue-600 transition-colors flex-shrink-0 cursor-pointer"
+                        title="Copy URL"
                       >
                         {copiedId === layout.layoutId ? (
-                          <Check className="h-3.5 w-3.5 text-emerald-500" />
+                          <Check className="h-4 w-4 text-emerald-500" />
                         ) : (
-                          <Copy className="h-3.5 w-3.5" />
+                          <Copy className="h-4 w-4" />
                         )}
                       </button>
-                      <a
-                        href={url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-slate-400 hover:text-blue-600 transition-colors flex-shrink-0"
-                      >
-                        <ExternalLink className="h-3.5 w-3.5" />
-                      </a>
+                    </div>
+                  ) : (
+                    <div className="mb-5 text-xs text-slate-500 bg-slate-50 p-3 rounded-xl border border-slate-100">
+                      This screen is currently a draft. Publish it to get your
+                      live URL.
                     </div>
                   )}
 
                   {/* Actions */}
-                  <div className="flex gap-2">
+                  <div className="mt-auto grid grid-cols-2 gap-2">
                     <button
                       onClick={() => onEditLayout(layout.layoutId)}
-                      className="btn-secondary flex-1 cursor-pointer"
+                      className="btn-secondary cursor-pointer justify-center"
                     >
                       <Pencil className="h-3.5 w-3.5" />
                       Edit
                     </button>
-                    {!isPublished && (
+                    <button
+                      onClick={() => handleDelete(layout.layoutId, layout.name)}
+                      className="btn-secondary px-3 border-red-200 text-red-600 hover:bg-red-50 hover:border-red-300 cursor-pointer"
+                      title="Delete Screen"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </button>
+
+                    {!isPublished ? (
                       <button
                         onClick={() => onEditLayout(layout.layoutId)}
-                        className="btn-primary flex-1 cursor-pointer"
+                        className="btn-primary cursor-pointer justify-center col-span-2"
                       >
                         <Rocket className="h-3.5 w-3.5" />
                         Publish
                       </button>
-                    )}
-                    {isPublished && (
+                    ) : (
                       <a
                         href={url}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="btn-secondary flex-1"
+                        className="btn-secondary col-span-2 justify-center bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100 hover:border-blue-300"
                       >
                         <ExternalLink className="h-3.5 w-3.5" />
                         View Live
                       </a>
                     )}
-                    <button
-                      onClick={() => handleDelete(layout.layoutId, layout.name)}
-                      className="btn-secondary flex-1 border-red-200 text-red-600 hover:bg-red-50 hover:border-red-300"
-                      title="Delete Screen"
-                    >
-                      <Trash2 className="h-3.5 w-3.5" />
-                    </button>
                   </div>
                 </div>
               </div>

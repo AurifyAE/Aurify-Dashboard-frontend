@@ -107,20 +107,13 @@ const CommodityTable = ({
 
         const multiplier = UNIT_MULTIPLIER[item.weight] || 1;
         const purity = purityFactor(item.purity);
+        const unitValue = Number(item.unit) || 1;
 
-        const bidRate =
-          Number(effectiveSpot.bid || 0) + Number(item.buyPremium || 0);
+        const baseBid = (effectiveSpot.bid / 31.103) * AED * multiplier * unitValue * purity;
+        const baseAsk = (effectiveSpot.ask / 31.103) * AED * multiplier * unitValue * purity;
 
-        const askRate =
-          Number(effectiveSpot.ask || 0) + Number(item.sellPremium || 0);
-
-        const bid =
-          (bidRate / 31.1035) * AED * multiplier * item.unit * purity +
-          Number(item.buyCharge || 0);
-
-        const ask =
-          (askRate / 31.1035) * AED * multiplier * item.unit * purity +
-          Number(item.sellCharge || 0);
+        const bid = baseBid + (Number(item.buyCharge) || 0) + (Number(item.buyPremium) || 0);
+        const ask = baseAsk + (Number(item.sellCharge) || 0) + (Number(item.sellPremium) || 0);
 
         return {
           group: item.group,
