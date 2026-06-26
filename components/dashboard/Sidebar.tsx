@@ -5,9 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 import { HugeiconsIcon } from "@hugeicons/react";
-import {
-  Logout01Icon,
-} from "@hugeicons/core-free-icons";
+import { Logout01Icon } from "@hugeicons/core-free-icons";
 
 import { cn } from "@/lib/utils";
 import Image from "next/image";
@@ -81,7 +79,6 @@ const navItems: NavItem[] = [
     roles: ["admin", "super_admin"],
   },
 ];
-
 
 export default function Sidebar() {
   const pathname = usePathname();
@@ -159,7 +156,6 @@ export default function Sidebar() {
               </Link>
             );
           })}
-
         </nav>
 
         {/* Bottom — User info + Logout */}
@@ -242,6 +238,9 @@ export default function Sidebar() {
               <ArrowRight className="w-3.5 h-3.5 text-red-400 opacity-0 -translate-x-1 group-hover/logout:opacity-100 group-hover/logout:translate-x-0 transition-all duration-200" />
             </button>
           </div>
+          <span className="text-[12px] mb-2 font-medium text-white/50   flex justify-center">
+            Version 1.0.0
+          </span>
         </div>
       </aside>
 
