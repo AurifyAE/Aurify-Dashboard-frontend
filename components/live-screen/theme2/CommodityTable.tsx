@@ -18,19 +18,58 @@ const UNIT_MULTIPLIER = {
   OZ: 31.103,
 };
 
+interface CommodityItem {
+  metal?: string;
+  metal_name?: string;
+  name?: string;
+  purity?: string | number;
+  unit?: string | number;
+  weight?: string;
+  buyCharge?: string | number;
+  buyPremium?: string | number;
+  sellCharge?: string | number;
+  sellPremium?: string | number;
+  group?: string;
+}
+
+interface SpotData {
+  bid: number;
+  ask: number;
+  low: number;
+  high: number;
+}
+
+interface CommodityTableProps {
+  commodities?: CommodityItem[];
+  isMintedBar?: boolean;
+  isCommodity?: boolean;
+  goldData?: SpotData;
+  silverData?: SpotData;
+}
+
+interface TableDataItem {
+  group?: string;
+  metal_name?: string;
+  name?: string;
+  metal?: string;
+  purity?: string | number;
+  weight: string;
+  bid: number;
+  ask: number;
+}
+
 const CommodityTable = ({
-  commodities,
+  commodities = [],
   isMintedBar = false,
   isCommodity = false,
   goldData,
-  silverData
-}) => {
-
+  silverData,
+}: CommodityTableProps) => {
   /* -----------------------
      HELPERS
   ------------------------ */
 
-  const getSpot = (metal) => {
+  const getSpot = (metal: string | undefined) => {
     const lower = metal?.toLowerCase() || "";
 
     if (lower.includes("gold") || lower.includes("minted")) {
@@ -43,14 +82,14 @@ const CommodityTable = ({
 
     return null;
   };
-  const purityFactor = (purity) => {
+  const purityFactor = (purity: string | number | undefined) => {
     if (!purity) return 1;
 
     const num = Number(purity);
 
     return num > 1000 ? num / 10000 : num / 1000;
   };
-  const formatByDigits = (value) => {
+  const formatByDigits = (value: number | null | undefined) => {
     if (value == null || isNaN(value)) return "";
 
     const integerDigits = Math.floor(Math.abs(value)).toString().length;
@@ -66,7 +105,7 @@ const CommodityTable = ({
   };
   const [isMobile, setIsMobile] = useState(false);
 
-  const formatPrice = (value) => {
+  const formatPrice = (value: number | null | undefined) => {
     if (value == null || isNaN(value)) return "—";
 
     const intLen = Math.floor(Math.abs(value)).toString().length;
@@ -95,37 +134,47 @@ const CommodityTable = ({
      BUILD TABLE DATA
   ------------------------ */
 
-  const buildTableData = () => {
+  const buildTableData = (): TableDataItem[] => {
     if (!commodities?.length) return [];
 
-    return commodities
-      .map((item) => {
-        const spot = getSpot(item.metal?.toLowerCase());
-        const effectiveSpot = spot || goldData;
+    const list: TableDataItem[] = [];
+    commodities.forEach((item) => {
+      const spot = getSpot(item.metal);
+      const effectiveSpot = spot || goldData;
 
-        if (!effectiveSpot) return null;
+      if (!effectiveSpot) return;
 
-        const multiplier = UNIT_MULTIPLIER[item.weight] || 1;
-        const purity = purityFactor(item.purity);
-        const unitValue = Number(item.unit) || 1;
+      const weightKey = (item.weight || "") as keyof typeof UNIT_MULTIPLIER;
+      const multiplier = UNIT_MULTIPLIER[weightKey] || 1;
+      const purity = purityFactor(item.purity);
+      const unitValue = Number(item.unit) || 1;
 
-        const baseBid = (effectiveSpot.bid / 31.103) * AED * multiplier * unitValue * purity;
-        const baseAsk = (effectiveSpot.ask / 31.103) * AED * multiplier * unitValue * purity;
+      const baseBid =
+        (effectiveSpot.bid / 31.103) * AED * multiplier * unitValue * purity;
+      const baseAsk =
+        (effectiveSpot.ask / 31.103) * AED * multiplier * unitValue * purity;
 
-        const bid = baseBid + (Number(item.buyCharge) || 0) + (Number(item.buyPremium) || 0);
-        const ask = baseAsk + (Number(item.sellCharge) || 0) + (Number(item.sellPremium) || 0);
+      const bid =
+        baseBid +
+        (Number(item.buyCharge) || 0) +
+        (Number(item.buyPremium) || 0);
+      const ask =
+        baseAsk +
+        (Number(item.sellCharge) || 0) +
+        (Number(item.sellPremium) || 0);
 
-        return {
-          group: item.group,
-          metal_name: item.name || item.metal_name,
-          name: item.metal,
-          purity: item.purity,
-          weight: `${item.unit} ${item.weight}`,
-          bid,
-          ask,
-        };
-      })
-      .filter(Boolean);
+      list.push({
+        group: item.group,
+        metal_name: item.name || item.metal_name,
+        name: item.metal,
+        metal: item.metal,
+        purity: item.purity,
+        weight: `${item.unit} ${item.weight}`,
+        bid,
+        ask,
+      });
+    });
+    return list;
   };
 
   const data = buildTableData();
@@ -138,7 +187,6 @@ const CommodityTable = ({
 
   const mintedBarData = data.filter((item) => item.group === "group1");
 
-
   // -----table height---
   const tableHeight = isMobile ? "35vw" : "18vw";
   // -----table items number---
@@ -148,7 +196,7 @@ const CommodityTable = ({
      TABLE COMPONENT
   ------------------------ */
 
-  const renderTable = (title, rows) => {
+  const renderTable = (title: string, rows: TableDataItem[]) => {
     if (!rows.length) return null;
 
     return (
@@ -156,7 +204,7 @@ const CommodityTable = ({
         <Box
           sx={{
             display: "grid",
-            gridTemplateColumns: title === 'Commodity' ? "1.4fr 0.8fr 0.8fr 0.8fr" : "1.4fr 0.8fr   0.8fr",
+            gridTemplateColumns: "1.4fr 0.8fr 0.8fr 0.8fr",
             py: "0.9vw",
             px: "1.5vw",
             alignItems: "end",
@@ -204,8 +252,7 @@ const CommodityTable = ({
             UNIT
           </Typography>
 
-          {title === 'Commodity' &&
-
+          {title === "Commodity" && (
             <Typography
               sx={{
                 fontSize: {
@@ -220,7 +267,7 @@ const CommodityTable = ({
             >
               BUY AED
             </Typography>
-          }
+          )}
 
           <Typography
             sx={{
@@ -279,13 +326,13 @@ const CommodityTable = ({
                 margin: ".4vw",
               }}
             >
-              {rows.map((row, index) => (
+              {rows.map((row: TableDataItem, index: number) => (
                 <SwiperSlide key={index}>
                   <Box
                     key={index}
                     sx={{
                       display: "grid",
-                      gridTemplateColumns:  "1.4fr 0.8fr 0.8fr 0.8fr",
+                      gridTemplateColumns: "1.4fr 0.8fr 0.8fr 0.8fr",
                       alignItems: "center",
                       py: ".7vw",
                       px: "1.5vw",
@@ -312,8 +359,8 @@ const CommodityTable = ({
                         },
                       }}
                     >
-                      {row.metal_name  ? row.metal_name : row.name}
-                       <Typography
+                      {row.metal_name ? row.metal_name : row.name}
+                      <Typography
                         sx={{
                           // fontSize: "1vw",
                           fontSize: {
@@ -344,26 +391,23 @@ const CommodityTable = ({
                     >
                       {row.weight}
                     </Typography>
-                    {title === 'Commodity' &&
+                    <Typography
+                      sx={{
+                        // fontSize: "1.32vw",
+                        fontSize: {
+                          xs: "14px",
+                          lg: "1.5vw",
+                          xl: "1.4vw",
+                        },
+                        fontVariantNumeric: "tabular-nums",
+                        textAlign: "center",
 
-
-                      <Typography
-                        sx={{
-                          // fontSize: "1.32vw",
-                          fontSize: {
-                            xs: "14px",
-                            lg: "1.5vw",
-                            xl: "1.4vw",
-                          },
-                          fontVariantNumeric: "tabular-nums",
-
-                          fontWeight: 600,
-                          color: "#fff", // soft pink ASK
-                        }}
-                      >
-                        {formatPrice(row.bid)}
-                      </Typography>
-                    }
+                        fontWeight: 600,
+                        color: "#fff", // soft pink ASK
+                      }}
+                    >
+                      {formatPrice(row.bid)}
+                    </Typography>
 
                     <Typography
                       sx={{
@@ -374,6 +418,7 @@ const CommodityTable = ({
                           xl: "1.4vw",
                         },
                         fontVariantNumeric: "tabular-nums",
+                        textAlign: "center",
 
                         fontWeight: 600,
                         color: "#fff", // soft pink ASK
@@ -387,7 +432,7 @@ const CommodityTable = ({
             </Swiper>
           )}
         </Box>
-      </Box >
+      </Box>
     );
   };
 

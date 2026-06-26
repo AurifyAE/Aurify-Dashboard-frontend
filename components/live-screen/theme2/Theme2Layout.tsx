@@ -10,8 +10,14 @@ import PoweredByAurify from "./PoweredByAurify";
 import io from "socket.io-client";
 import { API_URL, API_KEY, SOCKET_SECRET } from "@/lib/env";
 
-export default function Theme2Layout({ data, isPreview = false }) {
-  const { merchant, theme, layout, commodities, news } = data;
+export default function Theme2Layout({
+  data,
+  isPreview = false,
+}: {
+  data?: any;
+  isPreview?: boolean;
+}) {
+  const { merchant, theme, layout, commodities, news } = data || {};
   const widgets = layout?.widgets || [
     "Spot Rates",
     "Commodity Table",
@@ -21,8 +27,8 @@ export default function Theme2Layout({ data, isPreview = false }) {
   const showLogo = layout?.styles?.showLogo ?? true;
   const showName = layout?.styles?.showName ?? true;
 
-  const [marketData, setMarketData] = useState({});
-  const [serverURL, setServerURL] = useState(null);
+  const [marketData, setMarketData] = useState<Record<string, any>>({});
+  const [serverURL, setServerURL] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchServerURL = async () => {
@@ -52,7 +58,7 @@ export default function Theme2Layout({ data, isPreview = false }) {
     });
 
     socket.on("market-data", (data) => {
-      const updates = [];
+      const updates: any[] = [];
       if (Array.isArray(data)) {
         updates.push(...data);
       } else if (data && typeof data === "object") {
@@ -200,7 +206,7 @@ export default function Theme2Layout({ data, isPreview = false }) {
 
       <Grid
         container
-        spacing={10}
+        spacing={1}
         sx={{
           minHeight: "100%",
           justifyContent: "space-between",
@@ -211,19 +217,16 @@ export default function Theme2Layout({ data, isPreview = false }) {
           p: "0 2vw",
           alignItems: "center",
           width: "100%",
-          display: "grid",
-          gridTemplateColumns: "repeat(2, 1fr)",
+          display: "flex",
         }}
       >
         <Grid
-          item
-          xs={12}
-          md={6}
+          size={{ xs: 12, md: 6 }}
           sx={{
             display: "flex",
             alignItems: "center",
             flexDirection: "column",
-            padding: "1vw",
+            padding: "1vw .5vw",
             gap: "1vw",
           }}
         >
@@ -249,9 +252,7 @@ export default function Theme2Layout({ data, isPreview = false }) {
         </Grid>
 
         <Grid
-          item
-          xs={12}
-          md={6}
+          size={{ xs: 12, md: 6 }}
           sx={{ display: "grid", padding: "1vw", gap: "1vw" }}
         >
           <Box
@@ -265,7 +266,7 @@ export default function Theme2Layout({ data, isPreview = false }) {
             {showLogo ? (
               <img
                 src={merchant?.logo || "/images/theme2-logo.png"}
-                alt={merchant?.companyName }
+                alt={merchant?.companyName}
                 style={{
                   width: "100%",
                   height: "auto",
@@ -291,8 +292,7 @@ export default function Theme2Layout({ data, isPreview = false }) {
 
         {widgets.includes("News") && (
           <Grid
-            item
-            xs={12}
+            size={{ xs: 12 }}
             sx={{
               mt: { xs: "20px", md: "0" },
               position: "fixed",
@@ -306,7 +306,7 @@ export default function Theme2Layout({ data, isPreview = false }) {
             <NewsTicker
               newsItems={news}
               merchantName={merchant?.companyName}
-              newsHeading={layout?.newsHeading}
+              newsHeading={layout?.header?.newsHeading || layout?.newsHeading}
             />
           </Grid>
         )}

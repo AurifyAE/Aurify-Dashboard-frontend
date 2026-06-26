@@ -24,19 +24,19 @@ const clockConfig = [
 ];
 
 const WorldClockHorizontal = () => {
-  const [times, setTimes] = useState({});
+  const [times, setTimes] = useState<Record<string, string>>({});
 
   useEffect(() => {
     const updateTime = () => {
       const now = new Date();
 
-      const timeOptions = {
+      const timeOptions: Intl.DateTimeFormatOptions = {
         hour: "2-digit",
         minute: "2-digit",
         hour12: true,
       };
 
-      const updatedTimes = {};
+      const updatedTimes: Record<string, string> = {};
 
       clockConfig.forEach((clock) => {
         updatedTimes[clock.key] = now.toLocaleTimeString("en-US", {

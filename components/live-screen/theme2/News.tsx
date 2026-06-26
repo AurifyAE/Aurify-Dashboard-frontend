@@ -2,7 +2,22 @@
 import React from "react";
 import { Box, Typography } from "@mui/material";
 
-const NewsTicker = ({ newsItems = [], merchantName, newsHeading }) => {
+interface NewsItem {
+  title?: string;
+  content?: string;
+}
+
+interface NewsTickerProps {
+  newsItems?: NewsItem[];
+  merchantName?: string;
+  newsHeading?: string;
+}
+
+const NewsTicker = ({
+  newsItems = [],
+  merchantName,
+  newsHeading,
+}: NewsTickerProps) => {
   // Ensure enough items for smooth scrolling
   const tickerItems =
     newsItems.length <= 1 ? Array(5).fill(newsItems[0]) : newsItems;

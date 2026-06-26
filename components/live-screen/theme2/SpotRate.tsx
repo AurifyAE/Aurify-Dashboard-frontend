@@ -3,7 +3,19 @@ import React, { useEffect, useRef, useState } from "react";
 import { Box, Typography } from "@mui/material";
 
 
-const SpotRate = ({ goldData, silverData }) => {
+interface SpotData {
+  bid?: number | string | null;
+  ask?: number | string | null;
+  low?: number | string | null;
+  high?: number | string | null;
+}
+
+interface SpotRateProps {
+  goldData: SpotData;
+  silverData: SpotData;
+}
+
+const SpotRate = ({ goldData, silverData }: SpotRateProps) => {
 
   const [goldBidDir, setGoldBidDir] = useState("neutral");
   const [goldAskDir, setGoldAskDir] = useState("neutral");
@@ -22,7 +34,14 @@ const SpotRate = ({ goldData, silverData }) => {
     return () => window.removeEventListener("resize", checkWidth);
   }, []);
 
-  const prev = useRef({
+  const prev = useRef<{
+    goldBid: number | string | null | undefined;
+    goldAsk: number | string | null | undefined;
+    silverBid: number | string | null | undefined;
+    silverAsk: number | string | null | undefined;
+    platinumBid: number | string | null | undefined;
+    platinumAsk: number | string | null | undefined;
+  }>({
     goldBid: null,
     goldAsk: null,
     silverBid: null,
@@ -31,13 +50,20 @@ const SpotRate = ({ goldData, silverData }) => {
     platinumAsk: null,
   });
 
-  const detectChange = (prevVal, currVal, setDir) => {
-    if (prevVal === null) return currVal;
+  const detectChange = (
+    prevVal: number | string | null | undefined,
+    currVal: number | string | null | undefined,
+    setDir: React.Dispatch<React.SetStateAction<string>>
+  ) => {
+    if (prevVal === undefined || prevVal === null || currVal === undefined || currVal === null) return currVal;
 
-    if (currVal > prevVal) {
+    const prevNum = Number(prevVal);
+    const currNum = Number(currVal);
+
+    if (currNum > prevNum) {
       setDir("rise");
       setTimeout(() => setDir("neutral"), 800);
-    } else if (currVal < prevVal) {
+    } else if (currNum < prevNum) {
       setDir("fall");
       setTimeout(() => setDir("neutral"), 800);
     }
@@ -77,7 +103,7 @@ const SpotRate = ({ goldData, silverData }) => {
     );
   }, [silverData.ask]);
 
-  const getColors = (dir) => {
+  const getColors = (dir: string) => {
     if (dir === "rise")
       return {
         bgColor: "#4dbf00",
@@ -97,7 +123,13 @@ const SpotRate = ({ goldData, silverData }) => {
     };
   };
 
-  const PricePulse = ({ label, value, dir }) => {
+  interface PricePulseProps {
+    label: string;
+    value: string | number;
+    dir: string;
+  }
+
+  const PricePulse: React.FC<PricePulseProps> = ({ label, value, dir }) => {
     const { bgColor, border, color } = getColors(dir);
     const hasPulse = dir !== "neutral";
 
@@ -166,7 +198,14 @@ const SpotRate = ({ goldData, silverData }) => {
     );
   };
 
-  const MetalPanel = ({ data, bidDir, askDir, theme }) => {
+  interface MetalPanelProps {
+    data: SpotData;
+    bidDir: string;
+    askDir: string;
+    theme: "gold" | "silver";
+  }
+
+  const MetalPanel: React.FC<MetalPanelProps> = ({ data, bidDir, askDir, theme }) => {
     const isSilver = theme === "silver";
 
     let title = "GOLD";

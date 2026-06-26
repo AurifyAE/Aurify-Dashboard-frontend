@@ -226,7 +226,7 @@ export default function Theme1Layout({
 
       <Grid
         container
-        spacing={10}
+        spacing={4}
         sx={{
           minHeight: "100%",
           justifyContent: "space-between",
@@ -315,7 +315,7 @@ export default function Theme1Layout({
             <NewsTicker
               newsItems={news}
               merchantName={merchant?.companyName}
-              newsHeading={layout?.newsHeading}
+              newsHeading={layout?.header?.newsHeading || layout?.newsHeading}
               colors={colors}
             />
           </Grid>
