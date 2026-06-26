@@ -33,17 +33,31 @@ export default function Theme2Layout({
   useEffect(() => {
     const fetchServerURL = async () => {
       try {
-        const res = await fetch(`${API_URL}/get-server`, {
-          headers: { "x-api-key": API_KEY },
+        const response = await fetch(`${API_URL}/get-server`, {
+          headers: {
+            "Content-Type": "application/json",
+            "X-Secret-Key": API_KEY,
+          },
+          credentials: "include",
         });
-        const json = await res.json();
-        if (json.info?.serverURL) setServerURL(json.info.serverURL);
+        const resData = await response.json();
+        const serverUrlResult =
+          resData?.data?.info?.serverURL ||
+          resData?.data?.info?.serverUrl ||
+          resData?.data?.serverURL ||
+          resData?.data?.serverUrl ||
+          resData?.serverURL ||
+          resData?.serverUrl ||
+          resData?.info?.serverURL ||
+          resData?.info?.serverUrl ||
+          null;
+        setServerURL(serverUrlResult);
       } catch (err) {
         console.error("Failed to fetch server URL:", err);
       }
     };
     fetchServerURL();
-  }, [isPreview]);
+  }, []);
 
   useEffect(() => {
     if (!serverURL) return;
