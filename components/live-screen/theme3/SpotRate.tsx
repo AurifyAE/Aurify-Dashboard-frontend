@@ -1,11 +1,10 @@
-import React, { useEffect, useRef, useState } from "react";
-import { Box, Typography } from "@mui/material";
-const SpotRate = ({ goldData, silverData }: { goldData: any, silverData: any }) => {
-
-  const [goldBidDir, setGoldBidDir] = useState("neutral");
-  const [goldAskDir, setGoldAskDir] = useState("neutral");
-  const [silverBidDir, setSilverBidDir] = useState("neutral");
-  const [silverAskDir, setSilverAskDir] = useState("neutral");
+import React, { useEffect, useRef, useState } from 'react';
+import { Box, Typography } from '@mui/material';
+const SpotRate = ({ goldData, silverData }: { goldData: any; silverData: any }) => {
+  const [goldBidDir, setGoldBidDir] = useState('neutral');
+  const [goldAskDir, setGoldAskDir] = useState('neutral');
+  const [silverBidDir, setSilverBidDir] = useState('neutral');
+  const [silverAskDir, setSilverAskDir] = useState('neutral');
 
   const [isMobile, setIsMobile] = useState(false);
 
@@ -15,8 +14,8 @@ const SpotRate = ({ goldData, silverData }: { goldData: any, silverData: any }) 
     };
 
     checkWidth();
-    window.addEventListener("resize", checkWidth);
-    return () => window.removeEventListener("resize", checkWidth);
+    window.addEventListener('resize', checkWidth);
+    return () => window.removeEventListener('resize', checkWidth);
   }, []);
 
   const prev = useRef({
@@ -32,89 +31,69 @@ const SpotRate = ({ goldData, silverData }: { goldData: any, silverData: any }) 
     if (prevVal === null) return currVal;
 
     if (currVal > prevVal) {
-      setDir("rise");
-      setTimeout(() => setDir("neutral"), 800);
+      setDir('rise');
+      setTimeout(() => setDir('neutral'), 800);
     } else if (currVal < prevVal) {
-      setDir("fall");
-      setTimeout(() => setDir("neutral"), 800);
+      setDir('fall');
+      setTimeout(() => setDir('neutral'), 800);
     }
 
     return currVal;
   };
 
   useEffect(() => {
-    prev.current.goldBid = detectChange(
-      prev.current.goldBid,
-      goldData.bid,
-      setGoldBidDir,
-    );
+    prev.current.goldBid = detectChange(prev.current.goldBid, goldData.bid, setGoldBidDir);
   }, [goldData.bid]);
 
   useEffect(() => {
-    prev.current.goldAsk = detectChange(
-      prev.current.goldAsk,
-      goldData.ask,
-      setGoldAskDir,
-    );
+    prev.current.goldAsk = detectChange(prev.current.goldAsk, goldData.ask, setGoldAskDir);
   }, [goldData.ask]);
 
   useEffect(() => {
-    prev.current.silverBid = detectChange(
-      prev.current.silverBid,
-      silverData.bid,
-      setSilverBidDir,
-    );
+    prev.current.silverBid = detectChange(prev.current.silverBid, silverData.bid, setSilverBidDir);
   }, [silverData.bid]);
 
   useEffect(() => {
-    prev.current.silverAsk = detectChange(
-      prev.current.silverAsk,
-      silverData.ask,
-      setSilverAskDir,
-    );
+    prev.current.silverAsk = detectChange(prev.current.silverAsk, silverData.ask, setSilverAskDir);
   }, [silverData.ask]);
 
   const getColors = (dir: any) => {
-    if (dir === "rise")
+    if (dir === 'rise')
       return {
-        bgColor: "#55d500",
-        border: "1px solid #55d500",
-        color: "white",
+        bgColor: '#55d500',
+        border: '1px solid #55d500',
+        color: 'white',
       };
-    if (dir === "fall")
+    if (dir === 'fall')
       return {
-        bgColor: "#ff0000",
-        border: " 1px solid #ff0000",
-        color: "white",
+        bgColor: '#ff0000',
+        border: ' 1px solid #ff0000',
+        color: 'white',
       };
     return {
-      bgColor: "#F0F8FF00",
-      border: " 1px solid #FFFFFF",
-      color: "#fff",
+      bgColor: '#F0F8FF00',
+      border: ' 1px solid #FFFFFF',
+      color: '#fff',
     };
   };
 
   const PricePulse = ({ label, value, dir }: any) => {
     const { bgColor, border, color } = getColors(dir);
-    const hasPulse = dir !== "neutral";
+    const hasPulse = dir !== 'neutral';
 
     return (
       <Box
         sx={{
-          position: "relative",
+          position: 'relative',
           flex: 1,
-          mb: ".5vw",
+          mb: '.5vw',
+          textAlign: 'center',
 
-          overflow: "hidden",
+          overflow: 'hidden',
           ...(hasPulse && {
-            animation:
-              dir === "rise"
-                ? "pulseRise 0.8s ease-out"
-                : "pulseFall 0.8s ease-out",
+            animation: dir === 'rise' ? 'pulseRise 0.8s ease-out' : 'pulseFall 0.8s ease-out',
             bgcolor:
-              dir === "rise"
-                ? "0 0 0 0 rgba(0,255,157,0.6)"
-                : "0 0 0 0 rgba(255,51,102,0.6)",
+              dir === 'rise' ? '0 0 0 0 rgba(0,255,157,0.6)' : '0 0 0 0 rgba(255,51,102,0.6)',
           }),
         }}
       >
@@ -123,12 +102,12 @@ const SpotRate = ({ goldData, silverData }: { goldData: any, silverData: any }) 
             // fontSize: "1vw",
 
             fontSize: {
-              xs: "15px", // mobile
-              sm: "2.5vw", // small tablets
-              md: "1.5vw", // laptops
+              xs: '15px', // mobile
+              sm: '2.5vw', // small tablets
+              md: '1.5vw', // laptops
             },
-            letterSpacing: "0.25vw",
-            color: "#fff",
+            letterSpacing: '0.25vw',
+            color: '#fff',
           }}
         >
           {label}
@@ -138,21 +117,21 @@ const SpotRate = ({ goldData, silverData }: { goldData: any, silverData: any }) 
           sx={{
             // fontSize: "2.4vw",
             fontSize: {
-              xs: "18px", // mobile
-              sm: "2.5vw", // small tablets
-              md: "1.8vw", // laptops
-              lg: "2.4vw", // desktop
-              xl: "2.4vw", // large screens
+              xs: '18px', // mobile
+              sm: '2.5vw', // small tablets
+              md: '1.8vw', // laptops
+              lg: '2.4vw', // desktop
+              xl: '2.4vw', // large screens
             },
             fontWeight: 800,
-            letterSpacing: "0.18vw",
-            textAlign: "center",
+            letterSpacing: '0.18vw',
+            textAlign: 'center',
             bgcolor: bgColor,
             color: color,
             border: border,
-            borderRadius: "1vw",
-            fontVariantNumeric: "tabular-nums",
-            transition: "all 0.4s ease",
+            borderRadius: '1vw',
+            fontVariantNumeric: 'tabular-nums',
+            transition: 'all 0.4s ease',
           }}
         >
           {value}
@@ -162,52 +141,49 @@ const SpotRate = ({ goldData, silverData }: { goldData: any, silverData: any }) 
   };
 
   const MetalPanel = ({ data, bidDir, askDir, theme }: any) => {
-    const isSilver = theme === "silver";
+    const isSilver = theme === 'silver';
 
-    let title = "GOLD";
-    let gradient = "linear-gradient(90deg, #FFF098)";
-    let shadow = "0 0 3vw rgba(255 217 0 / 0.11) inset";
+    let title = 'GOLD';
+    let gradient = 'linear-gradient(90deg, #FFF098)';
+    let shadow = '0 0 3vw rgba(255 217 0 / 0.11) inset';
 
     if (isSilver) {
-      title = "SILVER";
-      gradient = "linear-gradient(90deg, #FFFFFF )";
-      shadow = "0 0 3vw rgba(160,180,255,0.15) inset";
+      title = 'SILVER';
+      gradient = 'linear-gradient(90deg, #FFFFFF )';
+      shadow = '0 0 3vw rgba(160,180,255,0.15) inset';
     }
 
     return (
       <Box
         sx={{
-          position: "relative",
-          overflow: "hidden",
+          position: 'relative',
+          overflow: 'hidden',
 
-          borderRadius: "1.8vw",
+          borderRadius: '1.8vw',
 
-          backdropFilter: "blur(0.8vw)",
+          backdropFilter: 'blur(0.8vw)',
 
           background: `linear-gradient(135deg,  rgba(46, 1, 17, 0.52) 0%,  rgba(88, 35, 35, 0.72), rgba(72, 7, 7, 0.52) 100%)`,
-          border: "0.18vw solid rgba(255, 225, 190, 0.28)",
+          border: '0.18vw solid rgba(255, 225, 190, 0.28)',
           padding: {
-            xs: "2vw 3vw",
-            sm: "0.5vw 2vw",
-            md: "1.5vw 1vw",
+            xs: '2vw 3vw',
+            sm: '0.5vw 2vw',
+            md: '1.5vw 1vw',
           },
 
-          display: "grid",
-          alignItems: "center",
-          gap: "1vw",
-          gridTemplateColumns: ".7fr 1fr 1fr",
+          display: 'grid',
+          alignItems: 'center',
+          gap: '1vw',
+          gridTemplateColumns: '.7fr 1fr 1fr',
 
-
-
-
-          "&::before": {
+          '&::before': {
             content: '""',
-            position: "absolute",
+            position: 'absolute',
             inset: 0,
 
-            padding: "0.08vw", // border thickness
+            padding: '0.08vw', // border thickness
             // borderRadius: "inherit",
-          borderRadius: "1.6vw",
+            borderRadius: '1.6vw',
 
             background: `
       linear-gradient(
@@ -224,46 +200,44 @@ const SpotRate = ({ goldData, silverData }: { goldData: any, silverData: any }) 
       linear-gradient(#fff 0 0)
     `,
 
-            WebkitMaskComposite: "xor",
-            maskComposite: "exclude",
+            WebkitMaskComposite: 'xor',
+            maskComposite: 'exclude',
 
-            pointerEvents: "none",
-          }
-
-
-
+            pointerEvents: 'none',
+          },
         }}
       >
         <Box
           sx={{
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            flexDirection: "column",
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            flexDirection: 'column',
           }}
         >
           <Box
             sx={{
-              width: "4.5vw",
-              height: "4.5vw",
-              objectFit: "contain",
+              width: '4.5vw',
+              height: '4.5vw',
+              objectFit: 'contain',
             }}
-            component='img'
+            component="img"
             src={isSilver ? '/images/silver-bar.png' : '/images/gold-bar.png'}
             alt={title}
           />
 
           <Box
             sx={{
-              fontSize: { xs: "14px", md: "1.7vw" },
+              fontSize: { xs: '14px', md: '1.7vw' },
               fontWeight: 700,
 
-              letterSpacing: "0.1em",
-              background: isSilver ? 'linear-gradient(90deg, #CCFBFF,#9AC6FF)' : 'linear-gradient(90deg, #FFF7CC,#FFCD9A)',
+              letterSpacing: '0.1em',
+              background: isSilver
+                ? 'linear-gradient(90deg, #CCFBFF,#9AC6FF)'
+                : 'linear-gradient(90deg, #FFF7CC,#FFCD9A)',
               WebkitBackgroundClip: 'text',
               WebkitTextFillColor: 'transparent',
-              lineHeight: '1'
-
+              lineHeight: '1',
             }}
           >
             {title}
@@ -273,15 +247,16 @@ const SpotRate = ({ goldData, silverData }: { goldData: any, silverData: any }) 
         <Box
           sx={{
             fontSize: {
-              xs: "15px", // mobile
-              sm: "2.5vw", // small tablets
-              md: "1.8vw", // laptops
-              lg: "1.5vw", // desktop
-              xl: "1.2vw", // large screens
+              xs: '15px', // mobile
+              sm: '2.5vw', // small tablets
+              md: '1.8vw', // laptops
+              lg: '1.5vw', // desktop
+              xl: '1.2vw', // large screens
             },
-            color: "#fff",
+            color: '#fff',
+            textAlign: 'center',
 
-            fontWeight: "700",
+            fontWeight: '700',
           }}
         >
           <PricePulse label="BID" value={data.bid} dir={bidDir} />
@@ -292,19 +267,19 @@ const SpotRate = ({ goldData, silverData }: { goldData: any, silverData: any }) 
         <Box
           sx={{
             fontSize: {
-              xs: "15px", // mobile
-              sm: "2.5vw", // small tablets
-              md: "1.8vw", // laptops
-              lg: "1.5vw", // desktop
-              xl: "1.2vw", // large screens
+              xs: '15px', // mobile
+              sm: '2.5vw', // small tablets
+              md: '1.8vw', // laptops
+              lg: '1.5vw', // desktop
+              xl: '1.2vw', // large screens
             },
-            color: "#fff",
-            fontWeight: "700",
+            textAlign: 'center',
+            color: '#fff',
+            fontWeight: '700',
           }}
         >
           <PricePulse label="ASK" value={data.ask} dir={askDir} />
-          HIGH{" "}
-          <span className="hl-value-high text-[#4dbf00]">{data.high}</span>
+          HIGH <span className="hl-value-high text-[#4dbf00]">{data.high}</span>
         </Box>
       </Box>
     );
@@ -313,30 +288,20 @@ const SpotRate = ({ goldData, silverData }: { goldData: any, silverData: any }) 
   return (
     <Box
       sx={{
-        display: "grid",
-        gap: "1vw",
-        width: "100%",
-        alignItems: "end",
+        display: 'grid',
+        gap: '1vw',
+        width: '100%',
+        alignItems: 'end',
         marginTop: {
-          xs: "20px", // mobile
-          sm: "0vw", // small tablets
+          xs: '20px', // mobile
+          sm: '0vw', // small tablets
         },
-        gridTemplateColumns: { xs: "1fr" },
+        gridTemplateColumns: { xs: '1fr' },
       }}
     >
-      <MetalPanel
-        data={goldData}
-        bidDir={goldBidDir}
-        askDir={goldAskDir}
-        theme="gold"
-      />
+      <MetalPanel data={goldData} bidDir={goldBidDir} askDir={goldAskDir} theme="gold" />
 
-      <MetalPanel
-        data={silverData}
-        bidDir={silverBidDir}
-        askDir={silverAskDir}
-        theme="silver"
-      />
+      <MetalPanel data={silverData} bidDir={silverBidDir} askDir={silverAskDir} theme="silver" />
     </Box>
   );
 };

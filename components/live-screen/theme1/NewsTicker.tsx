@@ -4,7 +4,12 @@ import { Box, Typography } from '@mui/material';
 import Marquee from 'react-fast-marquee';
 
 const NewsTicker = ({ newsItems = [], merchantName, newsHeading, colors }: any) => {
-  const tickerItems = newsItems.length === 0 ? [{ title: 'your news here' }] : newsItems.length === 1 ? Array(5).fill(newsItems[0]) : newsItems;
+  const tickerItems =
+    newsItems.length === 0
+      ? [{ title: 'your news here' }]
+      : newsItems.length === 1
+        ? Array(5).fill(newsItems[0])
+        : newsItems;
 
   return (
     <Box
@@ -57,13 +62,7 @@ const NewsTicker = ({ newsItems = [], merchantName, newsHeading, colors }: any) 
           alignItems: 'center',
         }}
       >
-        <Marquee
-          speed={40}
-          gradient={false}
-          autoFill={true}
-          loop={0}
-          direction="left"
-        >
+        <Marquee speed={40} gradient={false} autoFill={true} loop={0} direction="left">
           {tickerItems.map((item, index) => (
             <Typography
               key={index}

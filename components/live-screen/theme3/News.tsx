@@ -15,7 +15,12 @@ interface NewsTickerProps {
 }
 
 const NewsTicker = ({ newsItems = [], merchantName, newsHeading }: NewsTickerProps) => {
-  const tickerItems = newsItems.length === 0 ? [{ title: 'your news here' }] : newsItems.length === 1 ? Array(5).fill(newsItems[0]) : newsItems;
+  const tickerItems =
+    newsItems.length === 0
+      ? [{ title: 'your news here' }]
+      : newsItems.length === 1
+        ? Array(5).fill(newsItems[0])
+        : newsItems;
 
   return (
     <Box
@@ -30,7 +35,7 @@ const NewsTicker = ({ newsItems = [], merchantName, newsHeading }: NewsTickerPro
         overflow: 'hidden',
         backdropFilter: 'blur(0.3vw)',
         borderTop: '0.1vw solid #eee2d73d',
-        background: '#00000080'
+        background: '#00000080',
       }}
     >
       <Typography
@@ -64,13 +69,7 @@ const NewsTicker = ({ newsItems = [], merchantName, newsHeading }: NewsTickerPro
           alignItems: 'center',
         }}
       >
-        <Marquee
-          speed={40}
-          gradient={false}
-          autoFill={true}
-          loop={0}
-          direction="left"
-        >
+        <Marquee speed={40} gradient={false} autoFill={true} loop={0} direction="left">
           {tickerItems.map((item, index) => (
             <Typography
               key={index}

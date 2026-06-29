@@ -622,8 +622,8 @@ export default function ScreenBuilderTab({
                           {l.id === 'theme1'
                             ? 'Classic layout with gradients'
                             : l.id === 'theme2'
-                            ? 'Modern layout with glassmorphism'
-                            : 'Premium dark themed layout'}
+                              ? 'Modern layout with glassmorphism'
+                              : 'Premium dark themed layout'}
                         </span>
                       </div>
                       {draft.selectedLayout === l.id && (
