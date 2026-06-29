@@ -88,6 +88,7 @@ function headers(): HeadersInit {
 
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
   const res = await fetch(`${BACKEND_URL}/api/marketplace${path}`, {
+    cache: 'no-store',
     ...init,
     headers: { ...headers(), ...(init?.headers || {}) },
     credentials: 'include',
@@ -146,6 +147,10 @@ export const marketplaceApi = {
     request<MerchantNews>(id ? `/news/${id}` : '/news', {
       method: id ? 'PATCH' : 'POST',
       body: JSON.stringify(body),
+    }),
+  deleteNews: (id: string) =>
+    request<{ success: boolean; message: string }>(`/news/${id}`, {
+      method: 'DELETE',
     }),
   allLiveScreens: () => request<any[]>('/screens/all'),
 };

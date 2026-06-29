@@ -10,6 +10,7 @@ import {
   CheckCircle2,
   Loader2,
   Megaphone,
+  Pencil,
   Plus,
   Save,
   Tag,
@@ -47,7 +48,13 @@ const defaultForm = {
   endDate: '',
 };
 
-export default function NewsManagementTab({ isEmbedded = false }: { isEmbedded?: boolean }) {
+export default function NewsManagementTab({ 
+  isEmbedded = false,
+  onUpdate
+}: { 
+  isEmbedded?: boolean,
+  onUpdate?: () => void 
+}) {
   const [items, setItems] = useState<MerchantNews[]>([]);
   const [form, setForm] = useState(defaultForm);
   const [saving, setSaving] = useState(false);
@@ -55,6 +62,7 @@ export default function NewsManagementTab({ isEmbedded = false }: { isEmbedded?:
   const [message, setMessage] = useState('');
   const [messageType, setMessageType] = useState<'success' | 'error'>('success');
   const [showForm, setShowForm] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
 
   const load = () =>
     marketplaceApi
@@ -70,17 +78,19 @@ export default function NewsManagementTab({ isEmbedded = false }: { isEmbedded?:
   }, []);
 
   const save = async () => {
-    if (!form.title.trim()) {
-      setMessage('Title is required.');
+    if (!form.title.trim() && !form.content.trim()) {
+      setMessage('Either title or content is required.');
       setMessageType('error');
       return;
     }
     setSaving(true);
     try {
-      await marketplaceApi.saveNews(form);
+      await marketplaceApi.saveNews(form, editingId || undefined);
       setForm(defaultForm);
+      setEditingId(null);
       await load();
-      setMessage('News item added successfully.');
+      if (onUpdate) onUpdate();
+      setMessage(editingId ? 'News item updated successfully.' : 'News item added successfully.');
       setMessageType('success');
       setShowForm(false);
       setSaved(true);
@@ -90,6 +100,19 @@ export default function NewsManagementTab({ isEmbedded = false }: { isEmbedded?:
       setMessageType('error');
     } finally {
       setSaving(false);
+    }
+  };
+
+  const deleteItem = async (id: string) => {
+    try {
+      await marketplaceApi.deleteNews(id);
+      await load();
+      if (onUpdate) onUpdate();
+      setMessage('News item deleted successfully.');
+      setMessageType('success');
+    } catch (err) {
+      setMessage(err instanceof Error ? err.message : 'Delete failed');
+      setMessageType('error');
     }
   };
 
@@ -112,7 +135,19 @@ export default function NewsManagementTab({ isEmbedded = false }: { isEmbedded?:
               Control news tickers, promotions and announcements shown on your TV screens.
             </p>
           </div>
-          <button type="button" onClick={() => setShowForm((v) => !v)} className="btn-primary">
+          <button 
+            type="button" 
+            onClick={() => {
+              if (showForm) {
+                setForm(defaultForm);
+                setEditingId(null);
+                setShowForm(false);
+              } else {
+                setShowForm(true);
+              }
+            }} 
+            className="btn-primary"
+          >
             {showForm ? <X className="h-4 w-4" /> : <Plus className="h-4 w-4" />}
             {showForm ? 'Cancel' : 'Add News'}
           </button>
@@ -122,11 +157,19 @@ export default function NewsManagementTab({ isEmbedded = false }: { isEmbedded?:
       {isEmbedded && (
         <button
           type="button"
-          onClick={() => setShowForm((v) => !v)}
+          onClick={() => {
+            if (showForm) {
+              setForm(defaultForm);
+              setEditingId(null);
+              setShowForm(false);
+            } else {
+              setShowForm(true);
+            }
+          }}
           className="btn-secondary w-full"
         >
           {showForm ? <X className="h-4 w-4" /> : <Plus className="h-4 w-4" />}
-          {showForm ? 'Cancel Adding News' : 'Add News Item'}
+          {showForm ? 'Cancel' : 'Add News Item'}
         </button>
       )}
 
@@ -156,12 +199,12 @@ export default function NewsManagementTab({ isEmbedded = false }: { isEmbedded?:
         {showForm && (
           <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
             <h2 className="mb-5 flex items-center gap-2 font-bold text-slate-900">
-              <Plus className="h-4 w-4 text-blue-500" />
-              Create News Item
+              {editingId ? <Pencil className="h-4 w-4 text-blue-500" /> : <Plus className="h-4 w-4 text-blue-500" />}
+              {editingId ? 'Edit News Item' : 'Create News Item'}
             </h2>
             <div className="space-y-4">
               <div>
-                <label className={labelClass}>Title *</label>
+                <label className={labelClass}>Title</label>
                 <input
                   className={inputClass}
                   placeholder="e.g. Gold prices rally today"
@@ -179,125 +222,7 @@ export default function NewsManagementTab({ isEmbedded = false }: { isEmbedded?:
                   onChange={(e) => setForm({ ...form, content: e.target.value })}
                 />
               </div>
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className={labelClass}>Type</label>
-                  <Select
-                    value={form.type}
-                    onChange={(e) => setForm({ ...form, type: e.target.value as string })}
-                    displayEmpty
-                    fullWidth
-                    size="small"
-                    sx={{
-                      borderRadius: '0.75rem',
-                      height: '42px',
-                      fontSize: '0.875rem',
-                      backgroundColor: '#fff',
-                      '& .MuiOutlinedInput-notchedOutline': { borderColor: '#e2e8f0' },
-                      '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: '#cbd5e1' },
-                      '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                        borderColor: '#3b82f6',
-                        borderWidth: '1px',
-                      },
-                    }}
-                  >
-                    <MenuItem value="" disabled>
-                      Select type
-                    </MenuItem>
-                    {TYPES.map((t) => (
-                      <MenuItem key={t.key} value={t.key}>
-                        {t.key}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </div>
-                <div>
-                  <label className={labelClass}>Placement</label>
-                  <Select
-                    value={form.placement}
-                    onChange={(e) => setForm({ ...form, placement: e.target.value as string })}
-                    displayEmpty
-                    fullWidth
-                    size="small"
-                    sx={{
-                      borderRadius: '0.75rem',
-                      height: '42px',
-                      fontSize: '0.875rem',
-                      backgroundColor: '#fff',
-                      '& .MuiOutlinedInput-notchedOutline': { borderColor: '#e2e8f0' },
-                      '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: '#cbd5e1' },
-                      '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                        borderColor: '#3b82f6',
-                        borderWidth: '1px',
-                      },
-                    }}
-                  >
-                    <MenuItem value="" disabled>
-                      Select placement
-                    </MenuItem>
-                    {PLACEMENTS.map((p) => (
-                      <MenuItem key={p.key} value={p.key}>
-                        {p.label}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </div>
-              </div>
-              <div>
-                <label className={labelClass}>Priority (1 = highest)</label>
-                <input
-                  type="number"
-                  min="1"
-                  max="10"
-                  className={inputClass}
-                  value={form.priority}
-                  onChange={(e) => setForm({ ...form, priority: Number(e.target.value) })}
-                />
-              </div>
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className={labelClass}>
-                    <Calendar className="inline h-3 w-3 mr-1" />
-                    Start Date
-                  </label>
-                  <input
-                    type="date"
-                    className={inputClass}
-                    value={form.startDate}
-                    onChange={(e) => setForm({ ...form, startDate: e.target.value })}
-                  />
-                </div>
-                <div>
-                  <label className={labelClass}>
-                    <Calendar className="inline h-3 w-3 mr-1" />
-                    End Date
-                  </label>
-                  <input
-                    type="date"
-                    className={inputClass}
-                    value={form.endDate}
-                    onChange={(e) => setForm({ ...form, endDate: e.target.value })}
-                  />
-                </div>
-              </div>
-              {/* Active Toggle */}
-              <div className="flex items-center justify-between rounded-xl border border-slate-100 bg-slate-50 px-4 py-3">
-                <div>
-                  <p className="text-sm font-semibold text-slate-700">Active</p>
-                  <p className="text-xs text-slate-400">Show this item on TV screens</p>
-                </div>
-                <button
-                  type="button"
-                  role="switch"
-                  aria-checked={form.active}
-                  onClick={() => setForm((prev) => ({ ...prev, active: !prev.active }))}
-                  className={`relative h-6 w-11 rounded-full transition-all ${form.active ? 'bg-blue-600' : 'bg-slate-300'}`}
-                >
-                  <span
-                    className={`absolute top-1 h-4 w-4 rounded-full bg-white shadow transition-all ${form.active ? 'left-6' : 'left-1'}`}
-                  />
-                </button>
-              </div>
+
               <button type="button" onClick={save} disabled={saving} className="btn-primary w-full">
                 {saving ? (
                   <Loader2 className="h-4 w-4 animate-spin" />
@@ -341,39 +266,35 @@ export default function NewsManagementTab({ isEmbedded = false }: { isEmbedded?:
                       item.active ? 'border-slate-200' : 'border-slate-100 opacity-60'
                     }`}
                   >
-                    {/* Priority indicator */}
-                    <div
-                      className="absolute left-0 top-0 bottom-0 w-1 rounded-l-2xl"
-                      style={{
-                        background:
-                          item.priority >= 3
-                            ? '#3051bb'
-                            : item.priority === 2
-                              ? '#60a5fa'
-                              : '#94a3b8',
-                      }}
-                    />
+                    {/* Priority indicator removed since it's no longer used */}
                     <div className="pl-3">
                       <div className="mb-2 flex items-start justify-between gap-3">
-                        <div className="flex items-center gap-2 flex-wrap">
-                          <span
-                            className={`rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wide ${typeColor(item.type)}`}
+                        <div className="flex items-center gap-1.5 ml-auto flex-shrink-0">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setForm({
+                                ...defaultForm,
+                                title: item.title,
+                                content: item.content || '',
+                              });
+                              setEditingId(item._id);
+                              setShowForm(true);
+                              window.scrollTo({ top: 0, behavior: 'smooth' });
+                            }}
+                            className="p-1 rounded text-blue-400 hover:text-blue-600 hover:bg-blue-50 transition-colors"
+                            title="Edit news item"
                           >
-                            {item.type}
-                          </span>
-                          <span className="rounded-full border border-slate-100 bg-slate-50 px-2.5 py-0.5 text-[10px] font-medium text-slate-500">
-                            {item.placement}
-                          </span>
-                          {!item.active && (
-                            <span className="rounded-full bg-slate-100 px-2.5 py-0.5 text-[10px] font-medium text-slate-400">
-                              Inactive
-                            </span>
-                          )}
-                        </div>
-                        <div className="flex items-center gap-1.5 flex-shrink-0">
-                          <span className="text-[10px] font-bold text-slate-400">
-                            P{item.priority}
-                          </span>
+                            <Pencil className="h-4 w-4" />
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => deleteItem(item._id)}
+                            className="p-1 rounded text-red-400 hover:text-red-600 hover:bg-red-50 transition-colors"
+                            title="Delete news item"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </button>
                         </div>
                       </div>
                       <h3 className="font-semibold text-slate-900">{item.title}</h3>

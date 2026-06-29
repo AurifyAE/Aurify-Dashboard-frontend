@@ -33,14 +33,21 @@ function ScreenConsoleContent() {
     }
   }, [searchParams]);
 
+  const handleTabChange = (tab: TabId) => {
+    setActiveTab(tab);
+    const params = new URLSearchParams(searchParams.toString());
+    params.set('tab', tab);
+    router.push(`?${params.toString()}`);
+  };
+
   const handleEditLayout = (layoutId: string) => {
     setEditingLayoutId(layoutId);
-    setActiveTab('builder');
+    handleTabChange('builder');
   };
 
   const handleCreateNew = () => {
     setEditingLayoutId(undefined);
-    setActiveTab('builder');
+    handleTabChange('builder');
   };
 
   const tabsConfig = [
@@ -93,8 +100,8 @@ function ScreenConsoleContent() {
             <ScreenBuilderTab
               editingLayoutId={editingLayoutId}
               setEditingLayoutId={setEditingLayoutId}
-              setActiveTab={(tab) => setActiveTab(tab as TabId)}
-              onSaveSuccess={() => setActiveTab('my-screens')}
+              setActiveTab={(tab) => handleTabChange(tab as TabId)}
+              onSaveSuccess={() => handleTabChange('my-screens')}
             />
           )}
 

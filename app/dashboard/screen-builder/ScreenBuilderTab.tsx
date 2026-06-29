@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState, useRef } from 'react';
 import Link from 'next/link';
+import { useRouter, useSearchParams } from 'next/navigation';
 import LiveClock from '@/components/LiveClock';
 import Theme1Layout from '@/components/live-screen/theme1/Theme1Layout';
 import Theme2Layout from '@/components/live-screen/theme2/Theme2Layout';
@@ -28,9 +29,12 @@ import {
   Rocket,
   Save,
   Settings2,
+  Trash2,
   Tv,
+  X,
   XCircle,
 } from 'lucide-react';
+import Swal from 'sweetalert2';
 import Loader from '@/components/loader/loader';
 
 const WIDGETS = ['Spot Rates', 'Commodity Table', 'News', 'Clock', 'Date'];
@@ -224,7 +228,7 @@ const TVPreviewRenderer = ({ data }: { data: any }) => {
             fontWeight: 'bold',
           }}
         >
-          DEBUG: {enhancedData?.layout?.selectedLayout}
+          SCREEN : {enhancedData?.layout?.selectedLayout}
         </div>
         {enhancedData?.layout?.selectedLayout === 'theme3' ? (
           <Theme3Layout data={enhancedData} isPreview={true} />
@@ -335,7 +339,17 @@ export default function ScreenBuilderTab({
   onSaveSuccess,
 }: ScreenBuilderTabProps) {
   const [openAccordion, setOpenAccordion] = useState<string | null>('Global Colors');
-  const [step, setStep] = useState(1);
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const initialStep = parseInt(searchParams.get('step') || '1', 10);
+  const [step, setStepState] = useState(isNaN(initialStep) ? 1 : initialStep);
+
+  const setStep = (newStep: number) => {
+    setStepState(newStep);
+    const params = new URLSearchParams(searchParams.toString());
+    params.set('step', newStep.toString());
+    router.push(`?${params.toString()}`);
+  };
   const [merchant, setMerchant] = useState<Merchant | null>(null);
   const [themes, setThemes] = useState<MerchantTheme[]>([]);
   const [layouts, setLayouts] = useState<ScreenLayout[]>([]);
@@ -489,8 +503,14 @@ export default function ScreenBuilderTab({
       await load();
       showMessage('Draft saved successfully.', 'success');
       if (onSaveSuccess) onSaveSuccess();
-    } catch (err) {
-      showMessage(err instanceof Error ? err.message : 'Save failed', 'error');
+    } catch (err: any) {
+      Swal.fire({
+        title: 'Error',
+        text: err instanceof Error ? err.message : err?.message || 'Save failed',
+        icon: 'error',
+        confirmButtonColor: '#3b82f6',
+      });
+      showMessage('Save failed', 'error');
     } finally {
       setSaving(false);
     }
@@ -523,8 +543,14 @@ export default function ScreenBuilderTab({
       showMessage(`🎉 Screen is live: ${result.liveUrl}`, 'success');
       await load();
       if (onSaveSuccess) onSaveSuccess();
-    } catch (err) {
-      showMessage(err instanceof Error ? err.message : 'Publish failed', 'error');
+    } catch (err: any) {
+      Swal.fire({
+        title: 'Error',
+        text: err instanceof Error ? err.message : err?.message || 'Publish failed',
+        icon: 'error',
+        confirmButtonColor: '#3b82f6',
+      });
+      showMessage('Publish failed', 'error');
     } finally {
       setSaving(false);
     }
@@ -889,7 +915,10 @@ export default function ScreenBuilderTab({
               </div>
 
               <div className="border-t border-slate-100 pt-4">
-                <NewsManagementTab isEmbedded={true} />
+                <NewsManagementTab 
+                  isEmbedded={true} 
+                  onUpdate={() => marketplaceApi.news().then(setNews).catch(() => [])} 
+                />
               </div>
 
               <div className="flex gap-2 mt-6">
