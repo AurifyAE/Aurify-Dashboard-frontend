@@ -1,6 +1,7 @@
 import { fetchLiveScreen } from '@/lib/api/marketplace';
 import Theme1Layout from '@/components/live-screen/theme1/Theme1Layout';
 import Theme2Layout from '@/components/live-screen/theme2/Theme2Layout';
+import Theme3Layout from '@/components/live-screen/theme3/Theme3Layout';
 import DeviceTracker from '@/components/live-screen/DeviceTracker';
 
 export const dynamic = 'force-dynamic';
@@ -73,6 +74,14 @@ export default async function LiveScreenPage({ params }: PageProps) {
   const visible = merchant.visibility || {};
 
   const selectedThemeLayout = data?.layout?.header?.layout || data?.layout?.selectedLayout;
+  if (selectedThemeLayout === 'theme3') {
+    return (
+      <>
+        <DeviceTracker merchantId={merchant.merchantId} screenSlug={layout.screenSlug} />
+        <Theme3Layout data={data} />
+      </>
+    );
+  }
   if (selectedThemeLayout === 'theme2') {
     return (
       <>

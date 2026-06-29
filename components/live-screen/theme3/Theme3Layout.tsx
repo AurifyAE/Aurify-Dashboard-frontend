@@ -1,26 +1,18 @@
 'use client';
-import React, { useEffect, useState } from 'react';
-import { Grid, Box, Typography } from '@mui/material';
-import SpotRate from './SpotRate';
-import CommodityTable from './CommodityTable';
-import NewsTicker from './News';
-import WorldClockHorizontal from './WorldClock';
-import SystemClock from './SystemClock';
-import PoweredByAurify from './PoweredByAurify';
-import io from 'socket.io-client';
+import React, { useEffect, useState } from "react";
+import { Grid, Box } from "@mui/material";
+import SpotRate from "./SpotRate";
+import CommodityTable from "./CommodityTable";
+import NewsTicker from "./News";
+import WorldClockHorizontal from "./WorldClock";
+import SystemClock from "./SystemClock";
+import PoweredByAurify from "./PoweredByAurify";
+import io from "socket.io-client";
 import { API_URL, API_KEY, SOCKET_SECRET } from '@/lib/env';
 
-export default function Theme2Layout({
-  data,
-  isPreview = false,
-}: {
-  data?: any;
-  isPreview?: boolean;
-}) {
+export default function Theme3Layout({ data, isPreview = false }: { data?: any; isPreview?: boolean; }) {
   const { merchant, theme, layout, commodities, news } = data || {};
   const widgets = layout?.widgets || ['Spot Rates', 'Commodity Table', 'News', 'Clock'];
-  const showLogo = layout?.styles?.showLogo ?? true;
-  const showName = layout?.styles?.showName ?? true;
 
   const [marketData, setMarketData] = useState<Record<string, any>>({});
   const [serverURL, setServerURL] = useState<string | null>(null);
@@ -109,27 +101,15 @@ export default function Theme2Layout({
         ...rawGold,
         ask: rawGold.ask || (rawGold.bid ? (parseFloat(rawGold.bid) + 0.5).toFixed(2) : undefined),
       }
-    : {
-        bid: 2345.6,
-        ask: 2346.1,
-        low: 2340.0,
-        high: 2350.0,
-      };
+    : { bid: 2345.6, ask: 2346.1, low: 2340.0, high: 2350.0 };
 
   const rawSilver = marketData['SILVER'];
   const silverData = rawSilver
     ? {
         ...rawSilver,
-        ask:
-          rawSilver.ask ||
-          (rawSilver.bid ? (parseFloat(rawSilver.bid) + 0.05).toFixed(2) : undefined),
+        ask: rawSilver.ask || (rawSilver.bid ? (parseFloat(rawSilver.bid) + 0.05).toFixed(2) : undefined),
       }
-    : {
-        bid: 28.4,
-        ask: 28.45,
-        low: 28.0,
-        high: 28.6,
-      };
+    : { bid: 28.4, ask: 28.45, low: 28.0, high: 28.6 };
 
   const defaultCommodities = [
     {
@@ -162,140 +142,112 @@ export default function Theme2Layout({
   return (
     <Box
       sx={{
-        height: isPreview ? '100%' : '100dvh',
-        minHeight: '100dvh',
-        color: 'white',
-        pb: { xs: '0', md: '3vw' },
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        backgroundColor: '#000',
-        position: 'relative',
-        fontFamily: "'Scaver', sans-serif",
+        minHeight: isPreview ? "100%" : "100dvh",
+        height: isPreview ? "100%" : "auto",
+        color: "white",
+        pb: { xs: "0", md: "3vw" },
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        backgroundColor: "#000",
+        position: 'relative'
       }}
     >
       <Box
         sx={{
-          position: isPreview ? 'absolute' : 'fixed',
-          left: '0',
-          bottom: '0',
-          top: '0',
-          right: '0',
-          height: '100%',
-          width: '100%',
-          pointerEvents: 'none',
-          overflow: 'hidden',
+          position: isPreview ? "absolute" : "fixed",
+          left: "0",
+          bottom: "0",
+          top: "0",
+          right: "0",
+          height: "100%",
+          width: "100%",
+          pointerEvents: "none",
+          overflow: "hidden",
         }}
       >
         <Box
           component="img"
-          src={theme?.customizations?.backgroundUrl || '/images/theme2-bg.png'}
+          src={theme?.customizations?.backgroundUrl || "/images/theme3-bg.png"}
           alt="background"
-          onError={(e) => {
+          onError={(e: any) => {
             e.currentTarget.style.display = 'none';
           }}
-          sx={{ height: '100%', width: '100%', objectFit: 'cover' }}
+          sx={{
+            height: "100%",
+            width: "100%",
+            objectFit: "cover",
+          }}
         />
       </Box>
 
+      {/* Grid */}
       <Grid
         container
-        spacing={1}
+        spacing={2}
         sx={{
-          minHeight: '100%',
-          justifyContent: 'space-between',
-          flexWrap: 'wrap',
+          minHeight: "100%",
+          justifyContent: "space-between",
+          flexWrap: "wrap",
           zIndex: 1,
-          position: 'relative',
-          m: 0,
-          p: '0 2vw',
-          alignItems: 'center',
-          width: '100%',
-          display: 'flex',
+          position: "relative",
+          margin: 0,
+          padding: "0 2vw ",
+          alignItems: "center",
+          width: "100%",
         }}
       >
+        {/* Side: SpotRate & Date Time */}
+        <Grid size={{ xs: 12, md: 6 }} sx={{ padding: "1vw", gap: "1vw", display: "grid" }}>
+          {widgets.includes('Clock') && <SystemClock />}
+          {widgets.includes('Clock') && <WorldClockHorizontal />}
+          {widgets.includes('Spot Rates') && <SpotRate goldData={goldData} silverData={silverData} />}
+          <PoweredByAurify />
+        </Grid>
         <Grid
           size={{ xs: 12, md: 6 }}
           sx={{
-            display: 'flex',
-            alignItems: 'center',
-            flexDirection: 'column',
-            padding: '1vw .5vw',
-            gap: '1vw',
+            display: "flex",
+            alignItems: "center",
+            flexDirection: "column",
+            justifyContent: "space-between",
+            padding: "1vw",
+            gap: "1vw"
           }}
         >
-          {widgets.includes('Clock') && <SystemClock />}
-
-          {widgets.includes('Commodity Table') && (
-            <>
-              <CommodityTable
-                commodities={displayCommodities}
-                isCommodity={true}
-                goldData={goldData}
-                silverData={silverData}
-              />
-              <CommodityTable
-                commodities={displayCommodities}
-                isMintedBar={true}
-                goldData={goldData}
-                silverData={silverData}
-              />
-            </>
-          )}
-          {widgets.includes('Clock') && <WorldClockHorizontal />}
-        </Grid>
-
-        <Grid size={{ xs: 12, md: 6 }} sx={{ display: 'grid', padding: '1vw', gap: '1vw' }}>
           <Box
             sx={{
-              height: 'auto',
-              width: { xs: '40vw', sm: '20vw' },
-              marginBottom: { xs: '20px', sm: '0vw' },
-              mx: 'auto',
+              height: "auto",
+              width: { xs: "40vw", sm: "25vw" },
+              marginBottom: { xs: "20px", sm: "0vw" },
             }}
           >
-            {showLogo ? (
-              <img
-                src={merchant?.logo || '/images/logo-placeholder.svg'}
-                alt={merchant?.companyName}
-                style={{
-                  width: '100%',
-                  height: 'auto',
-                  objectFit: 'contain',
-                  maxHeight: '15vw',
-                }}
-              />
-            ) : showName ? (
-              <Typography variant="h4" sx={{ color: '#d4a017', fontWeight: 'bold' }}>
-                {merchant?.companyName || 'Merchant'}
-              </Typography>
+            {(layout?.styles?.showLogo ?? true) ? (
+              <img src={merchant?.logo || "/images/logo-placeholder.svg"} alt="" style={{ objectFit: 'contain', width: '100%' }} />
+            ) : (layout?.styles?.showName ?? true) ? (
+              <Box sx={{ fontSize: '2vw', fontWeight: 'bold', color: '#fff', textAlign: 'center' }}>
+                {merchant?.companyName}
+              </Box>
             ) : null}
           </Box>
-
-          {widgets.includes('Spot Rates') && (
-            <SpotRate goldData={goldData} silverData={silverData} />
+          {widgets.includes('Commodity Table') && (
+            <CommodityTable items={displayCommodities} goldData={goldData} silverData={silverData} />
           )}
-          <PoweredByAurify />
         </Grid>
 
         {widgets.includes('News') && (
           <Grid
             size={{ xs: 12 }}
             sx={{
-              mt: { xs: '20px', md: '0' },
-              position: 'fixed',
+              mt: { xs: "20px", md: "0" },
+              position: isPreview ? "absolute" : "fixed",
               zIndex: 1,
-              bottom: '0',
-              width: '100%',
-              left: '0',
-              p: 0,
+              bottom: "0",
+              width: "100%",
+              left: "0",
             }}
           >
-            <NewsTicker
-              newsItems={news}
-              merchantName={merchant?.companyName}
-              newsHeading={layout?.header?.newsHeading || layout?.newsHeading}
-            />
+            <NewsTicker newsItems={news} merchantName={merchant?.companyName} newsHeading={layout?.header?.newsHeading || layout?.newsHeading} />
           </Grid>
         )}
       </Grid>

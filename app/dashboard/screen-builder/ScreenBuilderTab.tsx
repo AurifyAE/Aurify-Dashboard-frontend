@@ -5,6 +5,7 @@ import Link from 'next/link';
 import LiveClock from '@/components/LiveClock';
 import Theme1Layout from '@/components/live-screen/theme1/Theme1Layout';
 import Theme2Layout from '@/components/live-screen/theme2/Theme2Layout';
+import Theme3Layout from '@/components/live-screen/theme3/Theme3Layout';
 import {
   marketplaceApi,
   type Merchant,
@@ -56,6 +57,15 @@ const LAYOUTS = [
   {
     id: 'theme2',
     label: 'Theme 2 (Modern)',
+    colors: [
+      { key: 'primary', label: 'Primary', default: '#d4a017' },
+      { key: 'secondary', label: 'Secondary', default: '#111827' },
+      { key: 'accent', label: 'Accent', default: '#38bdf8' },
+    ],
+  },
+  {
+    id: 'theme3',
+    label: 'Theme 3 (Premium)',
     colors: [
       { key: 'primary', label: 'Primary', default: '#d4a017' },
       { key: 'secondary', label: 'Secondary', default: '#111827' },
@@ -209,7 +219,9 @@ const TVPreviewRenderer = ({ data }: { data: any }) => {
         >
           DEBUG: {enhancedData?.layout?.selectedLayout}
         </div>
-        {enhancedData?.layout?.selectedLayout === 'theme2' ? (
+        {enhancedData?.layout?.selectedLayout === 'theme3' ? (
+          <Theme3Layout data={enhancedData} isPreview={true} />
+        ) : enhancedData?.layout?.selectedLayout === 'theme2' ? (
           <Theme2Layout data={enhancedData} isPreview={true} />
         ) : (
           <Theme1Layout data={enhancedData} isPreview={true} />
@@ -609,7 +621,9 @@ export default function ScreenBuilderTab({
                         <span className="text-xs text-slate-500">
                           {l.id === 'theme1'
                             ? 'Classic layout with gradients'
-                            : 'Modern layout with glassmorphism'}
+                            : l.id === 'theme2'
+                            ? 'Modern layout with glassmorphism'
+                            : 'Premium dark themed layout'}
                         </span>
                       </div>
                       {draft.selectedLayout === l.id && (

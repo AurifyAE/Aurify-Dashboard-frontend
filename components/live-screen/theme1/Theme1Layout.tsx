@@ -240,7 +240,7 @@ export default function Theme1Layout({
           >
             {showLogo ? (
               <img
-                src={merchant?.logo || '/images/theme1-logo.svg'}
+                src={merchant?.logo || '/images/logo-placeholder.svg'}
                 alt={merchant?.companyName}
                 style={{ width: '100%', height: 'auto', objectFit: 'contain' }}
               />
