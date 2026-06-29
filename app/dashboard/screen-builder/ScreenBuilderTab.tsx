@@ -561,46 +561,7 @@ export default function ScreenBuilderTab({
                   onChange={(e) => setDraft({ ...draft, screenSlug: e.target.value })}
                 />
               </div>
-              <div>
-                <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-500">
-                  Assigned Devices
-                </label>
-                <div className="flex gap-2 flex-wrap">
-                  {['TV 1', 'TV 2', 'TV 3', 'TV 4', 'TV 5', 'Lobby Display', 'Window Display'].map(
-                    (device) => {
-                      const devicesArray = draft.assignedDevices
-                        .split(',')
-                        .map((d) => d.trim())
-                        .filter(Boolean);
-                      const isSelected = devicesArray.includes(device);
-                      return (
-                        <label
-                          key={device}
-                          className={`flex items-center gap-2 p-2 rounded-xl border text-sm cursor-pointer transition-colors ${isSelected ? 'border-blue-500 bg-blue-50 text-blue-700' : 'border-slate-200 hover:bg-slate-50'}`}
-                        >
-                          <input
-                            type="checkbox"
-                            className="hidden"
-                            checked={isSelected}
-                            onChange={(e) => {
-                              let newDevices = [...devicesArray];
-                              if (e.target.checked) newDevices.push(device);
-                              else newDevices = newDevices.filter((d) => d !== device);
-                              setDraft({ ...draft, assignedDevices: newDevices.join(', ') });
-                            }}
-                          />
-                          <div
-                            className={`h-4 w-4 rounded border flex items-center justify-center ${isSelected ? 'bg-blue-600 border-blue-600' : 'border-slate-300'}`}
-                          >
-                            {isSelected && <Check className="h-3 w-3 text-white" />}
-                          </div>
-                          {device}
-                        </label>
-                      );
-                    }
-                  )}
-                </div>
-              </div>
+
               {/* Theme Selection */}
               <div className="pt-4 border-t border-slate-100">
                 <h3 className="font-bold text-slate-800 text-sm mb-3">Select Layout Theme</h3>
