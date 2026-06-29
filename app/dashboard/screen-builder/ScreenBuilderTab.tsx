@@ -34,7 +34,7 @@ import {
   X,
   XCircle,
 } from 'lucide-react';
-import Swal from 'sweetalert2';
+import toast from 'react-hot-toast';
 import Loader from '@/components/loader/loader';
 
 const WIDGETS = ['Spot Rates', 'Commodity Table', 'News', 'Clock', 'Date'];
@@ -377,8 +377,10 @@ export default function ScreenBuilderTab({
   };
 
   const showMessage = (text: string, type: 'info' | 'success' | 'error' = 'info') => {
-    setMessage(text);
-    setMessageType(type);
+    toast.dismiss();
+    if (type === 'error') toast.error(text);
+    else if (type === 'success') toast.success(text);
+    else toast(text);
   };
 
   const load = async () => {
@@ -504,13 +506,7 @@ export default function ScreenBuilderTab({
       showMessage('Draft saved successfully.', 'success');
       if (onSaveSuccess) onSaveSuccess();
     } catch (err: any) {
-      Swal.fire({
-        title: 'Error',
-        text: err instanceof Error ? err.message : err?.message || 'Save failed',
-        icon: 'error',
-        confirmButtonColor: '#3b82f6',
-      });
-      showMessage('Save failed', 'error');
+      showMessage(err instanceof Error ? err.message : err?.message || 'Save failed', 'error');
     } finally {
       setSaving(false);
     }
@@ -544,13 +540,7 @@ export default function ScreenBuilderTab({
       await load();
       if (onSaveSuccess) onSaveSuccess();
     } catch (err: any) {
-      Swal.fire({
-        title: 'Error',
-        text: err instanceof Error ? err.message : err?.message || 'Publish failed',
-        icon: 'error',
-        confirmButtonColor: '#3b82f6',
-      });
-      showMessage('Publish failed', 'error');
+      showMessage(err instanceof Error ? err.message : err?.message || 'Publish failed', 'error');
     } finally {
       setSaving(false);
     }
@@ -637,24 +627,7 @@ export default function ScreenBuilderTab({
         ))}
       </div>
 
-      {message && (
-        <div
-          className={`flex items-start gap-2 rounded-xl border p-3 text-sm ${
-            messageType === 'success'
-              ? 'border-emerald-200 bg-emerald-50 text-emerald-800'
-              : messageType === 'error'
-                ? 'border-red-200 bg-red-50 text-red-800'
-                : 'border-slate-200 bg-slate-50 text-slate-700'
-          }`}
-        >
-          {messageType === 'success' ? (
-            <CheckCircle2 className="h-4 w-4 mt-0.5 flex-shrink-0" />
-          ) : messageType === 'error' ? (
-            <XCircle className="h-4 w-4 mt-0.5 flex-shrink-0" />
-          ) : null}
-          {message}
-        </div>
-      )}
+
 
       <div className="grid gap-6 xl:grid-cols-[380px_1fr]">
         <aside className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sticky top-6 h-fit max-h-[70dvh] overflow-y-auto">

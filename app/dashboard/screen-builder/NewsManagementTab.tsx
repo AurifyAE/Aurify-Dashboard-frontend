@@ -15,9 +15,9 @@ import {
   Save,
   Tag,
   Trash2,
-  X,
 } from 'lucide-react';
 import { Select, MenuItem } from '@mui/material';
+import toast from 'react-hot-toast';
 
 const TYPES = [
   { key: 'Market News', color: 'bg-blue-100 text-blue-700' },
@@ -69,8 +69,8 @@ export default function NewsManagementTab({
       .news()
       .then(setItems)
       .catch((err) => {
-        setMessage(err.message);
-        setMessageType('error');
+        toast.dismiss();
+        toast.error(err.message);
       });
 
   useEffect(() => {
@@ -79,8 +79,8 @@ export default function NewsManagementTab({
 
   const save = async () => {
     if (!form.title.trim() && !form.content.trim()) {
-      setMessage('Either title or content is required.');
-      setMessageType('error');
+      toast.dismiss();
+      toast.error('Either title or content is required.');
       return;
     }
     setSaving(true);
@@ -90,14 +90,14 @@ export default function NewsManagementTab({
       setEditingId(null);
       await load();
       if (onUpdate) onUpdate();
-      setMessage(editingId ? 'News item updated successfully.' : 'News item added successfully.');
-      setMessageType('success');
+      toast.dismiss();
+      toast.success(editingId ? 'News item updated successfully.' : 'News item added successfully.');
       setShowForm(false);
       setSaved(true);
       setTimeout(() => setSaved(false), 3000);
     } catch (err) {
-      setMessage(err instanceof Error ? err.message : 'Save failed');
-      setMessageType('error');
+      toast.dismiss();
+      toast.error(err instanceof Error ? err.message : 'Save failed');
     } finally {
       setSaving(false);
     }
@@ -108,11 +108,11 @@ export default function NewsManagementTab({
       await marketplaceApi.deleteNews(id);
       await load();
       if (onUpdate) onUpdate();
-      setMessage('News item deleted successfully.');
-      setMessageType('success');
+      toast.dismiss();
+      toast.success('News item deleted successfully.');
     } catch (err) {
-      setMessage(err instanceof Error ? err.message : 'Delete failed');
-      setMessageType('error');
+      toast.dismiss();
+      toast.error(err instanceof Error ? err.message : 'Delete failed');
     }
   };
 
@@ -173,26 +173,7 @@ export default function NewsManagementTab({
         </button>
       )}
 
-      {/* Message */}
-      {message && (
-        <div
-          className={`mb-5 flex items-center gap-2 rounded-xl border px-4 py-3 text-sm ${
-            messageType === 'success'
-              ? 'border-emerald-200 bg-emerald-50 text-emerald-800'
-              : 'border-red-200 bg-red-50 text-red-800'
-          }`}
-        >
-          {messageType === 'success' ? (
-            <CheckCircle2 className="h-4 w-4 flex-shrink-0" />
-          ) : (
-            <AlertCircle className="h-4 w-4 flex-shrink-0" />
-          )}
-          {message}
-          <button onClick={() => setMessage('')} className="ml-auto flex-shrink-0">
-            <X className="h-3.5 w-3.5 opacity-50 hover:opacity-100" />
-          </button>
-        </div>
-      )}
+
 
       <div className={`grid gap-6 ${isEmbedded ? 'grid-cols-1' : 'xl:grid-cols-[420px_1fr]'}`}>
         {/* Form Panel */}
