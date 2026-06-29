@@ -1,25 +1,25 @@
-"use client";
-import React, { useEffect, useState } from "react";
-import { Box, Typography } from "@mui/material";
+'use client';
+import React, { useEffect, useState } from 'react';
+import { Box, Typography } from '@mui/material';
 
 const clockConfig = [
   {
-    key: "india",
-    label: "INDIA",
-    timeZone: "Asia/Kolkata",
-    flag: "/images/india.png",
+    key: 'india',
+    label: 'INDIA',
+    timeZone: 'Asia/Kolkata',
+    flag: '/images/india.png',
   },
   {
-    key: "uae",
-    label: "UAE",
-    timeZone: "Asia/Dubai",
-    flag: "/images/uae.png",
+    key: 'uae',
+    label: 'UAE',
+    timeZone: 'Asia/Dubai',
+    flag: '/images/uae.png',
   },
   {
-    key: "london",
-    label: "LONDON",
-    timeZone: "Europe/London",
-    flag: "/images/uk.png",
+    key: 'london',
+    label: 'LONDON',
+    timeZone: 'Europe/London',
+    flag: '/images/uk.png',
   },
 ];
 
@@ -31,15 +31,15 @@ const WorldClockHorizontal = () => {
       const now = new Date();
 
       const timeOptions: Intl.DateTimeFormatOptions = {
-        hour: "2-digit",
-        minute: "2-digit",
+        hour: '2-digit',
+        minute: '2-digit',
         hour12: true,
       };
 
       const updatedTimes: Record<string, string> = {};
 
       clockConfig.forEach((clock) => {
-        updatedTimes[clock.key] = now.toLocaleTimeString("en-US", {
+        updatedTimes[clock.key] = now.toLocaleTimeString('en-US', {
           ...timeOptions,
           timeZone: clock.timeZone,
         });
@@ -57,56 +57,52 @@ const WorldClockHorizontal = () => {
   return (
     <Box
       sx={{
-        display: "grid",
-        alignItems: "center",
-        gridTemplateColumns: "repeat(3,1fr)",
-        gap: "1vw",
-        width: "100%",
+        display: 'grid',
+        alignItems: 'center',
+        gridTemplateColumns: 'repeat(3,1fr)',
+        gap: '1vw',
+        width: '100%',
       }}
     >
       {clockConfig.map((clock) => (
         <Box
           key={clock.key}
           sx={{
-            display: "flex",
-            alignItems: "center",
+            display: 'flex',
+            alignItems: 'center',
             justifyContent: 'center',
             gap: {
-              xs: "10px",
-              lg: "1vw",
+              xs: '10px',
+              lg: '1vw',
             },
           }}
         >
           <Box
             sx={{
               width: {
-                xs: "30px",
-                lg: "3vw",
+                xs: '30px',
+                lg: '3vw',
               },
             }}
           >
-            <img
-              src={clock.flag}
-              alt={clock.label}
-              style={{ width: "100%", height: "auto" }}
-            />
+            <img src={clock.flag} alt={clock.label} style={{ width: '100%', height: 'auto' }} />
           </Box>
 
           <Box
             sx={{
-              display: "flex",
-              alignItems: "start",
-              flexDirection: "column",
+              display: 'flex',
+              alignItems: 'start',
+              flexDirection: 'column',
             }}
           >
             <Typography
               sx={{
                 fontSize: {
-                  xs: "14px",
-                  lg: "1vw",
+                  xs: '14px',
+                  lg: '1vw',
                 },
                 fontWeight: 500,
-                color: "#fff",
+                color: '#fff',
               }}
             >
               {clock.label}
@@ -115,13 +111,13 @@ const WorldClockHorizontal = () => {
             <Typography
               sx={{
                 fontSize: {
-                  xs: "14px",
-                  lg: "1vw",
+                  xs: '14px',
+                  lg: '1vw',
                 },
-                color: "#fff",
+                color: '#fff',
               }}
             >
-              {times[clock.key] || "--:--"}
+              {times[clock.key] || '--:--'}
             </Typography>
           </Box>
         </Box>

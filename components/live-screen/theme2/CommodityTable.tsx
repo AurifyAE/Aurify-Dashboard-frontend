@@ -1,11 +1,11 @@
-"use client";
-import React, { useEffect, useState } from "react";
-import { Box, Typography } from "@mui/material";
-import { Swiper, SwiperSlide } from "swiper/react";
-import { Autoplay } from "swiper/modules";
+'use client';
+import React, { useEffect, useState } from 'react';
+import { Box, Typography } from '@mui/material';
+import { Swiper, SwiperSlide } from 'swiper/react';
+import { Autoplay } from 'swiper/modules';
 
-import "swiper/css";
-import "swiper/css/autoplay";
+import 'swiper/css';
+import 'swiper/css/autoplay';
 
 const OUNCE = 31.103;
 const AED = 3.674;
@@ -70,13 +70,13 @@ const CommodityTable = ({
   ------------------------ */
 
   const getSpot = (metal: string | undefined) => {
-    const lower = metal?.toLowerCase() || "";
+    const lower = metal?.toLowerCase() || '';
 
-    if (lower.includes("gold") || lower.includes("minted")) {
+    if (lower.includes('gold') || lower.includes('minted')) {
       return goldData;
     }
 
-    if (lower.includes("silver")) {
+    if (lower.includes('silver')) {
       return silverData;
     }
 
@@ -90,7 +90,7 @@ const CommodityTable = ({
     return num > 1000 ? num / 10000 : num / 1000;
   };
   const formatByDigits = (value: number | null | undefined) => {
-    if (value == null || isNaN(value)) return "";
+    if (value == null || isNaN(value)) return '';
 
     const integerDigits = Math.floor(Math.abs(value)).toString().length;
 
@@ -106,7 +106,7 @@ const CommodityTable = ({
   const [isMobile, setIsMobile] = useState(false);
 
   const formatPrice = (value: number | null | undefined) => {
-    if (value == null || isNaN(value)) return "—";
+    if (value == null || isNaN(value)) return '—';
 
     const intLen = Math.floor(Math.abs(value)).toString().length;
 
@@ -114,7 +114,7 @@ const CommodityTable = ({
     if (intLen >= 4) decimals = 0;
     else if (intLen === 3) decimals = 2;
 
-    return value.toLocaleString("en-US", {
+    return value.toLocaleString('en-US', {
       minimumFractionDigits: decimals,
       maximumFractionDigits: decimals,
     });
@@ -126,9 +126,9 @@ const CommodityTable = ({
     };
 
     checkWidth();
-    window.addEventListener("resize", checkWidth);
+    window.addEventListener('resize', checkWidth);
 
-    return () => window.removeEventListener("resize", checkWidth);
+    return () => window.removeEventListener('resize', checkWidth);
   }, []);
   /* -----------------------
      BUILD TABLE DATA
@@ -144,24 +144,16 @@ const CommodityTable = ({
 
       if (!effectiveSpot) return;
 
-      const weightKey = (item.weight || "") as keyof typeof UNIT_MULTIPLIER;
+      const weightKey = (item.weight || '') as keyof typeof UNIT_MULTIPLIER;
       const multiplier = UNIT_MULTIPLIER[weightKey] || 1;
       const purity = purityFactor(item.purity);
       const unitValue = Number(item.unit) || 1;
 
-      const baseBid =
-        (effectiveSpot.bid / 31.103) * AED * multiplier * unitValue * purity;
-      const baseAsk =
-        (effectiveSpot.ask / 31.103) * AED * multiplier * unitValue * purity;
+      const baseBid = (effectiveSpot.bid / 31.103) * AED * multiplier * unitValue * purity;
+      const baseAsk = (effectiveSpot.ask / 31.103) * AED * multiplier * unitValue * purity;
 
-      const bid =
-        baseBid +
-        (Number(item.buyCharge) || 0) +
-        (Number(item.buyPremium) || 0);
-      const ask =
-        baseAsk +
-        (Number(item.sellCharge) || 0) +
-        (Number(item.sellPremium) || 0);
+      const bid = baseBid + (Number(item.buyCharge) || 0) + (Number(item.buyPremium) || 0);
+      const ask = baseAsk + (Number(item.sellCharge) || 0) + (Number(item.sellPremium) || 0);
 
       list.push({
         group: item.group,
@@ -183,12 +175,12 @@ const CommodityTable = ({
      FILTER GROUPS
   ------------------------ */
 
-  const commodityData = data.filter((item) => item.group === "commodity");
+  const commodityData = data.filter((item) => item.group === 'commodity');
 
-  const mintedBarData = data.filter((item) => item.group === "group1");
+  const mintedBarData = data.filter((item) => item.group === 'group1');
 
   // -----table height---
-  const tableHeight = isMobile ? "35vw" : "18vw";
+  const tableHeight = isMobile ? '35vw' : '18vw';
   // -----table items number---
   const tableItemsNumber = isMobile ? 6 : 5;
 
@@ -200,37 +192,37 @@ const CommodityTable = ({
     if (!rows.length) return null;
 
     return (
-      <Box sx={{ width: "100%", overflow: "hidden" }}>
+      <Box sx={{ width: '100%', overflow: 'hidden' }}>
         <Box
           sx={{
-            display: "grid",
-            gridTemplateColumns: "1.4fr 0.8fr 0.8fr 0.8fr",
-            py: "0.9vw",
-            px: "1.5vw",
-            alignItems: "end",
-            borderRadius: "1vw",
+            display: 'grid',
+            gridTemplateColumns: '1.4fr 0.8fr 0.8fr 0.8fr',
+            py: '0.9vw',
+            px: '1.5vw',
+            alignItems: 'end',
+            borderRadius: '1vw',
             // background: "#aa8a4b1a",
-            background: "#aa8a4b11",
+            background: '#aa8a4b11',
 
-            backdropFilter: "blur(0.3vw)",
-            border: "0.1vw solid #eee2d73d",
-            boxShadow: "0px 0px 25px rgba(69, 79, 170, 0.25) inset",
+            backdropFilter: 'blur(0.3vw)',
+            border: '0.1vw solid #eee2d73d',
+            boxShadow: '0px 0px 25px rgba(69, 79, 170, 0.25) inset',
 
-            margin: ".4vw",
+            margin: '.4vw',
           }}
         >
           <Typography
             sx={{
               // fontSize: "1.2vw",
               fontSize: {
-                xs: "14px",
-                lg: "1.2vw",
-                xl: "1.3vw",
+                xs: '14px',
+                lg: '1.2vw',
+                xl: '1.3vw',
               },
               fontWeight: 600,
-              color: "#fff",
-              letterSpacing: "0.04vw",
-              textAlign: "start",
+              color: '#fff',
+              letterSpacing: '0.04vw',
+              textAlign: 'start',
             }}
           >
             {title.toUpperCase()}
@@ -240,29 +232,29 @@ const CommodityTable = ({
             sx={{
               // fontSize: "1.2vw",
               fontSize: {
-                xs: "14px",
-                lg: "1.2vw",
-                xl: "1.3vw",
+                xs: '14px',
+                lg: '1.2vw',
+                xl: '1.3vw',
               },
               fontWeight: 600,
-              color: "#fff",
-              textAlign: "start",
+              color: '#fff',
+              textAlign: 'start',
             }}
           >
             UNIT
           </Typography>
 
-          {title === "Commodity" && (
+          {title === 'Commodity' && (
             <Typography
               sx={{
                 fontSize: {
-                  xs: "14px",
-                  lg: "1.2vw",
-                  xl: "1.3vw",
+                  xs: '14px',
+                  lg: '1.2vw',
+                  xl: '1.3vw',
                 },
                 fontWeight: 600,
-                color: "#fff",
-                textAlign: "center",
+                color: '#fff',
+                textAlign: 'center',
               }}
             >
               BUY AED
@@ -273,16 +265,16 @@ const CommodityTable = ({
             sx={{
               // fontSize: "1.2vw",
               fontSize: {
-                xs: "14px",
-                lg: "1.2vw",
-                xl: "1.3vw",
+                xs: '14px',
+                lg: '1.2vw',
+                xl: '1.3vw',
               },
               fontWeight: 600,
-              color: "#fff",
-              textAlign: "center",
+              color: '#fff',
+              textAlign: 'center',
             }}
           >
-            SELL AED{" "}
+            SELL AED{' '}
           </Typography>
         </Box>
 
@@ -294,10 +286,10 @@ const CommodityTable = ({
           {rows.length === 0 ? (
             <Typography
               sx={{
-                py: "3vw",
-                textAlign: "center",
-                color: "rgba(227,192,120,0.4)",
-                fontSize: "1.25vw",
+                py: '3vw',
+                textAlign: 'center',
+                color: 'rgba(227,192,120,0.4)',
+                fontSize: '1.25vw',
               }}
             >
               No data available
@@ -318,12 +310,12 @@ const CommodityTable = ({
               style={{
                 height: tableHeight,
 
-                backdropFilter: "blur(5px)",
-                background: "#aa8a4b15",
-                borderRadius: "1vw",
-                border: "0.1vw solid #eee2d73d",
-                boxShadow: "0px 0px 25px  rgba(69, 79, 170, 0.25)  inset",
-                margin: ".4vw",
+                backdropFilter: 'blur(5px)',
+                background: '#aa8a4b15',
+                borderRadius: '1vw',
+                border: '0.1vw solid #eee2d73d',
+                boxShadow: '0px 0px 25px  rgba(69, 79, 170, 0.25)  inset',
+                margin: '.4vw',
               }}
             >
               {rows.map((row: TableDataItem, index: number) => (
@@ -331,31 +323,31 @@ const CommodityTable = ({
                   <Box
                     key={index}
                     sx={{
-                      display: "grid",
-                      gridTemplateColumns: "1.4fr 0.8fr 0.8fr 0.8fr",
-                      alignItems: "center",
-                      py: ".7vw",
-                      px: "1.5vw",
-                      height: "100%",
+                      display: 'grid',
+                      gridTemplateColumns: '1.4fr 0.8fr 0.8fr 0.8fr',
+                      alignItems: 'center',
+                      py: '.7vw',
+                      px: '1.5vw',
+                      height: '100%',
                     }}
                   >
                     <Typography
                       sx={{
                         // fontSize: "1.24vw",
                         fontSize: {
-                          xs: "14px",
-                          sm: "12px",
-                          lg: "1.6vw",
-                          xl: "1.4vw",
+                          xs: '14px',
+                          sm: '12px',
+                          lg: '1.6vw',
+                          xl: '1.4vw',
                         },
                         fontWeight: 800,
-                        color: "#fff",
-                        display: "flex",
-                        alignItems: "center ",
-                        justifyContent: "start",
+                        color: '#fff',
+                        display: 'flex',
+                        alignItems: 'center ',
+                        justifyContent: 'start',
                         gap: {
-                          xs: "7px",
-                          lg: "0.3vw",
+                          xs: '7px',
+                          lg: '0.3vw',
                         },
                       }}
                     >
@@ -364,16 +356,16 @@ const CommodityTable = ({
                         sx={{
                           // fontSize: "1vw",
                           fontSize: {
-                            xs: "12px",
-                            sm: "10px",
-                            lg: "1.2vw",
+                            xs: '12px',
+                            sm: '10px',
+                            lg: '1.2vw',
                           },
                           fontWeight: 400,
-                          color: "#fff",
+                          color: '#fff',
                           // mb:'-0.5vw'
                         }}
                       >
-                        {row.metal == "Minted Bar" ? "" : row.purity}
+                        {row.metal == 'Minted Bar' ? '' : row.purity}
                       </Typography>
                     </Typography>
 
@@ -381,12 +373,12 @@ const CommodityTable = ({
                       sx={{
                         // fontSize: "1.18vw",
                         fontSize: {
-                          xs: "14px",
-                          lg: "1.3vw",
-                          xl: "1.4vw",
+                          xs: '14px',
+                          lg: '1.3vw',
+                          xl: '1.4vw',
                         },
-                        color: "#fff",
-                        textAlign: "start",
+                        color: '#fff',
+                        textAlign: 'start',
                       }}
                     >
                       {row.weight}
@@ -395,15 +387,15 @@ const CommodityTable = ({
                       sx={{
                         // fontSize: "1.32vw",
                         fontSize: {
-                          xs: "14px",
-                          lg: "1.5vw",
-                          xl: "1.4vw",
+                          xs: '14px',
+                          lg: '1.5vw',
+                          xl: '1.4vw',
                         },
-                        fontVariantNumeric: "tabular-nums",
-                        textAlign: "center",
+                        fontVariantNumeric: 'tabular-nums',
+                        textAlign: 'center',
 
                         fontWeight: 600,
-                        color: "#fff", // soft pink ASK
+                        color: '#fff', // soft pink ASK
                       }}
                     >
                       {formatPrice(row.bid)}
@@ -413,15 +405,15 @@ const CommodityTable = ({
                       sx={{
                         // fontSize: "1.32vw",
                         fontSize: {
-                          xs: "14px",
-                          lg: "1.5vw",
-                          xl: "1.4vw",
+                          xs: '14px',
+                          lg: '1.5vw',
+                          xl: '1.4vw',
                         },
-                        fontVariantNumeric: "tabular-nums",
-                        textAlign: "center",
+                        fontVariantNumeric: 'tabular-nums',
+                        textAlign: 'center',
 
                         fontWeight: 600,
-                        color: "#fff", // soft pink ASK
+                        color: '#fff', // soft pink ASK
                       }}
                     >
                       {formatPrice(row.ask)}
@@ -441,9 +433,9 @@ const CommodityTable = ({
   ------------------------ */
 
   return (
-    <Box sx={{ width: "100%" }}>
-      {isCommodity && renderTable("Commodity", commodityData)}
-      {isMintedBar && renderTable("Minted Bars", mintedBarData)}
+    <Box sx={{ width: '100%' }}>
+      {isCommodity && renderTable('Commodity', commodityData)}
+      {isMintedBar && renderTable('Minted Bars', mintedBarData)}
     </Box>
   );
 };

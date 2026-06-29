@@ -1,4 +1,4 @@
-export type TemplateElementKey = "spotRate" | "commodities";
+export type TemplateElementKey = 'spotRate' | 'commodities';
 
 export interface TemplateElementToggle {
   key: TemplateElementKey;
@@ -26,15 +26,14 @@ export interface TemplateConfig {
 
 export const defaultTemplateConfig = (templateId: string): TemplateConfig => ({
   templateId,
-  backgroundColor: "#0b1120",
-  textColor: "#ffffff",
-  fontFamily: "Inter",
+  backgroundColor: '#0b1120',
+  textColor: '#ffffff',
+  fontFamily: 'Inter',
   logoUrl: undefined,
   backgroundImageUrl: undefined,
   elements: [
-    { key: "spotRate", enabled: true },
-    { key: "commodities", enabled: true },
+    { key: 'spotRate', enabled: true },
+    { key: 'commodities', enabled: true },
   ],
   canvasState: undefined,
 });
-

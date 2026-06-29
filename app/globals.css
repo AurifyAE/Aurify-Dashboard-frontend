@@ -1,10 +1,10 @@
-@import "tailwindcss";
+@import 'tailwindcss';
 
 @font-face {
-  font-family: "Scaver";
+  font-family: 'Scaver';
   src:
-    url("/fonts/Scaver-Regular.woff2") format("woff2"),
-    url("/fonts/Scaver-Regular.woff") format("woff");
+    url('/fonts/Scaver-Regular.woff2') format('woff2'),
+    url('/fonts/Scaver-Regular.woff') format('woff');
   font-weight: normal;
   font-style: normal;
   font-display: swap;
@@ -71,7 +71,7 @@
   --color-black: #171717;
   --color-primary-1: #d4af37;
   --color-primary-2: #d8cba0;
-  --font-primary: "DM Sans", sans-serif;
+  --font-primary: 'DM Sans', sans-serif;
 }
 
 .dark {

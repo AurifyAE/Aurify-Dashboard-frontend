@@ -1,4 +1,4 @@
-import axiosInstance from "@/app/axios/axiosInstance";
+import axiosInstance from '@/app/axios/axiosInstance';
 
 export interface AdminMerchant {
   _id: string;
@@ -24,7 +24,7 @@ export interface AdminMerchant {
 
 export const adminApi = {
   getMerchants: async () => {
-    const response = await axiosInstance.get<{ data: AdminMerchant[] }>("/admin/users");
+    const response = await axiosInstance.get<{ data: AdminMerchant[] }>('/admin/users');
     return response.data.data;
   },
   updateMerchant: async (id: string, data: Partial<AdminMerchant>) => {

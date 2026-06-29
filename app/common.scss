@@ -111,11 +111,7 @@
   }
 
   &.active {
-    background: linear-gradient(
-      to right,
-      rgba(29, 78, 216, 0.3),
-      rgba(67, 56, 202, 0.2)
-    );
+    background: linear-gradient(to right, rgba(29, 78, 216, 0.3), rgba(67, 56, 202, 0.2));
     color: #ffffff;
     font-weight: 500;
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
@@ -123,7 +119,7 @@
     overflow: hidden;
 
     &::before {
-      content: "";
+      content: '';
       position: absolute;
       top: 50%;
       left: -15%;

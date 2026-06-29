@@ -1,40 +1,30 @@
-"use client";
+'use client';
 
-import React, { useEffect, useState } from "react";
-import {
-  marketplaceApi,
-  type MarketplaceTheme,
-  type MerchantTheme,
-} from "@/lib/api/marketplace";
-import {
-  Check,
-  CheckCircle2,
-  Download,
-  Loader2,
-  Palette,
-} from "lucide-react";
+import React, { useEffect, useState } from 'react';
+import { marketplaceApi, type MarketplaceTheme, type MerchantTheme } from '@/lib/api/marketplace';
+import { Check, CheckCircle2, Download, Loader2, Palette } from 'lucide-react';
 
 const CATEGORIES = [
-  "All",
-  "Luxury Gold",
-  "Modern Dark",
-  "Corporate",
-  "Jewellery Premium",
-  "Arabic Premium",
+  'All',
+  'Luxury Gold',
+  'Modern Dark',
+  'Corporate',
+  'Jewellery Premium',
+  'Arabic Premium',
 ];
 
 const CATEGORY_BADGES: Record<string, { bg: string; text: string }> = {
-  "Luxury Gold": { bg: "bg-amber-100", text: "text-amber-700" },
-  "Modern Dark": { bg: "bg-slate-100", text: "text-slate-700" },
-  Corporate: { bg: "bg-blue-100", text: "text-blue-700" },
-  "Jewellery Premium": { bg: "bg-pink-100", text: "text-pink-700" },
-  "Arabic Premium": { bg: "bg-emerald-100", text: "text-emerald-700" },
+  'Luxury Gold': { bg: 'bg-amber-100', text: 'text-amber-700' },
+  'Modern Dark': { bg: 'bg-slate-100', text: 'text-slate-700' },
+  Corporate: { bg: 'bg-blue-100', text: 'text-blue-700' },
+  'Jewellery Premium': { bg: 'bg-pink-100', text: 'text-pink-700' },
+  'Arabic Premium': { bg: 'bg-emerald-100', text: 'text-emerald-700' },
 };
 
 function MiniTVPreview({ theme }: { theme: MarketplaceTheme }) {
-  const primary = theme.colors?.primary || "#d4a017";
-  const secondary = theme.colors?.secondary || "#111827";
-  const accent = theme.colors?.accent || "#38bdf8";
+  const primary = theme.colors?.primary || '#d4a017';
+  const secondary = theme.colors?.secondary || '#111827';
+  const accent = theme.colors?.accent || '#38bdf8';
   return (
     <div
       className="aspect-video w-full overflow-hidden rounded-xl"
@@ -46,10 +36,7 @@ function MiniTVPreview({ theme }: { theme: MarketplaceTheme }) {
         style={{ borderBottom: `1px solid ${primary}22` }}
       >
         <div>
-          <div
-            className="text-[9px] font-bold leading-tight"
-            style={{ color: primary }}
-          >
+          <div className="text-[9px] font-bold leading-tight" style={{ color: primary }}>
             AURIFY GOLD
           </div>
           <div className="text-[7px] opacity-40 text-white">LIVE RATES</div>
@@ -65,8 +52,8 @@ function MiniTVPreview({ theme }: { theme: MarketplaceTheme }) {
       {/* Spot Rates */}
       <div className="grid grid-cols-2 gap-1 px-2 py-1.5">
         {[
-          { label: "GOLD", price: "2,345.60", color: primary },
-          { label: "SILVER", price: "28.40", color: accent },
+          { label: 'GOLD', price: '2,345.60', color: primary },
+          { label: 'SILVER', price: '28.40', color: accent },
         ].map((item) => (
           <div
             key={item.label}
@@ -84,14 +71,23 @@ function MiniTVPreview({ theme }: { theme: MarketplaceTheme }) {
       {/* Commodity Table */}
       <div className="px-2 pb-1">
         <div className="grid grid-cols-4 gap-0.5 text-[6px] font-semibold opacity-50 text-white mb-0.5">
-          <span>ITEM</span><span>WT</span><span>BUY</span><span>SELL</span>
+          <span>ITEM</span>
+          <span>WT</span>
+          <span>BUY</span>
+          <span>SELL</span>
         </div>
         {[
-          ["Gold Bar 999", "1g", "224", "225"],
-          ["Gold Coin", "8g", "182", "183"],
+          ['Gold Bar 999', '1g', '224', '225'],
+          ['Gold Coin', '8g', '182', '183'],
         ].map((row) => (
-          <div key={row[0]} className="grid grid-cols-4 gap-0.5 text-[6px] text-white/80 py-0.5" style={{ borderTop: `1px solid ${primary}15` }}>
-            {row.map((cell, i) => <span key={i}>{cell}</span>)}
+          <div
+            key={row[0]}
+            className="grid grid-cols-4 gap-0.5 text-[6px] text-white/80 py-0.5"
+            style={{ borderTop: `1px solid ${primary}15` }}
+          >
+            {row.map((cell, i) => (
+              <span key={i}>{cell}</span>
+            ))}
           </div>
         ))}
       </div>
@@ -114,10 +110,10 @@ interface ThemeMarketplaceTabProps {
 export default function ThemeMarketplaceTab({ onThemeInstalled }: ThemeMarketplaceTabProps) {
   const [themes, setThemes] = useState<MarketplaceTheme[]>([]);
   const [installed, setInstalled] = useState<MerchantTheme[]>([]);
-  const [activeCategory, setActiveCategory] = useState("All");
+  const [activeCategory, setActiveCategory] = useState('All');
   const [installing, setInstalling] = useState<string | null>(null);
-  const [message, setMessage] = useState("");
-  const [messageType, setMessageType] = useState<"success" | "error">("success");
+  const [message, setMessage] = useState('');
+  const [messageType, setMessageType] = useState<'success' | 'error'>('success');
 
   const load = async () => {
     const [all, mine] = await Promise.all([
@@ -131,32 +127,30 @@ export default function ThemeMarketplaceTab({ onThemeInstalled }: ThemeMarketpla
   useEffect(() => {
     load().catch((err) => {
       setMessage(err.message);
-      setMessageType("error");
+      setMessageType('error');
     });
   }, []);
 
   const install = async (themeId: string) => {
     setInstalling(themeId);
-    setMessage("");
+    setMessage('');
     try {
       await marketplaceApi.installTheme(themeId);
       await load();
-      setMessage("Theme installed successfully into your merchant library.");
-      setMessageType("success");
+      setMessage('Theme installed successfully into your merchant library.');
+      setMessageType('success');
       if (onThemeInstalled) {
         onThemeInstalled();
       }
     } catch (err: any) {
-      setMessage(err instanceof Error ? err.message : "Install failed");
-      setMessageType("error");
+      setMessage(err instanceof Error ? err.message : 'Install failed');
+      setMessageType('error');
     } finally {
       setInstalling(null);
     }
   };
 
-  const filtered = themes.filter(
-    (t) => activeCategory === "All" || t.category === activeCategory,
-  );
+  const filtered = themes.filter((t) => activeCategory === 'All' || t.category === activeCategory);
 
   return (
     <div className="space-y-6">
@@ -164,8 +158,8 @@ export default function ThemeMarketplaceTab({ onThemeInstalled }: ThemeMarketpla
       <div>
         <h2 className="text-xl font-bold text-slate-900">Theme Library & Marketplace</h2>
         <p className="mt-1 text-sm text-slate-500">
-          Browse professional TV screen themes. Install any theme to your library
-          — your customizations are always preserved.
+          Browse professional TV screen themes. Install any theme to your library — your
+          customizations are always preserved.
         </p>
       </div>
 
@@ -173,14 +167,12 @@ export default function ThemeMarketplaceTab({ onThemeInstalled }: ThemeMarketpla
       {message && (
         <div
           className={`flex items-center gap-2 rounded-xl border px-4 py-3 text-sm ${
-            messageType === "success"
-              ? "border-emerald-200 bg-emerald-50 text-emerald-800"
-              : "border-red-200 bg-red-50 text-red-800"
+            messageType === 'success'
+              ? 'border-emerald-200 bg-emerald-50 text-emerald-800'
+              : 'border-red-200 bg-red-50 text-red-800'
           }`}
         >
-          {messageType === "success" ? (
-            <CheckCircle2 className="h-4 w-4 flex-shrink-0" />
-          ) : null}
+          {messageType === 'success' ? <CheckCircle2 className="h-4 w-4 flex-shrink-0" /> : null}
           {message}
         </div>
       )}
@@ -190,8 +182,10 @@ export default function ThemeMarketplaceTab({ onThemeInstalled }: ThemeMarketpla
         <div className="flex items-center gap-3 rounded-2xl border border-emerald-200 bg-emerald-50/60 px-5 py-3">
           <CheckCircle2 className="h-5 w-5 text-emerald-600 flex-shrink-0" />
           <p className="text-sm text-emerald-800">
-            You have{" "}
-            <strong>{installed.length} theme{installed.length > 1 ? "s" : ""}</strong>{" "}
+            You have{' '}
+            <strong>
+              {installed.length} theme{installed.length > 1 ? 's' : ''}
+            </strong>{' '}
             installed in your library.
           </p>
         </div>
@@ -206,12 +200,12 @@ export default function ThemeMarketplaceTab({ onThemeInstalled }: ThemeMarketpla
             onClick={() => setActiveCategory(cat)}
             className={`rounded-full px-4 py-1.5 text-sm font-semibold transition-all cursor-pointer ${
               activeCategory === cat
-                ? "bg-blue-600 text-white shadow-sm shadow-blue-600/10"
-                : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+                ? 'bg-blue-600 text-white shadow-sm shadow-blue-600/10'
+                : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
             }`}
           >
             {cat}
-            {cat !== "All" && (
+            {cat !== 'All' && (
               <span className="ml-1.5 text-xs opacity-60">
                 ({themes.filter((t) => t.category === cat).length})
               </span>
@@ -232,16 +226,16 @@ export default function ThemeMarketplaceTab({ onThemeInstalled }: ThemeMarketpla
             const isInstalled = installed.some((i) => i.themeId === theme._id);
             const isInstalling = installing === theme._id;
             const badge = CATEGORY_BADGES[theme.category] || {
-              bg: "bg-slate-100",
-              text: "text-slate-700",
+              bg: 'bg-slate-100',
+              text: 'text-slate-700',
             };
             return (
               <article
                 key={theme._id}
                 className={`group overflow-hidden rounded-2xl border transition-all hover:shadow-lg bg-white ${
                   isInstalled
-                    ? "border-emerald-200 shadow-sm shadow-emerald-100"
-                    : "border-slate-200 hover:border-slate-300"
+                    ? 'border-emerald-200 shadow-sm shadow-emerald-100'
+                    : 'border-slate-200 hover:border-slate-300'
                 }`}
               >
                 {/* Mini TV Preview */}
@@ -261,14 +255,16 @@ export default function ThemeMarketplaceTab({ onThemeInstalled }: ThemeMarketpla
                       </span>
                     </div>
                     <div className="flex gap-1">
-                      {Object.entries(theme.colors || {}).slice(0, 3).map(([key, val]) => (
-                        <div
-                          key={key}
-                          className="h-4 w-4 rounded-full border border-white shadow-sm"
-                          style={{ background: val as string }}
-                          title={key}
-                        />
-                      ))}
+                      {Object.entries(theme.colors || {})
+                        .slice(0, 3)
+                        .map(([key, val]) => (
+                          <div
+                            key={key}
+                            className="h-4 w-4 rounded-full border border-white shadow-sm"
+                            style={{ background: val as string }}
+                            title={key}
+                          />
+                        ))}
                     </div>
                   </div>
 
@@ -307,8 +303,8 @@ export default function ThemeMarketplaceTab({ onThemeInstalled }: ThemeMarketpla
                     disabled={isInstalling || isInstalled}
                     className={
                       isInstalled
-                        ? "flex h-10 w-full items-center justify-center gap-2 rounded-xl border border-slate-200 bg-slate-50 text-slate-400 cursor-default text-sm font-semibold"
-                        : "btn-primary w-full cursor-pointer"
+                        ? 'flex h-10 w-full items-center justify-center gap-2 rounded-xl border border-slate-200 bg-slate-50 text-slate-400 cursor-default text-sm font-semibold'
+                        : 'btn-primary w-full cursor-pointer'
                     }
                   >
                     {isInstalling ? (

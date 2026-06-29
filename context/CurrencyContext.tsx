@@ -1,6 +1,6 @@
-"use client";
+'use client';
 
-import React, { createContext, useContext, useState, ReactNode } from "react";
+import React, { createContext, useContext, useState, ReactNode } from 'react';
 
 interface CurrencyContextType {
   currency: string;
@@ -10,7 +10,7 @@ interface CurrencyContextType {
 const CurrencyContext = createContext<CurrencyContextType | undefined>(undefined);
 
 export const CurrencyProvider = ({ children }: { children: ReactNode }) => {
-  const [currency, setCurrency] = useState("AED");
+  const [currency, setCurrency] = useState('AED');
 
   return (
     <CurrencyContext.Provider value={{ currency, setCurrency }}>
@@ -22,7 +22,7 @@ export const CurrencyProvider = ({ children }: { children: ReactNode }) => {
 export const useCurrency = () => {
   const context = useContext(CurrencyContext);
   if (!context) {
-    throw new Error("useCurrency must be used within a CurrencyProvider");
+    throw new Error('useCurrency must be used within a CurrencyProvider');
   }
   return context;
 };

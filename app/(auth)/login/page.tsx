@@ -1,11 +1,11 @@
-"use client";
+'use client';
 
-import React, { useState, FormEvent, useEffect } from "react";
-import Image from "next/image";
-import { Eye, EyeOff } from "lucide-react";
-import { useAuth } from "@/context/AuthContext";
-import Swal from "sweetalert2";
-import { useSearchParams } from "next/navigation";
+import React, { useState, FormEvent, useEffect } from 'react';
+import Image from 'next/image';
+import { Eye, EyeOff } from 'lucide-react';
+import { useAuth } from '@/context/AuthContext';
+import Swal from 'sweetalert2';
+import { useSearchParams } from 'next/navigation';
 
 interface FieldErrors {
   email?: string;
@@ -16,20 +16,20 @@ export default function LoginPage() {
   const { login } = useAuth();
   const searchParams = useSearchParams();
 
-  const [email, setEmail] = useState<string>("");
-  const [password, setPassword] = useState<string>("");
+  const [email, setEmail] = useState<string>('');
+  const [password, setPassword] = useState<string>('');
   const [showPassword, setShowPassword] = useState<boolean>(false);
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
-  const [apiError, setApiError] = useState<string>("");
+  const [apiError, setApiError] = useState<string>('');
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
   useEffect(() => {
-    if (searchParams?.get("alert") === "deleted") {
+    if (searchParams?.get('alert') === 'deleted') {
       Swal.fire({
-        icon: "warning",
-        title: "Session Expired",
-        text: "Your account has been suspended or deleted by the administrator.",
-        confirmButtonColor: "#4A90E2",
+        icon: 'warning',
+        title: 'Session Expired',
+        text: 'Your account has been suspended or deleted by the administrator.',
+        confirmButtonColor: '#4A90E2',
       });
     }
   }, [searchParams]);
@@ -38,12 +38,12 @@ export default function LoginPage() {
   const validate = (): boolean => {
     const errors: FieldErrors = {};
     if (!email.trim()) {
-      errors.email = "Email is required";
+      errors.email = 'Email is required';
     } else if (!/^\S+@\S+\.\S+$/.test(email)) {
-      errors.email = "Please enter a valid email address";
+      errors.email = 'Please enter a valid email address';
     }
     if (!password) {
-      errors.password = "Password is required";
+      errors.password = 'Password is required';
     }
     setFieldErrors(errors);
     return Object.keys(errors).length === 0;
@@ -51,7 +51,7 @@ export default function LoginPage() {
 
   const handleLogin = async (e: FormEvent<HTMLFormElement>): Promise<void> => {
     e.preventDefault();
-    setApiError(""); // optional — you can keep or remove banner
+    setApiError(''); // optional — you can keep or remove banner
     setFieldErrors({}); // clear previous field errors
 
     if (!validate()) return;
@@ -64,9 +64,9 @@ export default function LoginPage() {
       if (res.success) {
         // ── Success case ─────────────────────────────────────
         await Swal.fire({
-          icon: "success",
-          title: "Login Successful!",
-          text: "Welcome back to Aurify",
+          icon: 'success',
+          title: 'Login Successful!',
+          text: 'Welcome back to Aurify',
           showConfirmButton: false,
           timer: 1000, // disappears after 1.8 seconds
         });
@@ -79,28 +79,28 @@ export default function LoginPage() {
           setFieldErrors(res.errors as FieldErrors);
 
           await Swal.fire({
-            icon: "warning",
-            title: "Validation Error",
-            text: "Please check the highlighted fields",
+            icon: 'warning',
+            title: 'Validation Error',
+            text: 'Please check the highlighted fields',
           });
         } else {
           // General login failure (wrong credentials, etc.)
           await Swal.fire({
-            icon: "error",
-            title: "Login Failed",
-            text: res.message || "Invalid email or password. Please try again.",
+            icon: 'error',
+            title: 'Login Failed',
+            text: res.message || 'Invalid email or password. Please try again.',
           });
         }
       }
     } catch (err) {
-      console.error("Login Error:", err);
+      console.error('Login Error:', err);
 
       // Network / unexpected error
       await Swal.fire({
-        icon: "error",
-        title: "Connection Error",
-        text: "Unable to connect. Please check your network and try again.",
-        confirmButtonColor: "#4A90E2",
+        icon: 'error',
+        title: 'Connection Error',
+        text: 'Unable to connect. Please check your network and try again.',
+        confirmButtonColor: '#4A90E2',
       });
     } finally {
       setIsLoading(false);
@@ -111,8 +111,8 @@ export default function LoginPage() {
   const inputClass = (field: keyof FieldErrors) =>
     `w-full px-4 py-[11px] text-[14px] border rounded-[6px] focus:outline-none focus:ring-1 transition-all text-[#374151] placeholder-[#9CA3AF] bg-white ${
       fieldErrors[field]
-        ? "border-red-400 focus:ring-red-400 focus:border-red-400"
-        : "border-[#D1D5DB] focus:ring-[#4A90E2] focus:border-[#4A90E2]"
+        ? 'border-red-400 focus:ring-red-400 focus:border-red-400'
+        : 'border-[#D1D5DB] focus:ring-[#4A90E2] focus:border-[#4A90E2]'
     }`;
 
   return (
@@ -121,7 +121,7 @@ export default function LoginPage() {
       <div className="hidden relative overflow-hidden lg:flex lg:w-3/5 bg-[#000000]">
         <div className="">
           <Image
-            src={"/images/bg.png"}
+            src={'/images/bg.png'}
             height={800}
             width={1000}
             alt=""
@@ -142,9 +142,7 @@ export default function LoginPage() {
                 width={500}
               />
             </div>
-            <h1 className="text-[26px] font-semibold text-[#2C3E50] mb-2">
-              Welcome Back
-            </h1>
+            <h1 className="text-[26px] font-semibold text-[#2C3E50] mb-2">Welcome Back</h1>
             <p className="text-[13px] text-[#6B7280] leading-relaxed">
               Login to access your trading dashboards and manage content
             </p>
@@ -162,10 +160,7 @@ export default function LoginPage() {
           <form onSubmit={handleLogin} className="space-y-5" noValidate>
             {/* Email Field */}
             <div>
-              <label
-                htmlFor="email"
-                className="block text-[13px] font-medium text-[#374151] mb-2"
-              >
+              <label htmlFor="email" className="block text-[13px] font-medium text-[#374151] mb-2">
                 Email <span className="text-red-500">*</span>
               </label>
               <input
@@ -174,18 +169,15 @@ export default function LoginPage() {
                 value={email}
                 onChange={(e) => {
                   setEmail(e.target.value);
-                  if (fieldErrors.email)
-                    setFieldErrors((p) => ({ ...p, email: undefined }));
-                  setApiError("");
+                  if (fieldErrors.email) setFieldErrors((p) => ({ ...p, email: undefined }));
+                  setApiError('');
                 }}
                 placeholder="Enter your email"
-                className={inputClass("email")}
+                className={inputClass('email')}
                 autoComplete="email"
               />
               {fieldErrors.email && (
-                <p className="mt-1 text-[12px] text-red-500">
-                  {fieldErrors.email}
-                </p>
+                <p className="mt-1 text-[12px] text-red-500">{fieldErrors.email}</p>
               )}
             </div>
 
@@ -199,17 +191,17 @@ export default function LoginPage() {
               </label>
               <div className="relative">
                 <input
-                  type={showPassword ? "text" : "password"}
+                  type={showPassword ? 'text' : 'password'}
                   id="password"
                   value={password}
                   onChange={(e) => {
                     setPassword(e.target.value);
                     if (fieldErrors.password)
                       setFieldErrors((p) => ({ ...p, password: undefined }));
-                    setApiError("");
+                    setApiError('');
                   }}
                   placeholder="Enter your password"
-                  className={`${inputClass("password")} pr-11`}
+                  className={`${inputClass('password')} pr-11`}
                   autoComplete="current-password"
                 />
                 <button
@@ -222,9 +214,7 @@ export default function LoginPage() {
                 </button>
               </div>
               {fieldErrors.password && (
-                <p className="mt-1 text-[12px] text-red-500">
-                  {fieldErrors.password}
-                </p>
+                <p className="mt-1 text-[12px] text-red-500">{fieldErrors.password}</p>
               )}
             </div>
 
@@ -245,22 +235,22 @@ export default function LoginPage() {
               className="relative w-full overflow-hidden bg-transparent py-[17px] rounded-[6px] text-white text-[13px] tracking-[0.26em] uppercase flex items-center justify-center gap-[10px] transition-[filter] duration-300 hover:brightness-[1.08] active:scale-[0.994] group"
               style={{
                 fontFamily: "'Tenor Sans', serif",
-                background: "linear-gradient(90deg, #163db9 0%, #6287df 100%)",
-                border: "none",
+                background: 'linear-gradient(90deg, #163db9 0%, #6287df 100%)',
+                border: 'none',
               }}
             >
               <span
                 className="absolute top-0 left-0 right-0 h-px"
                 style={{
                   background:
-                    "linear-gradient(90deg,transparent,rgba(255,255,255,0.8) 50%,transparent)",
+                    'linear-gradient(90deg,transparent,rgba(255,255,255,0.8) 50%,transparent)',
                 }}
               />
               <span
                 className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-[650ms] ease-in-out"
                 style={{
                   background:
-                    "linear-gradient(105deg,transparent 35%,rgba(255,255,255,0.14) 50%,transparent 65%)",
+                    'linear-gradient(105deg,transparent 35%,rgba(255,255,255,0.14) 50%,transparent 65%)',
                 }}
               />
               {isLoading ? (

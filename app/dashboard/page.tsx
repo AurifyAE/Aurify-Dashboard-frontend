@@ -1,18 +1,12 @@
-"use client";
+'use client';
 
-import React, { useEffect, useState } from "react";
-import DashboardShell from "@/components/dashboard/DashboardShell";
-import DashboardData from "@/components/dashboard/DashboardData";
-import Loader from "@/components/loader/loader";
-import { marketplaceApi, type Merchant } from "@/lib/api/marketplace";
-import Link from "next/link";
-import {
-  AlertCircle,
-  CheckCircle2,
-  Clock,
-  Rocket,
-  XCircle,
-} from "lucide-react";
+import React, { useEffect, useState } from 'react';
+import DashboardShell from '@/components/dashboard/DashboardShell';
+import DashboardData from '@/components/dashboard/DashboardData';
+import Loader from '@/components/loader/loader';
+import { marketplaceApi, type Merchant } from '@/lib/api/marketplace';
+import Link from 'next/link';
+import { AlertCircle, CheckCircle2, Clock, Rocket, XCircle } from 'lucide-react';
 
 function MerchantStatusBanner({ merchant }: { merchant: Merchant | null }) {
   if (!merchant) {
@@ -38,7 +32,7 @@ function MerchantStatusBanner({ merchant }: { merchant: Merchant | null }) {
     );
   }
 
-  if (merchant.status === "Pending") {
+  if (merchant.status === 'Pending') {
     return (
       <div className="mb-6 flex items-center gap-4 rounded-2xl border border-amber-200 bg-gradient-to-r from-amber-50 to-orange-50 p-4">
         <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-amber-100">
@@ -58,7 +52,7 @@ function MerchantStatusBanner({ merchant }: { merchant: Merchant | null }) {
     );
   }
 
-  if (merchant.status === "Active") {
+  if (merchant.status === 'Active') {
     return (
       <div className="mb-6 flex items-center gap-4 rounded-2xl border border-emerald-200 bg-gradient-to-r from-emerald-50 to-green-50 p-4">
         <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-emerald-100">
@@ -81,7 +75,7 @@ function MerchantStatusBanner({ merchant }: { merchant: Merchant | null }) {
     );
   }
 
-  if (merchant.status === "Suspended") {
+  if (merchant.status === 'Suspended') {
     return (
       <div className="mb-6 flex items-center gap-4 rounded-2xl border border-red-200 bg-gradient-to-r from-red-50 to-rose-50 p-4">
         <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-red-100">
@@ -89,7 +83,9 @@ function MerchantStatusBanner({ merchant }: { merchant: Merchant | null }) {
         </div>
         <div className="flex-1">
           <p className="font-semibold text-red-800">Account Suspended</p>
-          <p className="mt-0.5 text-sm text-red-600">Please contact support to resolve your account status.</p>
+          <p className="mt-0.5 text-sm text-red-600">
+            Please contact support to resolve your account status.
+          </p>
         </div>
       </div>
     );
@@ -104,7 +100,8 @@ export default function DashboardPage() {
 
   useEffect(() => {
     // Load merchant status quietly
-    marketplaceApi.myMerchant()
+    marketplaceApi
+      .myMerchant()
       .then((data) => {
         setMerchant(data);
       })
@@ -121,9 +118,7 @@ export default function DashboardPage() {
       {loading && <Loader />}
       <DashboardShell className="space-y-6">
         {/* Merchant Status Banner */}
-        {merchant !== undefined && (
-          <MerchantStatusBanner merchant={merchant} />
-        )}
+        {merchant !== undefined && <MerchantStatusBanner merchant={merchant} />}
         <DashboardData />
       </DashboardShell>
     </>

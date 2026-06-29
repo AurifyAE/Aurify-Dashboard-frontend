@@ -5,6 +5,7 @@ This project uses **shadcn/ui** components, which are built on top of **Radix UI
 ## What is shadcn/ui?
 
 shadcn/ui is **not a component library** - it's a collection of reusable components built with Radix UI and Tailwind CSS. The components are:
+
 - **Copied into your project** (not installed as dependencies)
 - Built on **Radix UI** primitives for accessibility
 - Styled with **Tailwind CSS**
@@ -26,11 +27,13 @@ npm run ui:add
 ```
 
 Or directly:
+
 ```bash
 npx shadcn@latest add [component-name]
 ```
 
 Example:
+
 ```bash
 npx shadcn@latest add dialog
 npx shadcn@latest add select

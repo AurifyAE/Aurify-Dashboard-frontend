@@ -1,15 +1,15 @@
-"use client";
+'use client';
 
-import React, { useEffect, useState } from "react";
-import { Grid, Box, Typography } from "@mui/material";
-import io from "socket.io-client";
-import CommodityTable from "./CommodityTable";
-import LiveSpotRate from "./LiveSpotRate";
-import NewsTicker from "./NewsTicker";
-import WorldClockHorizontal from "./WorldClock";
-import SystemClock from "./SystemClock";
-import PoweredByAurify from "./PoweredByAurify";
-import { API_URL, API_KEY, SOCKET_SECRET } from "@/lib/env";
+import React, { useEffect, useState } from 'react';
+import { Grid, Box, Typography } from '@mui/material';
+import io from 'socket.io-client';
+import CommodityTable from './CommodityTable';
+import LiveSpotRate from './LiveSpotRate';
+import NewsTicker from './NewsTicker';
+import WorldClockHorizontal from './WorldClock';
+import SystemClock from './SystemClock';
+import PoweredByAurify from './PoweredByAurify';
+import { API_URL, API_KEY, SOCKET_SECRET } from '@/lib/env';
 
 export default function Theme1Layout({
   data,
@@ -19,18 +19,13 @@ export default function Theme1Layout({
   isPreview?: boolean;
 }) {
   const { merchant, theme, layout, commodities, news } = data;
-  const widgets = layout?.widgets || [
-    "Spot Rates",
-    "Commodity Table",
-    "News",
-    "Clock",
-  ];
+  const widgets = layout?.widgets || ['Spot Rates', 'Commodity Table', 'News', 'Clock'];
   const showLogo = layout?.styles?.showLogo ?? true;
   const showName = layout?.styles?.showName ?? true;
   const colors = layout?.styles?.colorOverride || {};
-  const [serverURL, setServerURL] = useState("");
+  const [serverURL, setServerURL] = useState('');
   const [marketData, setMarketData] = useState<Record<string, any>>({});
-  const symbols = ["GOLD", "SILVER"];
+  const symbols = ['GOLD', 'SILVER'];
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -38,10 +33,10 @@ export default function Theme1Layout({
       try {
         const response = await fetch(`${API_URL}/get-server`, {
           headers: {
-            "Content-Type": "application/json",
-            "X-Secret-Key": API_KEY,
+            'Content-Type': 'application/json',
+            'X-Secret-Key': API_KEY,
           },
-          credentials: "include",
+          credentials: 'include',
         });
         const resData = await response.json();
         const serverUrlResult =
@@ -56,7 +51,7 @@ export default function Theme1Layout({
           null;
         setServerURL(serverUrlResult);
       } catch (err) {
-        console.error("Failed to fetch server URL:", err);
+        console.error('Failed to fetch server URL:', err);
       }
     };
     fetchServerURL();
@@ -67,31 +62,24 @@ export default function Theme1Layout({
 
     const socket = io(serverURL, {
       query: { secret: SOCKET_SECRET },
-      transports: ["websocket"],
+      transports: ['websocket'],
       withCredentials: true,
     });
 
-    socket.on("connect", () => {
-      socket.emit("request-data", symbols);
+    socket.on('connect', () => {
+      socket.emit('request-data', symbols);
     });
 
-    socket.on("market-data", (data) => {
+    socket.on('market-data', (data) => {
       const updates: any[] = [];
       if (Array.isArray(data)) {
         updates.push(...data);
-      } else if (data && typeof data === "object") {
+      } else if (data && typeof data === 'object') {
         if (data.symbol) {
           updates.push(data);
         } else {
-          for (const key of [
-            "Gold",
-            "GOLD",
-            "XAU",
-            "Silver",
-            "SILVER",
-            "XAG",
-          ]) {
-            if (data[key] && typeof data[key] === "object") {
+          for (const key of ['Gold', 'GOLD', 'XAU', 'Silver', 'SILVER', 'XAG']) {
+            if (data[key] && typeof data[key] === 'object') {
               updates.push({ symbol: key, ...data[key] });
             }
           }
@@ -105,9 +93,8 @@ export default function Theme1Layout({
             if (item.symbol) {
               const sym = item.symbol.toUpperCase();
               next[sym] = { ...next[sym], ...item };
-              if (sym === "XAU") next["GOLD"] = { ...next["GOLD"], ...item };
-              if (sym === "XAG")
-                next["SILVER"] = { ...next["SILVER"], ...item };
+              if (sym === 'XAU') next['GOLD'] = { ...next['GOLD'], ...item };
+              if (sym === 'XAG') next['SILVER'] = { ...next['SILVER'], ...item };
             }
           });
           return next;
@@ -115,9 +102,9 @@ export default function Theme1Layout({
       }
     });
 
-    socket.on("error", (error) => {
-      console.error("WebSocket error:", error);
-      setError("An error occurred while receiving data");
+    socket.on('error', (error) => {
+      console.error('WebSocket error:', error);
+      setError('An error occurred while receiving data');
     });
 
     return () => {
@@ -125,15 +112,11 @@ export default function Theme1Layout({
     };
   }, [serverURL]);
 
-  const rawGold = marketData["GOLD"];
+  const rawGold = marketData['GOLD'];
   const goldData = rawGold
     ? {
         ...rawGold,
-        ask:
-          rawGold.ask ||
-          (rawGold.bid
-            ? (parseFloat(rawGold.bid) + 0.5).toFixed(2)
-            : undefined),
+        ask: rawGold.ask || (rawGold.bid ? (parseFloat(rawGold.bid) + 0.5).toFixed(2) : undefined),
       }
     : {
         bid: 2345.6,
@@ -142,15 +125,13 @@ export default function Theme1Layout({
         high: 2350.0,
       };
 
-  const rawSilver = marketData["SILVER"];
+  const rawSilver = marketData['SILVER'];
   const silverData = rawSilver
     ? {
         ...rawSilver,
         ask:
           rawSilver.ask ||
-          (rawSilver.bid
-            ? (parseFloat(rawSilver.bid) + 0.05).toFixed(2)
-            : undefined),
+          (rawSilver.bid ? (parseFloat(rawSilver.bid) + 0.05).toFixed(2) : undefined),
       }
     : {
         bid: 28.4,
@@ -161,66 +142,65 @@ export default function Theme1Layout({
 
   const defaultCommodities = [
     {
-      metal: "GOLD",
-      metal_name: "Gold Bar 999",
+      metal: 'GOLD',
+      metal_name: 'Gold Bar 999',
       purity: 999,
       unit: 1,
-      weight: "GM",
+      weight: 'GM',
       buyCharge: 0,
       buyPremium: 2,
       sellCharge: 0,
       sellPremium: 2,
     },
     {
-      metal: "GOLD",
-      metal_name: "Gold Coin",
+      metal: 'GOLD',
+      metal_name: 'Gold Coin',
       purity: 916,
       unit: 8,
-      weight: "GM",
+      weight: 'GM',
       buyCharge: 0,
       buyPremium: 10,
       sellCharge: 0,
       sellPremium: 10,
     },
   ];
-  const displayCommodities =
-    commodities?.length > 0 ? commodities : defaultCommodities;
+  const displayCommodities = commodities?.length > 0 ? commodities : defaultCommodities;
 
   return (
     <Box
       sx={{
-        height: isPreview ? "100%" : "100dvh",
-        minHeight: "100dvh",
-        color: "white",
-        pb: { xs: "0", md: "3vw" },
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        backgroundColor: colors.backgroundColor || "#140b10",
-        position: "relative",
+        height: isPreview ? '100%' : '100dvh',
+        minHeight: '100dvh',
+        color: 'white',
+        pb: { xs: '0', md: '3vw' },
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: colors.backgroundColor || '#140b10',
+        position: 'relative',
       }}
     >
       <Box
         sx={{
-          position: isPreview ? "absolute" : "fixed",
-          left: "0",
-          bottom: "0",
-          top: "0",
-          right: "0",
-          height: "100%",
-          width: "100%",
-          pointerEvents: "none",
-          overflow: "hidden",
+          position: isPreview ? 'absolute' : 'fixed',
+          left: '0',
+          bottom: '0',
+          top: '0',
+          right: '0',
+          height: '100%',
+          width: '100%',
+          pointerEvents: 'none',
+          overflow: 'hidden',
         }}
       >
         <Box
           component="img"
-          src={theme?.customizations?.backgroundUrl || "/images/theme1-bg.png"}
+          src={theme?.customizations?.backgroundUrl || '/images/theme1-bg.png'}
           alt="background"
           onError={(e) => {
-            e.currentTarget.style.display = "none";
+            e.currentTarget.style.display = 'none';
           }}
-          sx={{ height: "100%", width: "100%", objectFit: "cover" }}
+          sx={{ height: '100%', width: '100%', objectFit: 'cover' }}
         />
       </Box>
 
@@ -228,52 +208,52 @@ export default function Theme1Layout({
         container
         spacing={4}
         sx={{
-          minHeight: "100%",
-          justifyContent: "space-between",
-          flexWrap: "wrap",
+          minHeight: '100%',
+          justifyContent: 'space-between',
+          flexWrap: 'wrap',
           zIndex: 1,
-          position: "relative",
+          position: 'relative',
           m: 0,
-          gap: "0",
-          p: "0 2vw",
-          display: "flex",
-          alignItems: "center",
-          width: "100%",
+          gap: '0',
+          p: '0 2vw',
+          display: 'flex',
+          alignItems: 'center',
+          width: '100%',
         }}
       >
         <Grid
           size={{ xs: 12, md: 6 }}
           sx={{
-            display: "flex",
-            alignItems: "center",
-            flexDirection: "column",
-            justifyContent: "space-between",
-            gap: "1vw",
+            display: 'flex',
+            alignItems: 'center',
+            flexDirection: 'column',
+            justifyContent: 'space-between',
+            gap: '1vw',
           }}
         >
           <Box
             sx={{
-              height: "auto",
-              width: { xs: "40vw", sm: "18vw" },
-              marginBottom: { xs: "20px", sm: "0vw" },
+              height: 'auto',
+              width: { xs: '40vw', sm: '18vw' },
+              marginBottom: { xs: '20px', sm: '0vw' },
             }}
           >
             {showLogo ? (
               <img
-                src={merchant?.logo || "/images/theme1-logo.svg"}
+                src={merchant?.logo || '/images/theme1-logo.svg'}
                 alt={merchant?.companyName}
-                style={{ width: "100%", height: "auto", objectFit: "contain" }}
+                style={{ width: '100%', height: 'auto', objectFit: 'contain' }}
               />
             ) : showName ? (
               <Typography
                 variant="h4"
-                sx={{ color: colors.primary || "#d4a017", fontWeight: "bold" }}
+                sx={{ color: colors.primary || '#d4a017', fontWeight: 'bold' }}
               >
-                {merchant?.companyName || "Merchant"}
+                {merchant?.companyName || 'Merchant'}
               </Typography>
             ) : null}
           </Box>
-          {widgets.includes("Commodity Table") && (
+          {widgets.includes('Commodity Table') && (
             <CommodityTable
               items={displayCommodities}
               goldData={goldData}
@@ -283,33 +263,29 @@ export default function Theme1Layout({
           )}
         </Grid>
 
-        <Grid size={{ xs: 12, md: 6 }} sx={{ gap: "1vw", display: "grid" }}>
-          {widgets.includes("Clock") && (
+        <Grid size={{ xs: 12, md: 6 }} sx={{ gap: '1vw', display: 'grid' }}>
+          {widgets.includes('Clock') && (
             <>
               <WorldClockHorizontal colors={colors} />
               <SystemClock colors={colors} />
             </>
           )}
-          {widgets.includes("Spot Rates") && (
-            <LiveSpotRate
-              goldData={goldData}
-              silverData={silverData}
-              colors={colors}
-            />
+          {widgets.includes('Spot Rates') && (
+            <LiveSpotRate goldData={goldData} silverData={silverData} colors={colors} />
           )}
           <PoweredByAurify />
         </Grid>
 
-        {widgets.includes("News") && (
+        {widgets.includes('News') && (
           <Grid
             size={{ xs: 12 }}
             sx={{
-              mt: { xs: "20px", md: "0" },
-              position: "fixed",
+              mt: { xs: '20px', md: '0' },
+              position: 'fixed',
               zIndex: 1,
-              bottom: "0",
-              width: "100%",
-              left: "0",
+              bottom: '0',
+              width: '100%',
+              left: '0',
             }}
           >
             <NewsTicker

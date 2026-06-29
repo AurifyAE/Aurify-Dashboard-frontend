@@ -1,7 +1,7 @@
-import { fetchLiveScreen } from "@/lib/api/marketplace";
-import Theme1Layout from "@/components/live-screen/theme1/Theme1Layout";
-import Theme2Layout from "@/components/live-screen/theme2/Theme2Layout";
-import DeviceTracker from "@/components/live-screen/DeviceTracker";
+import { fetchLiveScreen } from '@/lib/api/marketplace';
+import Theme1Layout from '@/components/live-screen/theme1/Theme1Layout';
+import Theme2Layout from '@/components/live-screen/theme2/Theme2Layout';
+import DeviceTracker from '@/components/live-screen/DeviceTracker';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
@@ -11,7 +11,7 @@ type PageProps = {
 };
 
 function money(value: number) {
-  return new Intl.NumberFormat("en-US", { maximumFractionDigits: 2 }).format(value);
+  return new Intl.NumberFormat('en-US', { maximumFractionDigits: 2 }).format(value);
 }
 
 function commodityValue(weight: number, charge: number, spot = 2300) {
@@ -22,17 +22,17 @@ export default async function LiveScreenPage({ params }: PageProps) {
   const { merchantSlug, screenSlug } = await params;
 
   if (
-    merchantSlug === "favicon.ico" ||
-    merchantSlug === "favicon.svg" ||
-    merchantSlug === "images" ||
-    merchantSlug.startsWith("_next")
+    merchantSlug === 'favicon.ico' ||
+    merchantSlug === 'favicon.svg' ||
+    merchantSlug === 'images' ||
+    merchantSlug.startsWith('_next')
   ) {
     return null;
   }
 
   let data;
   try {
-    data = await fetchLiveScreen(merchantSlug, screenSlug?.[0] || "main");
+    data = await fetchLiveScreen(merchantSlug, screenSlug?.[0] || 'main');
   } catch (err) {
     return (
       <main className="min-h-screen bg-[#0f172a] flex flex-col items-center justify-center p-8 text-center text-white">
@@ -43,11 +43,16 @@ export default async function LiveScreenPage({ params }: PageProps) {
           <div className="space-y-2">
             <h1 className="text-xl font-bold">Live Screen Unavailable</h1>
             <p className="text-slate-400 text-xs leading-relaxed">
-              {err instanceof Error ? err.message : "The requested showroom TV screen or merchant profile is not active yet."}
+              {err instanceof Error
+                ? err.message
+                : 'The requested showroom TV screen or merchant profile is not active yet.'}
             </p>
           </div>
           <div className="pt-2">
-            <a href="/dashboard" className="inline-block px-5 py-2.5 bg-gradient-to-r from-amber-500 to-orange-500 rounded-xl font-bold text-xs text-white shadow-sm hover:from-amber-600 hover:to-orange-600 transition-all">
+            <a
+              href="/dashboard"
+              className="inline-block px-5 py-2.5 bg-gradient-to-r from-amber-500 to-orange-500 rounded-xl font-bold text-xs text-white shadow-sm hover:from-amber-600 hover:to-orange-600 transition-all"
+            >
               Return to Dashboard
             </a>
           </div>
@@ -62,13 +67,13 @@ export default async function LiveScreenPage({ params }: PageProps) {
   const commodities = data.commodities || [];
   const news = data.news || [];
   const colors = theme?.customizations?.colors || merchant.branding || {};
-  const primary = colors.primary || merchant.branding?.primaryColor || "#d4a017";
-  const secondary = colors.secondary || merchant.branding?.secondaryColor || "#0f172a";
-  const accent = colors.accent || merchant.branding?.accentColor || "#38bdf8";
+  const primary = colors.primary || merchant.branding?.primaryColor || '#d4a017';
+  const secondary = colors.secondary || merchant.branding?.secondaryColor || '#0f172a';
+  const accent = colors.accent || merchant.branding?.accentColor || '#38bdf8';
   const visible = merchant.visibility || {};
 
   const selectedThemeLayout = data?.layout?.header?.layout || data?.layout?.selectedLayout;
-  if (selectedThemeLayout === "theme2") {
+  if (selectedThemeLayout === 'theme2') {
     return (
       <>
         <DeviceTracker merchantId={merchant.merchantId} screenSlug={layout.screenSlug} />

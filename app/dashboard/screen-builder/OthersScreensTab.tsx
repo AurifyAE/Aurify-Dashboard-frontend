@@ -1,13 +1,13 @@
-"use client";
+'use client';
 
-import React, { useEffect, useState } from "react";
-import { marketplaceApi } from "@/lib/api/marketplace";
-import { Loader2, Monitor, ExternalLink } from "lucide-react";
+import React, { useEffect, useState } from 'react';
+import { marketplaceApi } from '@/lib/api/marketplace';
+import { Loader2, Monitor, ExternalLink } from 'lucide-react';
 
 export default function OthersScreensTab() {
   const [screens, setScreens] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
+  const [error, setError] = useState('');
 
   useEffect(() => {
     marketplaceApi
@@ -70,7 +70,7 @@ export default function OthersScreensTab() {
                   <p className="text-xs text-slate-400 truncate">/{screen.screenSlug}</p>
                 </div>
               </div>
-              
+
               <div className="p-4 bg-slate-50/50 flex flex-col items-center justify-center aspect-video border-b border-slate-100">
                 <Monitor className="h-10 w-10 text-slate-300 mb-2" />
                 <span className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider bg-slate-200 px-2 py-0.5 rounded">

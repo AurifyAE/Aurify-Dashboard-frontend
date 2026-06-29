@@ -1,8 +1,8 @@
-"use client";
+'use client';
 
-import React, { useEffect, useState } from "react";
-import DashboardShell from "@/components/dashboard/DashboardShell";
-import { marketplaceApi, type Merchant } from "@/lib/api/marketplace";
+import React, { useEffect, useState } from 'react';
+import DashboardShell from '@/components/dashboard/DashboardShell';
+import { marketplaceApi, type Merchant } from '@/lib/api/marketplace';
 import {
   Building2,
   Camera,
@@ -21,7 +21,7 @@ import {
   Save,
   Trash2,
   Youtube,
-} from "lucide-react";
+} from 'lucide-react';
 
 const TikTokIcon = () => (
   <svg viewBox="0 0 24 24" className="h-4 w-4 fill-current">
@@ -30,16 +30,40 @@ const TikTokIcon = () => (
 );
 
 const SOCIAL_CONFIGS = [
-  { key: "facebook", icon: Facebook, label: "Facebook", placeholder: "https://facebook.com/yourpage", color: "text-blue-600" },
-  { key: "instagram", icon: Instagram, label: "Instagram", placeholder: "https://instagram.com/yourhandle", color: "text-pink-500" },
-  { key: "linkedin", icon: Linkedin, label: "LinkedIn", placeholder: "https://linkedin.com/company/yourco", color: "text-blue-700" },
-  { key: "youtube", icon: Youtube, label: "YouTube", placeholder: "https://youtube.com/@yourchannel", color: "text-red-500" },
+  {
+    key: 'facebook',
+    icon: Facebook,
+    label: 'Facebook',
+    placeholder: 'https://facebook.com/yourpage',
+    color: 'text-blue-600',
+  },
+  {
+    key: 'instagram',
+    icon: Instagram,
+    label: 'Instagram',
+    placeholder: 'https://instagram.com/yourhandle',
+    color: 'text-pink-500',
+  },
+  {
+    key: 'linkedin',
+    icon: Linkedin,
+    label: 'LinkedIn',
+    placeholder: 'https://linkedin.com/company/yourco',
+    color: 'text-blue-700',
+  },
+  {
+    key: 'youtube',
+    icon: Youtube,
+    label: 'YouTube',
+    placeholder: 'https://youtube.com/@yourchannel',
+    color: 'text-red-500',
+  },
 ];
 
 const HOURS_CONFIG = [
-  { key: "mondayFriday", label: "Monday – Friday" },
-  { key: "saturday", label: "Saturday" },
-  { key: "sunday", label: "Sunday" },
+  { key: 'mondayFriday', label: 'Monday – Friday' },
+  { key: 'saturday', label: 'Saturday' },
+  { key: 'sunday', label: 'Sunday' },
 ];
 
 type BranchItem = { name: string; city?: string; address?: string; phone?: string };
@@ -49,8 +73,10 @@ export default function MerchantProfilePage() {
   const [profile, setProfile] = useState<Record<string, any>>({});
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
-  const [error, setError] = useState("");
-  const [activeTab, setActiveTab] = useState<"company" | "social" | "hours" | "branches">("company");
+  const [error, setError] = useState('');
+  const [activeTab, setActiveTab] = useState<'company' | 'social' | 'hours' | 'branches'>(
+    'company'
+  );
 
   useEffect(() => {
     marketplaceApi
@@ -64,7 +90,7 @@ export default function MerchantProfilePage() {
 
   const save = async () => {
     setSaving(true);
-    setError("");
+    setError('');
     setSaved(false);
     try {
       const payload = {
@@ -86,7 +112,7 @@ export default function MerchantProfilePage() {
       setSaved(true);
       setTimeout(() => setSaved(false), 3000);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Save failed");
+      setError(err instanceof Error ? err.message : 'Save failed');
     } finally {
       setSaving(false);
     }
@@ -107,10 +133,7 @@ export default function MerchantProfilePage() {
   const addBranch = () =>
     setProfile((prev) => ({
       ...prev,
-      branches: [
-        ...(prev.branches || []),
-        { name: "", city: "", address: "", phone: "" },
-      ],
+      branches: [...(prev.branches || []), { name: '', city: '', address: '', phone: '' }],
     }));
 
   const updateBranch = (index: number, field: string, value: string) =>
@@ -127,15 +150,15 @@ export default function MerchantProfilePage() {
     }));
 
   const inputClass =
-    "w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm text-slate-800 placeholder-slate-400 focus:border-amber-400 focus:outline-none focus:ring-2 focus:ring-amber-400/20 transition-all";
+    'w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm text-slate-800 placeholder-slate-400 focus:border-amber-400 focus:outline-none focus:ring-2 focus:ring-amber-400/20 transition-all';
 
-  const labelClass = "block mb-1.5 text-xs font-semibold uppercase tracking-wide text-slate-500";
+  const labelClass = 'block mb-1.5 text-xs font-semibold uppercase tracking-wide text-slate-500';
 
   const TABS = [
-    { key: "company", label: "Company", icon: Building2 },
-    { key: "social", label: "Social Media", icon: Globe },
-    { key: "hours", label: "Business Hours", icon: Clock },
-    { key: "branches", label: "Branches", icon: MapPin },
+    { key: 'company', label: 'Company', icon: Building2 },
+    { key: 'social', label: 'Social Media', icon: Globe },
+    { key: 'hours', label: 'Business Hours', icon: Clock },
+    { key: 'branches', label: 'Branches', icon: MapPin },
   ] as const;
 
   return (
@@ -148,11 +171,7 @@ export default function MerchantProfilePage() {
             Manage your brand identity, contact info, social links, and branch locations.
           </p>
         </div>
-        <button
-          onClick={save}
-          disabled={saving}
-          className="btn-primary"
-        >
+        <button onClick={save} disabled={saving} className="btn-primary">
           {saving ? (
             <Loader2 className="h-4 w-4 animate-spin" />
           ) : saved ? (
@@ -160,7 +179,7 @@ export default function MerchantProfilePage() {
           ) : (
             <Save className="h-4 w-4" />
           )}
-          {saving ? "Saving..." : saved ? "Saved!" : "Save Profile"}
+          {saving ? 'Saving...' : saved ? 'Saved!' : 'Save Profile'}
         </button>
       </div>
 
@@ -187,13 +206,13 @@ export default function MerchantProfilePage() {
               <img src={merchant.logo} alt="Logo" className="h-full w-full object-cover" />
             ) : (
               <span className="text-2xl font-bold text-white">
-                {merchant?.companyName?.charAt(0) || "?"}
+                {merchant?.companyName?.charAt(0) || '?'}
               </span>
             )}
           </div>
           <div className="pb-1">
             <p className="text-lg font-bold text-white">
-              {merchant?.companyName || "Your Company"}
+              {merchant?.companyName || 'Your Company'}
             </p>
             <p className="text-xs text-white/60">{merchant?.email}</p>
           </div>
@@ -201,13 +220,15 @@ export default function MerchantProfilePage() {
         <div className="absolute right-4 top-4">
           <span
             className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-bold ${
-              merchant?.status === "Active"
-                ? "bg-emerald-400/20 text-emerald-300 border border-emerald-400/30"
-                : "bg-amber-400/20 text-amber-300 border border-amber-400/30"
+              merchant?.status === 'Active'
+                ? 'bg-emerald-400/20 text-emerald-300 border border-emerald-400/30'
+                : 'bg-amber-400/20 text-amber-300 border border-amber-400/30'
             }`}
           >
-            <span className={`h-1.5 w-1.5 rounded-full ${merchant?.status === "Active" ? "bg-emerald-400" : "bg-amber-400 animate-pulse"}`} />
-            {merchant?.status || "Pending"}
+            <span
+              className={`h-1.5 w-1.5 rounded-full ${merchant?.status === 'Active' ? 'bg-emerald-400' : 'bg-amber-400 animate-pulse'}`}
+            />
+            {merchant?.status || 'Pending'}
           </span>
         </div>
       </div>
@@ -221,8 +242,8 @@ export default function MerchantProfilePage() {
             onClick={() => setActiveTab(tab.key)}
             className={`flex flex-1 items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold transition-all whitespace-nowrap ${
               activeTab === tab.key
-                ? "bg-white text-amber-700 shadow-sm"
-                : "text-slate-500 hover:text-slate-700"
+                ? 'bg-white text-amber-700 shadow-sm'
+                : 'text-slate-500 hover:text-slate-700'
             }`}
           >
             <tab.icon className="h-4 w-4" />
@@ -232,7 +253,7 @@ export default function MerchantProfilePage() {
       </div>
 
       {/* TAB: Company */}
-      {activeTab === "company" && (
+      {activeTab === 'company' && (
         <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
           <h2 className="mb-5 flex items-center gap-2 font-bold text-slate-900">
             <Building2 className="h-5 w-5 text-amber-500" />
@@ -243,7 +264,7 @@ export default function MerchantProfilePage() {
               <label className={labelClass}>Company Name</label>
               <input
                 className={inputClass}
-                value={merchant?.companyName || ""}
+                value={merchant?.companyName || ''}
                 onChange={(e) =>
                   setMerchant((m) => (m ? { ...m, companyName: e.target.value } : m))
                 }
@@ -257,10 +278,8 @@ export default function MerchantProfilePage() {
               <input
                 className={inputClass}
                 placeholder="https://..."
-                value={merchant?.logo || ""}
-                onChange={(e) =>
-                  setMerchant((m) => (m ? { ...m, logo: e.target.value } : m))
-                }
+                value={merchant?.logo || ''}
+                onChange={(e) => setMerchant((m) => (m ? { ...m, logo: e.target.value } : m))}
               />
             </div>
             <div>
@@ -271,7 +290,7 @@ export default function MerchantProfilePage() {
               <input
                 className={inputClass}
                 placeholder="https://..."
-                value={profile.banner || ""}
+                value={profile.banner || ''}
                 onChange={(e) => setProfile({ ...profile, banner: e.target.value })}
               />
             </div>
@@ -281,7 +300,7 @@ export default function MerchantProfilePage() {
                 className={`${inputClass} resize-none`}
                 rows={3}
                 placeholder="Tell customers about your business..."
-                value={profile.about || ""}
+                value={profile.about || ''}
                 onChange={(e) => setProfile({ ...profile, about: e.target.value })}
               />
             </div>
@@ -293,7 +312,7 @@ export default function MerchantProfilePage() {
               <input
                 className={inputClass}
                 placeholder="https://..."
-                value={profile.website || ""}
+                value={profile.website || ''}
                 onChange={(e) => setProfile({ ...profile, website: e.target.value })}
               />
             </div>
@@ -305,7 +324,7 @@ export default function MerchantProfilePage() {
               <input
                 className={inputClass}
                 placeholder="Street, Building, Area"
-                value={profile.address || ""}
+                value={profile.address || ''}
                 onChange={(e) => setProfile({ ...profile, address: e.target.value })}
               />
             </div>
@@ -317,10 +336,8 @@ export default function MerchantProfilePage() {
               <input
                 className={inputClass}
                 placeholder="+971 ..."
-                value={merchant?.phone || ""}
-                onChange={(e) =>
-                  setMerchant((m) => (m ? { ...m, phone: e.target.value } : m))
-                }
+                value={merchant?.phone || ''}
+                onChange={(e) => setMerchant((m) => (m ? { ...m, phone: e.target.value } : m))}
               />
             </div>
             <div>
@@ -331,10 +348,8 @@ export default function MerchantProfilePage() {
               <input
                 className={inputClass}
                 placeholder="+971 ..."
-                value={merchant?.whatsapp || ""}
-                onChange={(e) =>
-                  setMerchant((m) => (m ? { ...m, whatsapp: e.target.value } : m))
-                }
+                value={merchant?.whatsapp || ''}
+                onChange={(e) => setMerchant((m) => (m ? { ...m, whatsapp: e.target.value } : m))}
               />
             </div>
           </div>
@@ -342,7 +357,7 @@ export default function MerchantProfilePage() {
       )}
 
       {/* TAB: Social Media */}
-      {activeTab === "social" && (
+      {activeTab === 'social' && (
         <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
           <h2 className="mb-5 flex items-center gap-2 font-bold text-slate-900">
             <Globe className="h-5 w-5 text-amber-500" />
@@ -363,7 +378,7 @@ export default function MerchantProfilePage() {
                   <input
                     className={inputClass}
                     placeholder={soc.placeholder}
-                    value={profile.socialLinks?.[soc.key] || ""}
+                    value={profile.socialLinks?.[soc.key] || ''}
                     onChange={(e) => setSocial(soc.key, e.target.value)}
                   />
                 </div>
@@ -375,14 +390,12 @@ export default function MerchantProfilePage() {
                 <TikTokIcon />
               </div>
               <div className="flex-1">
-                <label className="mb-1 block text-xs font-semibold text-slate-600">
-                  TikTok
-                </label>
+                <label className="mb-1 block text-xs font-semibold text-slate-600">TikTok</label>
                 <input
                   className={inputClass}
                   placeholder="https://tiktok.com/@yourhandle"
-                  value={profile.socialLinks?.tiktok || ""}
-                  onChange={(e) => setSocial("tiktok", e.target.value)}
+                  value={profile.socialLinks?.tiktok || ''}
+                  onChange={(e) => setSocial('tiktok', e.target.value)}
                 />
               </div>
             </div>
@@ -391,7 +404,7 @@ export default function MerchantProfilePage() {
       )}
 
       {/* TAB: Business Hours */}
-      {activeTab === "hours" && (
+      {activeTab === 'hours' && (
         <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
           <h2 className="mb-5 flex items-center gap-2 font-bold text-slate-900">
             <Clock className="h-5 w-5 text-amber-500" />
@@ -403,13 +416,11 @@ export default function MerchantProfilePage() {
                 key={h.key}
                 className="flex items-center justify-between gap-4 rounded-xl border border-slate-100 bg-slate-50/60 px-4 py-3"
               >
-                <span className="text-sm font-semibold text-slate-700 w-32">
-                  {h.label}
-                </span>
+                <span className="text-sm font-semibold text-slate-700 w-32">{h.label}</span>
                 <input
                   className="flex-1 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-800 focus:border-amber-400 focus:outline-none focus:ring-2 focus:ring-amber-400/20 transition-all"
                   placeholder="e.g. 09:00 – 18:00 or Closed"
-                  value={profile.businessHours?.[h.key] || ""}
+                  value={profile.businessHours?.[h.key] || ''}
                   onChange={(e) => setHours(h.key, e.target.value)}
                 />
               </div>
@@ -419,23 +430,19 @@ export default function MerchantProfilePage() {
       )}
 
       {/* TAB: Branches */}
-      {activeTab === "branches" && (
+      {activeTab === 'branches' && (
         <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
           <div className="mb-5 flex items-center justify-between">
             <h2 className="flex items-center gap-2 font-bold text-slate-900">
               <MapPin className="h-5 w-5 text-amber-500" />
               Branch Locations
             </h2>
-            <button
-              type="button"
-              onClick={addBranch}
-              className="btn-secondary"
-            >
+            <button type="button" onClick={addBranch} className="btn-secondary">
               <Plus className="h-4 w-4" />
               Add Branch
             </button>
           </div>
-          {(!profile.branches || profile.branches.length === 0) ? (
+          {!profile.branches || profile.branches.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-12 text-slate-400">
               <MapPin className="h-10 w-10 mb-3 opacity-30" />
               <p className="text-sm font-medium">No branches added yet</p>
@@ -466,8 +473,8 @@ export default function MerchantProfilePage() {
                       <input
                         className={inputClass}
                         placeholder="e.g. Main Branch"
-                        value={branch.name || ""}
-                        onChange={(e) => updateBranch(i, "name", e.target.value)}
+                        value={branch.name || ''}
+                        onChange={(e) => updateBranch(i, 'name', e.target.value)}
                       />
                     </div>
                     <div>
@@ -475,8 +482,8 @@ export default function MerchantProfilePage() {
                       <input
                         className={inputClass}
                         placeholder="Dubai"
-                        value={branch.city || ""}
-                        onChange={(e) => updateBranch(i, "city", e.target.value)}
+                        value={branch.city || ''}
+                        onChange={(e) => updateBranch(i, 'city', e.target.value)}
                       />
                     </div>
                     <div>
@@ -484,8 +491,8 @@ export default function MerchantProfilePage() {
                       <input
                         className={inputClass}
                         placeholder="Street, Building"
-                        value={branch.address || ""}
-                        onChange={(e) => updateBranch(i, "address", e.target.value)}
+                        value={branch.address || ''}
+                        onChange={(e) => updateBranch(i, 'address', e.target.value)}
                       />
                     </div>
                     <div>
@@ -493,8 +500,8 @@ export default function MerchantProfilePage() {
                       <input
                         className={inputClass}
                         placeholder="+971 ..."
-                        value={branch.phone || ""}
-                        onChange={(e) => updateBranch(i, "phone", e.target.value)}
+                        value={branch.phone || ''}
+                        onChange={(e) => updateBranch(i, 'phone', e.target.value)}
                       />
                     </div>
                   </div>

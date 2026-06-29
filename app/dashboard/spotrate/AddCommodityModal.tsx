@@ -1,11 +1,22 @@
-"use client";
+'use client';
 
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import { Dialog, DialogTitle, DialogContent, DialogActions, Button, TextField, Select, MenuItem, Typography, IconButton } from '@mui/material';
+import {
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Button,
+  TextField,
+  Select,
+  MenuItem,
+  Typography,
+  IconButton,
+} from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import axiosInstance from '../../axios/axiosInstance';
 import { Snackbar, Alert } from '@mui/material';
-import { useAuth } from "@/context/AuthContext";
+import { useAuth } from '@/context/AuthContext';
 
 interface AddCommodityModalProps {
   open: boolean;
@@ -73,29 +84,41 @@ const AddCommodityModal: React.FC<AddCommodityModalProps> = ({
   const [error, setError] = useState<string | null>(null);
   const { user } = useAuth();
 
-  const exchangeRates = useMemo<Record<string, number>>(() => ({
-    AED: 3.674,
-    USD: 1,
-    EUR: 0.92,
-    GBP: 0.79
-  }), []);
+  const exchangeRates = useMemo<Record<string, number>>(
+    () => ({
+      AED: 3.674,
+      USD: 1,
+      EUR: 0.92,
+      GBP: 0.79,
+    }),
+    []
+  );
 
-  const convertCurrency = useCallback((amount: string, fromCurrency: string, toCurrency: string) => {
-    if (!amount) return '';
-    const parsed = parseFloat(amount);
-    if (isNaN(parsed)) return '';
-    const inUSD = parsed / exchangeRates[fromCurrency];
-    return (inUSD * exchangeRates[toCurrency]).toFixed(4);
-  }, [exchangeRates]);
+  const convertCurrency = useCallback(
+    (amount: string, fromCurrency: string, toCurrency: string) => {
+      if (!amount) return '';
+      const parsed = parseFloat(amount);
+      if (isNaN(parsed)) return '';
+      const inUSD = parsed / exchangeRates[fromCurrency];
+      return (inUSD * exchangeRates[toCurrency]).toFixed(4);
+    },
+    [exchangeRates]
+  );
 
   const getUnitMultiplier = useCallback((weight: string) => {
     switch (weight) {
-      case 'GM': return 1;
-      case 'KG': return 1000;
-      case 'TTB': return 116.6400;
-      case 'TOLA': return 11.664;
-      case 'OZ': return 31.1034768;
-      default: return 1;
+      case 'GM':
+        return 1;
+      case 'KG':
+        return 1000;
+      case 'TTB':
+        return 116.64;
+      case 'TOLA':
+        return 11.664;
+      case 'OZ':
+        return 31.1034768;
+      default:
+        return 1;
     }
   }, []);
 
@@ -144,7 +167,7 @@ const AddCommodityModal: React.FC<AddCommodityModalProps> = ({
 
   useEffect(() => {
     if (initialData && (isEditing || open)) {
-      setFormData(prevState => ({
+      setFormData((prevState) => ({
         ...prevState,
         ...initialData,
         sellCharges: initialData.sellCharge || initialData.sellCharges || '',
@@ -162,11 +185,18 @@ const AddCommodityModal: React.FC<AddCommodityModalProps> = ({
   }, [initialData, isEditing, open, resetForm]);
 
   const calculatePrices = useCallback(() => {
-    setFormData(prevState => {
+    setFormData((prevState) => {
       if (prevState.metal && prevState.purity && prevState.unit && prevState.weight) {
         const metal = prevState.metal;
-        const isGoldRelated = ['Gold', 'Gold Kilobar', 'Gold TOLA', 'Gold Ten TOLA', 'Gold Coin', 'Minted Bar'].includes(metal);
-        const metalBid = isGoldRelated ? marketData['Gold']?.bid : (marketData[metal]?.bid || 0);
+        const isGoldRelated = [
+          'Gold',
+          'Gold Kilobar',
+          'Gold TOLA',
+          'Gold Ten TOLA',
+          'Gold Coin',
+          'Minted Bar',
+        ].includes(metal);
+        const metalBid = isGoldRelated ? marketData['Gold']?.bid : marketData[metal]?.bid || 0;
         const bidSpread = spreadMarginData[`${metal.toLowerCase()}BidSpread`] || 0;
         const askSpread = spreadMarginData[`${metal.toLowerCase()}AskSpread`] || 0;
         const additionalPrice = isGoldRelated ? 0.5 : 0.05;
@@ -180,8 +210,26 @@ const AddCommodityModal: React.FC<AddCommodityModalProps> = ({
         const sellCharge = parseFloat(prevState.sellCharges) || 0;
         const buyCharge = parseFloat(prevState.buyCharges) || 0;
 
-        const baseBuyPrice = (((parseFloat(String(metalBid)) + parseFloat(String(bidSpread)) + parseFloat(String(buyPremiumUSD))) / 31.103) * exchangeRate * parseFloat(String(prevState.unit)) * unitMultiplier) * (purityValue / Math.pow(10, purityLength));
-        const baseSellPrice = (((parseFloat(String(metalBid)) + parseFloat(String(bidSpread)) + parseFloat(String(askSpread)) + additionalPrice + parseFloat(String(sellPremiumUSD))) / 31.103) * exchangeRate * parseFloat(String(prevState.unit)) * unitMultiplier) * (purityValue / Math.pow(10, purityLength));
+        const baseBuyPrice =
+          ((parseFloat(String(metalBid)) +
+            parseFloat(String(bidSpread)) +
+            parseFloat(String(buyPremiumUSD))) /
+            31.103) *
+          exchangeRate *
+          parseFloat(String(prevState.unit)) *
+          unitMultiplier *
+          (purityValue / Math.pow(10, purityLength));
+        const baseSellPrice =
+          ((parseFloat(String(metalBid)) +
+            parseFloat(String(bidSpread)) +
+            parseFloat(String(askSpread)) +
+            additionalPrice +
+            parseFloat(String(sellPremiumUSD))) /
+            31.103) *
+          exchangeRate *
+          parseFloat(String(prevState.unit)) *
+          unitMultiplier *
+          (purityValue / Math.pow(10, purityLength));
 
         const sellPrice = baseSellPrice + sellCharge;
         const buyPrice = baseBuyPrice + buyCharge;
@@ -195,7 +243,7 @@ const AddCommodityModal: React.FC<AddCommodityModalProps> = ({
           sellAED: sellPrice.toFixed(4),
           buyAED: buyPrice.toFixed(4),
           sellUSD: convertCurrency(sellPrice.toFixed(4), currency, 'USD'),
-          buyUSD: convertCurrency(buyPrice.toFixed(4), currency, 'USD')
+          buyUSD: convertCurrency(buyPrice.toFixed(4), currency, 'USD'),
         };
       }
       return prevState;
@@ -204,7 +252,17 @@ const AddCommodityModal: React.FC<AddCommodityModalProps> = ({
 
   useEffect(() => {
     calculatePrices();
-  }, [formData.metal, formData.purity, formData.unit, formData.weight, formData.buyCharges, formData.sellCharges, formData.buyPremiumUSD, formData.sellPremiumUSD, calculatePrices]);
+  }, [
+    formData.metal,
+    formData.purity,
+    formData.unit,
+    formData.weight,
+    formData.buyCharges,
+    formData.sellCharges,
+    formData.buyPremiumUSD,
+    formData.sellPremiumUSD,
+    calculatePrices,
+  ]);
 
   const handleChange = useCallback((e: any) => {
     const { name, value } = e.target;
@@ -213,13 +271,25 @@ const AddCommodityModal: React.FC<AddCommodityModalProps> = ({
     let updatedValue = value;
     if (['purity', 'unit'].includes(name)) {
       updatedValue = value === '' ? '' : value;
-    } else if (['sellPremiumUSD', 'sellCharges', 'buyPremiumUSD', 'buyCharges', 'buyAED', 'buyUSD', 'sellAED', 'sellUSD', 'metal_name'].includes(name)) {
+    } else if (
+      [
+        'sellPremiumUSD',
+        'sellCharges',
+        'buyPremiumUSD',
+        'buyCharges',
+        'buyAED',
+        'buyUSD',
+        'sellAED',
+        'sellUSD',
+        'metal_name',
+      ].includes(name)
+    ) {
       updatedValue = value === '' ? '' : value;
     }
 
-    setFormData(prevState => ({
+    setFormData((prevState) => ({
       ...prevState,
-      [name]: updatedValue
+      [name]: updatedValue,
     }));
   }, []);
 
@@ -232,7 +302,12 @@ const AddCommodityModal: React.FC<AddCommodityModalProps> = ({
       }
       try {
         const response = await axiosInstance.get(`/data/${userName}`);
-        if (response && response.data && response.data.data && Array.isArray(response.data.data.commodities)) {
+        if (
+          response &&
+          response.data &&
+          response.data.data &&
+          Array.isArray(response.data.data.commodities)
+        ) {
           const fetchedCommodities = response.data.data.commodities;
           const goldItems = [
             { _id: 'gold', symbol: 'Gold' },
@@ -240,9 +315,11 @@ const AddCommodityModal: React.FC<AddCommodityModalProps> = ({
             { _id: 'gold-tola', symbol: 'Gold TOLA' },
             { _id: 'gold-ten-tola', symbol: 'Ten TOLA' },
             { _id: 'gold-coin', symbol: 'Gold Coin' },
-            { _id: 'minted-bar', symbol: 'Minted Bar' }
+            { _id: 'minted-bar', symbol: 'Minted Bar' },
           ];
-          const nonGoldItems = fetchedCommodities.filter((item: any) => !goldItems.find(goldItem => goldItem.symbol === item.symbol));
+          const nonGoldItems = fetchedCommodities.filter(
+            (item: any) => !goldItems.find((goldItem) => goldItem.symbol === item.symbol)
+          );
           const combinedCommodities = [...goldItems, ...nonGoldItems];
           setCommodities(combinedCommodities);
         } else {
@@ -258,10 +335,12 @@ const AddCommodityModal: React.FC<AddCommodityModalProps> = ({
 
   const handleSave = useCallback(async () => {
     const requiredFields: (keyof FormData)[] = ['metal', 'purity', 'unit', 'weight'];
-    const emptyFields = requiredFields.filter(field => !formData[field]);
+    const emptyFields = requiredFields.filter((field) => !formData[field]);
 
     if (emptyFields.length > 0) {
-      setToastMessage(`${emptyFields.join(', ')} ${emptyFields.length > 1 ? 'are' : 'is'} required`);
+      setToastMessage(
+        `${emptyFields.join(', ')} ${emptyFields.length > 1 ? 'are' : 'is'} required`
+      );
       setToastOpen(true);
       return;
     }
@@ -274,19 +353,29 @@ const AddCommodityModal: React.FC<AddCommodityModalProps> = ({
         weight: formData.weight,
       };
 
-      if (formData.sellCharges !== '') commodityData.sellCharge = parseFloat(formData.sellCharges) || 0;
-      if (formData.buyCharges !== '') commodityData.buyCharge = parseFloat(formData.buyCharges) || 0;
-      if (formData.sellPremiumUSD !== '') commodityData.sellPremium = parseFloat(formData.sellPremiumUSD) || 0;
-      if (formData.buyPremiumUSD !== '') commodityData.buyPremium = parseFloat(formData.buyPremiumUSD) || 0;
+      if (formData.sellCharges !== '')
+        commodityData.sellCharge = parseFloat(formData.sellCharges) || 0;
+      if (formData.buyCharges !== '')
+        commodityData.buyCharge = parseFloat(formData.buyCharges) || 0;
+      if (formData.sellPremiumUSD !== '')
+        commodityData.sellPremium = parseFloat(formData.sellPremiumUSD) || 0;
+      if (formData.buyPremiumUSD !== '')
+        commodityData.buyPremium = parseFloat(formData.buyPremiumUSD) || 0;
 
       commodityData.metal_name = formData.metal_name?.trim() ? formData.metal_name.trim() : null;
       commodityData.group = formData.group || 'commodity';
 
       let response;
       if (isEditMode && initialData) {
-        response = await axiosInstance.patch(`/spotrate-commodity/${adminId}/${initialData._id}`, commodityData);
+        response = await axiosInstance.patch(
+          `/spotrate-commodity/${adminId}/${initialData._id}`,
+          commodityData
+        );
       } else {
-        response = await axiosInstance.post('/spotrate-commodity', { adminId, commodity: commodityData });
+        response = await axiosInstance.post('/spotrate-commodity', {
+          adminId,
+          commodity: commodityData,
+        });
       }
 
       if (response.status === 200) {
@@ -361,21 +450,39 @@ const AddCommodityModal: React.FC<AddCommodityModalProps> = ({
         sx: {
           borderRadius: '20px',
           boxShadow: '0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1)',
-        }
+        },
       }}
     >
-      <DialogTitle sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #f1f5f9', px: 3, py: 2.5 }}>
+      <DialogTitle
+        sx={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          borderBottom: '1px solid #f1f5f9',
+          px: 3,
+          py: 2.5,
+        }}
+      >
         <Typography component="div" variant="h6" sx={{ fontWeight: 'extrabold', color: '#1e293b' }}>
           {isEditMode ? 'Edit Commodity Template' : 'Add New Commodity Template'}
         </Typography>
-        <IconButton onClick={onClose} size="small" sx={{ color: '#94a3b8', hover: { color: '#64748b' } }}>
+        <IconButton
+          onClick={onClose}
+          size="small"
+          sx={{ color: '#94a3b8', hover: { color: '#64748b' } }}
+        >
           <CloseIcon fontSize="small" />
         </IconButton>
       </DialogTitle>
       <DialogContent sx={{ p: 3, borderBottom: '1px solid #f1f5f9' }}>
         <div className="grid grid-cols-12 gap-5">
           <div className="col-span-3">
-            <Typography variant="body2" sx={{ fontWeight: 'bold', color: '#475569', mb: 1, fontSize: '12px' }}>Metal</Typography>
+            <Typography
+              variant="body2"
+              sx={{ fontWeight: 'bold', color: '#475569', mb: 1, fontSize: '12px' }}
+            >
+              Metal
+            </Typography>
             <Select
               name="metal"
               value={formData.metal}
@@ -392,12 +499,19 @@ const AddCommodityModal: React.FC<AddCommodityModalProps> = ({
                   </MenuItem>
                 ))
               ) : (
-                <MenuItem value="" sx={{ fontSize: '13px' }}>Loading...</MenuItem>
+                <MenuItem value="" sx={{ fontSize: '13px' }}>
+                  Loading...
+                </MenuItem>
               )}
             </Select>
           </div>
           <div className="col-span-3">
-            <Typography variant="body2" sx={{ fontWeight: 'bold', color: '#475569', mb: 1, fontSize: '12px' }}>Purity</Typography>
+            <Typography
+              variant="body2"
+              sx={{ fontWeight: 'bold', color: '#475569', mb: 1, fontSize: '12px' }}
+            >
+              Purity
+            </Typography>
             <Select
               name="purity"
               value={formData.purity}
@@ -407,18 +521,39 @@ const AddCommodityModal: React.FC<AddCommodityModalProps> = ({
               sx={inputStyle}
               required
             >
-              <MenuItem value={9999} sx={{ fontSize: '13px' }}>9999</MenuItem>
-              <MenuItem value={999.9} sx={{ fontSize: '13px' }}>999.9</MenuItem>
-              <MenuItem value={999} sx={{ fontSize: '13px' }}>999</MenuItem>
-              <MenuItem value={995} sx={{ fontSize: '13px' }}>995</MenuItem>
-              <MenuItem value={916} sx={{ fontSize: '13px' }}>916</MenuItem>
-              <MenuItem value={920} sx={{ fontSize: '13px' }}>920</MenuItem>
-              <MenuItem value={875} sx={{ fontSize: '13px' }}>875</MenuItem>
-              <MenuItem value={750} sx={{ fontSize: '13px' }}>750</MenuItem>
+              <MenuItem value={9999} sx={{ fontSize: '13px' }}>
+                9999
+              </MenuItem>
+              <MenuItem value={999.9} sx={{ fontSize: '13px' }}>
+                999.9
+              </MenuItem>
+              <MenuItem value={999} sx={{ fontSize: '13px' }}>
+                999
+              </MenuItem>
+              <MenuItem value={995} sx={{ fontSize: '13px' }}>
+                995
+              </MenuItem>
+              <MenuItem value={916} sx={{ fontSize: '13px' }}>
+                916
+              </MenuItem>
+              <MenuItem value={920} sx={{ fontSize: '13px' }}>
+                920
+              </MenuItem>
+              <MenuItem value={875} sx={{ fontSize: '13px' }}>
+                875
+              </MenuItem>
+              <MenuItem value={750} sx={{ fontSize: '13px' }}>
+                750
+              </MenuItem>
             </Select>
           </div>
           <div className="col-span-3">
-            <Typography variant="body2" sx={{ fontWeight: 'bold', color: '#475569', mb: 1, fontSize: '12px' }}>Sell Premium</Typography>
+            <Typography
+              variant="body2"
+              sx={{ fontWeight: 'bold', color: '#475569', mb: 1, fontSize: '12px' }}
+            >
+              Sell Premium
+            </Typography>
             <TextField
               name="sellPremiumUSD"
               placeholder="USD"
@@ -430,7 +565,12 @@ const AddCommodityModal: React.FC<AddCommodityModalProps> = ({
             />
           </div>
           <div className="col-span-3">
-            <Typography variant="body2" sx={{ fontWeight: 'bold', color: '#475569', mb: 1, fontSize: '12px' }}>Sell Charges</Typography>
+            <Typography
+              variant="body2"
+              sx={{ fontWeight: 'bold', color: '#475569', mb: 1, fontSize: '12px' }}
+            >
+              Sell Charges
+            </Typography>
             <TextField
               name="sellCharges"
               placeholder={currency}
@@ -442,7 +582,12 @@ const AddCommodityModal: React.FC<AddCommodityModalProps> = ({
             />
           </div>
           <div className="col-span-3">
-            <Typography variant="body2" sx={{ fontWeight: 'bold', color: '#475569', mb: 1, fontSize: '12px' }}>Unit</Typography>
+            <Typography
+              variant="body2"
+              sx={{ fontWeight: 'bold', color: '#475569', mb: 1, fontSize: '12px' }}
+            >
+              Unit
+            </Typography>
             <TextField
               name="unit"
               type="number"
@@ -456,7 +601,12 @@ const AddCommodityModal: React.FC<AddCommodityModalProps> = ({
             />
           </div>
           <div className="col-span-3">
-            <Typography variant="body2" sx={{ fontWeight: 'bold', color: '#475569', mb: 1, fontSize: '12px' }}>Weight</Typography>
+            <Typography
+              variant="body2"
+              sx={{ fontWeight: 'bold', color: '#475569', mb: 1, fontSize: '12px' }}
+            >
+              Weight
+            </Typography>
             <Select
               name="weight"
               value={formData.weight}
@@ -466,15 +616,30 @@ const AddCommodityModal: React.FC<AddCommodityModalProps> = ({
               sx={inputStyle}
               required
             >
-              <MenuItem value="GM" sx={{ fontSize: '13px' }}>GM</MenuItem>
-              <MenuItem value="KG" sx={{ fontSize: '13px' }}>KG</MenuItem>
-              <MenuItem value="TTB" sx={{ fontSize: '13px' }}>TTB</MenuItem>
-              <MenuItem value="TOLA" sx={{ fontSize: '13px' }}>TOLA</MenuItem>
-              <MenuItem value="OZ" sx={{ fontSize: '13px' }}>OZ</MenuItem>
+              <MenuItem value="GM" sx={{ fontSize: '13px' }}>
+                GM
+              </MenuItem>
+              <MenuItem value="KG" sx={{ fontSize: '13px' }}>
+                KG
+              </MenuItem>
+              <MenuItem value="TTB" sx={{ fontSize: '13px' }}>
+                TTB
+              </MenuItem>
+              <MenuItem value="TOLA" sx={{ fontSize: '13px' }}>
+                TOLA
+              </MenuItem>
+              <MenuItem value="OZ" sx={{ fontSize: '13px' }}>
+                OZ
+              </MenuItem>
             </Select>
           </div>
           <div className="col-span-3">
-            <Typography variant="body2" sx={{ fontWeight: 'bold', color: '#475569', mb: 1, fontSize: '12px' }}>Buy Premium</Typography>
+            <Typography
+              variant="body2"
+              sx={{ fontWeight: 'bold', color: '#475569', mb: 1, fontSize: '12px' }}
+            >
+              Buy Premium
+            </Typography>
             <TextField
               name="buyPremiumUSD"
               placeholder="USD"
@@ -486,7 +651,12 @@ const AddCommodityModal: React.FC<AddCommodityModalProps> = ({
             />
           </div>
           <div className="col-span-3">
-            <Typography variant="body2" sx={{ fontWeight: 'bold', color: '#475569', mb: 1, fontSize: '12px' }}>Buy Charges</Typography>
+            <Typography
+              variant="body2"
+              sx={{ fontWeight: 'bold', color: '#475569', mb: 1, fontSize: '12px' }}
+            >
+              Buy Charges
+            </Typography>
             <TextField
               name="buyCharges"
               placeholder={currency}
@@ -498,7 +668,12 @@ const AddCommodityModal: React.FC<AddCommodityModalProps> = ({
             />
           </div>
           <div className="col-span-6">
-            <Typography variant="body2" sx={{ fontWeight: 'bold', color: '#475569', mb: 1, fontSize: '12px' }}>Alternate Metal Name</Typography>
+            <Typography
+              variant="body2"
+              sx={{ fontWeight: 'bold', color: '#475569', mb: 1, fontSize: '12px' }}
+            >
+              Alternate Metal Name
+            </Typography>
             <TextField
               name="metal_name"
               placeholder="Optional"
@@ -510,7 +685,12 @@ const AddCommodityModal: React.FC<AddCommodityModalProps> = ({
             />
           </div>
           <div className="col-span-6">
-            <Typography variant="body2" sx={{ fontWeight: 'bold', color: '#475569', mb: 1, fontSize: '12px' }}>Group</Typography>
+            <Typography
+              variant="body2"
+              sx={{ fontWeight: 'bold', color: '#475569', mb: 1, fontSize: '12px' }}
+            >
+              Group
+            </Typography>
             <Select
               name="group"
               value={formData.group}
@@ -519,9 +699,15 @@ const AddCommodityModal: React.FC<AddCommodityModalProps> = ({
               size="small"
               sx={inputStyle}
             >
-              <MenuItem value="commodity" sx={{ fontSize: '13px' }}>Commodity</MenuItem>
-              <MenuItem value="group1" sx={{ fontSize: '13px' }}>Group 1</MenuItem>
-              <MenuItem value="group2" sx={{ fontSize: '13px' }}>Group 2</MenuItem>
+              <MenuItem value="commodity" sx={{ fontSize: '13px' }}>
+                Commodity
+              </MenuItem>
+              <MenuItem value="group1" sx={{ fontSize: '13px' }}>
+                Group 1
+              </MenuItem>
+              <MenuItem value="group2" sx={{ fontSize: '13px' }}>
+                Group 2
+              </MenuItem>
             </Select>
           </div>
           <div className="col-span-12">
@@ -529,14 +715,54 @@ const AddCommodityModal: React.FC<AddCommodityModalProps> = ({
               <table style={{ width: '100%', borderCollapse: 'separate', borderSpacing: '0 4px' }}>
                 <thead>
                   <tr style={{ background: '#f8fafc' }}>
-                    <th style={{ width: '20%', fontSize: '11px', fontWeight: 'bold', color: '#64748b', textTransform: 'uppercase', padding: '6px 8px', borderRadius: '8px 0 0 8px' }}>Type</th>
-                    <th style={{ width: '40%', fontSize: '11px', fontWeight: 'bold', color: '#64748b', textTransform: 'uppercase', padding: '6px 8px' }}>{currency}</th>
-                    <th style={{ width: '40%', fontSize: '11px', fontWeight: 'bold', color: '#64748b', textTransform: 'uppercase', padding: '6px 8px', borderRadius: '0 8px 8px 0' }}>USD</th>
+                    <th
+                      style={{
+                        width: '20%',
+                        fontSize: '11px',
+                        fontWeight: 'bold',
+                        color: '#64748b',
+                        textTransform: 'uppercase',
+                        padding: '6px 8px',
+                        borderRadius: '8px 0 0 8px',
+                      }}
+                    >
+                      Type
+                    </th>
+                    <th
+                      style={{
+                        width: '40%',
+                        fontSize: '11px',
+                        fontWeight: 'bold',
+                        color: '#64748b',
+                        textTransform: 'uppercase',
+                        padding: '6px 8px',
+                      }}
+                    >
+                      {currency}
+                    </th>
+                    <th
+                      style={{
+                        width: '40%',
+                        fontSize: '11px',
+                        fontWeight: 'bold',
+                        color: '#64748b',
+                        textTransform: 'uppercase',
+                        padding: '6px 8px',
+                        borderRadius: '0 8px 8px 0',
+                      }}
+                    >
+                      USD
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
                   <tr>
-                    <td align="center" style={{ fontSize: '12px', fontWeight: 'bold', color: '#1e293b' }}>Buy</td>
+                    <td
+                      align="center"
+                      style={{ fontSize: '12px', fontWeight: 'bold', color: '#1e293b' }}
+                    >
+                      Buy
+                    </td>
                     <td>
                       <TextField
                         name={`buy${currency}`}
@@ -561,7 +787,12 @@ const AddCommodityModal: React.FC<AddCommodityModalProps> = ({
                     </td>
                   </tr>
                   <tr>
-                    <td align="center" style={{ fontSize: '12px', fontWeight: 'bold', color: '#1e293b' }}>Sell</td>
+                    <td
+                      align="center"
+                      style={{ fontSize: '12px', fontWeight: 'bold', color: '#1e293b' }}
+                    >
+                      Sell
+                    </td>
                     <td>
                       <TextField
                         name={`sell${currency}`}
@@ -601,7 +832,7 @@ const AddCommodityModal: React.FC<AddCommodityModalProps> = ({
             borderRadius: '10px',
             px: 2.5,
             py: 1,
-            "&:hover": {
+            '&:hover': {
               backgroundColor: '#f1f5f9',
             },
           }}
@@ -620,7 +851,7 @@ const AddCommodityModal: React.FC<AddCommodityModalProps> = ({
             px: 3,
             py: 1,
             boxShadow: '0 4px 6px -1px rgb(0 163 255 / 0.1), 0 2px 4px -2px rgb(0 163 255 / 0.1)',
-            "&:hover": {
+            '&:hover': {
               background: 'linear-gradient(270deg, rgb(0, 110, 180) 0%, rgb(0, 140, 220) 100%)',
               boxShadow: 'none',
             },

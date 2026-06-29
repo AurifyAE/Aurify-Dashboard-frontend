@@ -1,4 +1,4 @@
-import React from "react";
+import React from 'react';
 
 const Loader: React.FC = () => {
   return (
@@ -155,14 +155,14 @@ const Loader: React.FC = () => {
 
 const styles: { container: React.CSSProperties } = {
   container: {
-    position: "fixed",
+    position: 'fixed',
     inset: 0,
     zIndex: 1000,
-    backgroundColor: "rgba(255,255,255,0.1)",
-    backdropFilter: "blur(2px)",
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
+    backgroundColor: 'rgba(255,255,255,0.1)',
+    backdropFilter: 'blur(2px)',
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 };
 

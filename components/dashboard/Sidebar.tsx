@@ -1,16 +1,16 @@
-"use client";
+'use client';
 
-import React, { useState } from "react";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
+import React, { useState } from 'react';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 
-import { HugeiconsIcon } from "@hugeicons/react";
-import { Logout01Icon } from "@hugeicons/core-free-icons";
+import { HugeiconsIcon } from '@hugeicons/react';
+import { Logout01Icon } from '@hugeicons/core-free-icons';
 
-import { cn } from "@/lib/utils";
-import Image from "next/image";
-import { useAuth } from "@/context/AuthContext";
-import type { UserRole } from "@/lib/auth";
+import { cn } from '@/lib/utils';
+import Image from 'next/image';
+import { useAuth } from '@/context/AuthContext';
+import type { UserRole } from '@/lib/auth';
 import {
   ArrowRight,
   BarChart2,
@@ -29,7 +29,7 @@ import {
   Store,
   Tv,
   Users,
-} from "lucide-react";
+} from 'lucide-react';
 
 type LucideIcon = React.ComponentType<{ className?: string; size?: number }>;
 
@@ -43,40 +43,40 @@ interface NavItem {
 
 const navItems: NavItem[] = [
   {
-    title: "Dashboard",
-    href: "/dashboard",
+    title: 'Dashboard',
+    href: '/dashboard',
     icon: LayoutDashboard,
-    roles: ["user"],
+    roles: ['user'],
   },
   {
-    title: "Spot Rate",
-    href: "/dashboard/spotrate",
+    title: 'Spot Rate',
+    href: '/dashboard/spotrate',
     icon: BarChart2,
-    roles: ["user"],
+    roles: ['user'],
   },
   {
-    title: "Screens & Marketplace",
-    href: "/dashboard/screen-builder",
+    title: 'Screens & Marketplace',
+    href: '/dashboard/screen-builder',
     icon: Tv,
-    roles: ["user"],
+    roles: ['user'],
   },
   {
-    title: "Profile",
-    href: "/dashboard/merchant-profile",
+    title: 'Profile',
+    href: '/dashboard/merchant-profile',
     icon: Building2,
-    roles: ["user"],
+    roles: ['user'],
   },
   {
-    title: "Account Settings",
-    href: "/dashboard/settings",
+    title: 'Account Settings',
+    href: '/dashboard/settings',
     icon: Settings2,
-    roles: ["user", "admin", "super_admin"],
+    roles: ['user', 'admin', 'super_admin'],
   },
   {
-    title: "Client Management",
-    href: "/dashboard/admin/clients",
+    title: 'Client Management',
+    href: '/dashboard/admin/clients',
     icon: Users,
-    roles: ["admin", "super_admin"],
+    roles: ['admin', 'super_admin'],
   },
 ];
 
@@ -93,9 +93,9 @@ export default function Sidebar() {
 
   const getInitials = (name: string): string => {
     return name
-      .split(" ")
+      .split(' ')
       .map((n) => n[0])
-      .join("")
+      .join('')
       .toUpperCase()
       .slice(0, 2);
   };
@@ -105,9 +105,9 @@ export default function Sidebar() {
       {/* Sidebar */}
       <aside
         className={cn(
-          "flex flex-col z-40 text-white transition-all duration-300 ease-in-out overflow-hidden lg:translate-x-0 lg:w-60 w-64 translate-x-0",
+          'flex flex-col z-40 text-white transition-all duration-300 ease-in-out overflow-hidden lg:translate-x-0 lg:w-60 w-64 translate-x-0'
         )}
-        style={{ pointerEvents: "auto", minWidth: "270px" }}
+        style={{ pointerEvents: 'auto', minWidth: '270px' }}
       >
         {/* Logo section */}
         <div className="p-6 min-h-10 border-b border-slate-700/60 flex justify-start items-center relative flex-shrink-0 overflow-hidden">
@@ -120,18 +120,8 @@ export default function Sidebar() {
               priority
               className="flex-shrink-0 relative z-10"
             />
-            <div
-              className={cn(
-                "transition-all duration-300 relative z-0 opacity-100 visible",
-              )}
-            >
-              <Image
-                src="/images/aurify-logo2.svg"
-                alt="Aurify"
-                width={120}
-                height={30}
-                priority
-              />
+            <div className={cn('transition-all duration-300 relative z-0 opacity-100 visible')}>
+              <Image src="/images/aurify-logo2.svg" alt="Aurify" width={120} height={30} priority />
             </div>
           </div>
         </div>
@@ -140,8 +130,8 @@ export default function Sidebar() {
         <nav className="flex-1 overflow-y-auto overflow-x-hidden p-4 space-y-1">
           {visibleNavItems.map((item) => {
             const isActive =
-              item.href === "/dashboard"
-                ? pathname === "/dashboard"
+              item.href === '/dashboard'
+                ? pathname === '/dashboard'
                 : pathname.startsWith(item.href);
             const IconComp = item.icon;
             return (
@@ -149,10 +139,10 @@ export default function Sidebar() {
                 key={item.href}
                 href={item.href}
                 onClick={() => setIsMobileOpen(false)}
-                className={`${"sidebarLink "} ${isActive ? "active custom_b_border" : ""}`}
+                className={`${'sidebarLink '} ${isActive ? 'active custom_b_border' : ''}`}
               >
-                <IconComp className={"icon"} size={20} />
-                <span className={"title"}>{item.title}</span>
+                <IconComp className={'icon'} size={20} />
+                <span className={'title'}>{item.title}</span>
               </Link>
             );
           })}
@@ -199,14 +189,14 @@ export default function Sidebar() {
                     <div className="flex items-center gap-1.5">
                       <span className="w-1 h-1 rounded-full bg-amber-400" />
                       <span className="text-[11px] text-white/40 tracking-widest uppercase">
-                        {user.role === "super_admin"
-                          ? "Super Admin"
-                          : user.role === "admin"
-                            ? "Admin"
-                            : "User"}
+                        {user.role === 'super_admin'
+                          ? 'Super Admin'
+                          : user.role === 'admin'
+                            ? 'Admin'
+                            : 'User'}
                       </span>
                     </div>
-                    {user.role === "super_admin" && (
+                    {user.role === 'super_admin' && (
                       <div className="flex items-center gap-1 bg-amber-400/[0.08] border border-amber-400/20 rounded-full px-2 py-0.5">
                         <Crown className="w-2.5 h-2.5 text-amber-400" />
                         <span className="text-[10px] font-medium text-amber-400 tracking-wide">
@@ -225,12 +215,7 @@ export default function Sidebar() {
               className="w-full flex items-center gap-2.5 bg-white/[0.02] hover:bg-red-500/[0.08] border border-white/[0.06] hover:border-red-500/20 rounded-xl px-3 py-2.5 transition-all duration-200 group/logout"
             >
               <div className="w-7 h-7 flex-shrink-0 rounded-[7px] bg-red-500/[0.08] border border-red-500/15 flex items-center justify-center">
-                <HugeiconsIcon
-                  icon={Logout01Icon}
-                  size={14}
-                  color="#f87171"
-                  strokeWidth={1.5}
-                />
+                <HugeiconsIcon icon={Logout01Icon} size={14} color="#f87171" strokeWidth={1.5} />
               </div>
               <span className="text-[13px] font-medium text-white/50 flex-1 text-left">
                 Sign out

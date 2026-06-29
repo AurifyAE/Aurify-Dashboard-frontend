@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import React, {
   createContext,
@@ -7,8 +7,8 @@ import React, {
   useEffect,
   useCallback,
   ReactNode,
-} from "react";
-import { useRouter, usePathname } from "next/navigation";
+} from 'react';
+import { useRouter, usePathname } from 'next/navigation';
 import {
   AuthUser,
   AuthResponse,
@@ -19,7 +19,7 @@ import {
   apiLogin,
   apiRegister,
   apiGetMe,
-} from "@/lib/auth";
+} from '@/lib/auth';
 
 // ─── Context Types ────────────────────────────────────────────────────────────
 interface AuthContextValue {
@@ -57,7 +57,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const forceRegisterRedirect = useCallback(() => {
     removeToken();
     setUser(null);
-    router.push("/login?alert=deleted");
+    router.push('/login?alert=deleted');
   }, [router]);
 
   // Hydrate and verify user on mount, route change, and interval
@@ -69,7 +69,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setHasHydrated(true);
         return;
       }
-      
+
       // Fast initial hydration
       if (!hasHydrated) {
         const decoded = decodeToken(token);
@@ -86,7 +86,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           forceRegisterRedirect();
         }
       } catch (err) {
-        console.error("Auth check failed:", err);
+        console.error('Auth check failed:', err);
       }
       setIsLoading(false);
     };
@@ -104,15 +104,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (response.success && response.token && response.user) {
         setToken(response.token);
         setUser(response.user);
-        if (response.user.role === "admin" || response.user.role === "super_admin") {
-          router.push("/dashboard/admin/clients");
+        if (response.user.role === 'admin' || response.user.role === 'super_admin') {
+          router.push('/dashboard/admin/clients');
         } else {
-          router.push("/dashboard");
+          router.push('/dashboard');
         }
       }
       return response;
     },
-    [router],
+    [router]
   );
 
   const register = useCallback(
@@ -133,17 +133,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (response.success && response.token && response.user) {
         setToken(response.token);
         setUser(response.user);
-        router.push("/dashboard");
+        router.push('/dashboard');
       }
       return response;
     },
-    [router],
+    [router]
   );
 
   const logout = useCallback(() => {
     removeToken();
     setUser(null);
-    router.push("/login");
+    router.push('/login');
   }, [router]);
 
   return (
@@ -167,7 +167,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 export function useAuth(): AuthContextValue {
   const ctx = useContext(AuthContext);
   if (!ctx) {
-    throw new Error("useAuth must be used inside <AuthProvider>");
+    throw new Error('useAuth must be used inside <AuthProvider>');
   }
   return ctx;
 }

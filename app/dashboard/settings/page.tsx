@@ -1,55 +1,55 @@
-"use client";
+'use client';
 
-import React, { useState, useEffect } from "react";
-import DashboardShell from "@/components/dashboard/DashboardShell";
-import { useAuth } from "@/context/AuthContext";
-import { Save, Lock, User, Phone, CheckCircle2, AlertCircle, Loader2 } from "lucide-react";
-import axiosInstance from "@/app/axios/axiosInstance";
+import React, { useState, useEffect } from 'react';
+import DashboardShell from '@/components/dashboard/DashboardShell';
+import { useAuth } from '@/context/AuthContext';
+import { Save, Lock, User, Phone, CheckCircle2, AlertCircle, Loader2 } from 'lucide-react';
+import axiosInstance from '@/app/axios/axiosInstance';
 
 export default function SettingsPage() {
   const { user, login } = useAuth(); // login function in auth context might need token to be re-set
-  
+
   const [form, setForm] = useState({
-    companyName: "",
-    phone: "",
-    currentPassword: "",
-    newPassword: "",
-    confirmPassword: "",
+    companyName: '',
+    phone: '',
+    currentPassword: '',
+    newPassword: '',
+    confirmPassword: '',
   });
 
   const [saving, setSaving] = useState(false);
-  const [message, setMessage] = useState("");
-  const [messageType, setMessageType] = useState<"success" | "error">("success");
+  const [message, setMessage] = useState('');
+  const [messageType, setMessageType] = useState<'success' | 'error'>('success');
 
   useEffect(() => {
     if (user) {
-      setForm(prev => ({
+      setForm((prev) => ({
         ...prev,
-        companyName: user.companyName || "",
-        phone: user.phone || "",
+        companyName: user.companyName || '',
+        phone: user.phone || '',
       }));
     }
   }, [user]);
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
-    setMessage("");
+    setMessage('');
 
     if (form.newPassword && form.newPassword !== form.confirmPassword) {
-      setMessageType("error");
-      setMessage("New passwords do not match.");
+      setMessageType('error');
+      setMessage('New passwords do not match.');
       return;
     }
 
     if (form.newPassword && !form.currentPassword) {
-      setMessageType("error");
-      setMessage("Current password is required to set a new password.");
+      setMessageType('error');
+      setMessage('Current password is required to set a new password.');
       return;
     }
 
     setSaving(true);
     try {
-      const response = await axiosInstance.put("/auth/profile", {
+      const response = await axiosInstance.put('/auth/profile', {
         companyName: form.companyName,
         phone: form.phone,
         currentPassword: form.currentPassword,
@@ -57,33 +57,38 @@ export default function SettingsPage() {
       });
 
       if (response.data.success) {
-        setMessageType("success");
-        setMessage("Profile updated successfully!");
-        
+        setMessageType('success');
+        setMessage('Profile updated successfully!');
+
         // Update local storage token if returned
         if (response.data.token) {
-          localStorage.setItem("token", response.data.token);
+          localStorage.setItem('token', response.data.token);
           // Optional: we might need to force AuthContext to re-fetch or use returned user
         }
-        
+
         // clear password fields
-        setForm(prev => ({
+        setForm((prev) => ({
           ...prev,
-          currentPassword: "",
-          newPassword: "",
-          confirmPassword: "",
+          currentPassword: '',
+          newPassword: '',
+          confirmPassword: '',
         }));
       }
     } catch (err: any) {
-      setMessageType("error");
-      setMessage(err.response?.data?.message || err.response?.data?.errors?.password || "Failed to update profile.");
+      setMessageType('error');
+      setMessage(
+        err.response?.data?.message ||
+          err.response?.data?.errors?.password ||
+          'Failed to update profile.'
+      );
     } finally {
       setSaving(false);
     }
   };
 
-  const inputClass = "w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm text-slate-800 placeholder-slate-400 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all";
-  const labelClass = "block mb-1.5 text-xs font-semibold uppercase tracking-wide text-slate-500";
+  const inputClass =
+    'w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm text-slate-800 placeholder-slate-400 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all';
+  const labelClass = 'block mb-1.5 text-xs font-semibold uppercase tracking-wide text-slate-500';
 
   return (
     <DashboardShell>
@@ -96,12 +101,14 @@ export default function SettingsPage() {
         </div>
 
         {message && (
-          <div className={`flex items-start gap-3 rounded-xl border p-4 text-sm ${
-            messageType === "success"
-              ? "border-emerald-200 bg-emerald-50 text-emerald-800"
-              : "border-red-200 bg-red-50 text-red-800"
-          }`}>
-            {messageType === "success" ? (
+          <div
+            className={`flex items-start gap-3 rounded-xl border p-4 text-sm ${
+              messageType === 'success'
+                ? 'border-emerald-200 bg-emerald-50 text-emerald-800'
+                : 'border-red-200 bg-red-50 text-red-800'
+            }`}
+          >
+            {messageType === 'success' ? (
               <CheckCircle2 className="h-4 w-4 mt-0.5 flex-shrink-0" />
             ) : (
               <AlertCircle className="h-4 w-4 mt-0.5 flex-shrink-0" />
@@ -116,16 +123,18 @@ export default function SettingsPage() {
               <User className="h-5 w-5 text-blue-500" />
               General Information
             </h2>
-            
+
             <div className="grid gap-5 sm:grid-cols-2">
               <div className="sm:col-span-2">
                 <label className={labelClass}>Email Address</label>
                 <input
                   className={`${inputClass} bg-slate-50 text-slate-500 cursor-not-allowed`}
-                  value={user?.email || ""}
+                  value={user?.email || ''}
                   disabled
                 />
-                <p className="mt-1.5 text-[11px] text-slate-400">Email address cannot be changed.</p>
+                <p className="mt-1.5 text-[11px] text-slate-400">
+                  Email address cannot be changed.
+                </p>
               </div>
 
               <div>
@@ -159,7 +168,9 @@ export default function SettingsPage() {
               <Lock className="h-5 w-5 text-amber-500" />
               Change Password
             </h2>
-            <p className="text-sm text-slate-500 -mt-2">Leave password fields blank if you do not wish to change your password.</p>
+            <p className="text-sm text-slate-500 -mt-2">
+              Leave password fields blank if you do not wish to change your password.
+            </p>
 
             <div className="space-y-4 max-w-md">
               <div>
@@ -198,13 +209,13 @@ export default function SettingsPage() {
           </div>
 
           <div className="flex justify-end">
-            <button
-              type="submit"
-              disabled={saving}
-              className="btn-primary"
-            >
-              {saving ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Save className="h-4 w-4 mr-2" />}
-              {saving ? "Saving Changes..." : "Save Settings"}
+            <button type="submit" disabled={saving} className="btn-primary">
+              {saving ? (
+                <Loader2 className="h-4 w-4 animate-spin mr-2" />
+              ) : (
+                <Save className="h-4 w-4 mr-2" />
+              )}
+              {saving ? 'Saving Changes...' : 'Save Settings'}
             </button>
           </div>
         </form>

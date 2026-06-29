@@ -1,7 +1,7 @@
-"use client";
+'use client';
 
-import React, { useEffect, useState } from "react";
-import { marketplaceApi, type ScreenLayout } from "@/lib/api/marketplace";
+import React, { useEffect, useState } from 'react';
+import { marketplaceApi, type ScreenLayout } from '@/lib/api/marketplace';
 import {
   Check,
   Copy,
@@ -14,8 +14,8 @@ import {
   Plus,
   Rocket,
   Trash2,
-} from "lucide-react";
-import Swal from "sweetalert2";
+} from 'lucide-react';
+import Swal from 'sweetalert2';
 
 interface MyScreensTabProps {
   onEditLayout: (layoutId: string) => void;
@@ -24,14 +24,11 @@ interface MyScreensTabProps {
 
 // Removed MiniScreenPreview component
 
-export default function MyScreensTab({
-  onEditLayout,
-  onCreateNew,
-}: MyScreensTabProps) {
+export default function MyScreensTab({ onEditLayout, onCreateNew }: MyScreensTabProps) {
   const [layouts, setLayouts] = useState<ScreenLayout[]>([]);
   const [loading, setLoading] = useState(true);
   const [copiedId, setCopiedId] = useState<string | null>(null);
-  const [error, setError] = useState("");
+  const [error, setError] = useState('');
 
   const load = () => {
     setLoading(true);
@@ -52,19 +49,19 @@ export default function MyScreensTab({
       setCopiedId(id);
       setTimeout(() => setCopiedId(null), 2000);
     } catch (err) {
-      console.error("Failed to copy:", err);
+      console.error('Failed to copy:', err);
     }
   };
 
   const handleDelete = async (layoutId: string, name: string) => {
     const result = await Swal.fire({
-      title: "Delete Screen?",
+      title: 'Delete Screen?',
       text: `Are you sure you want to delete "${name}"? This action cannot be undone.`,
-      icon: "warning",
+      icon: 'warning',
       showCancelButton: true,
-      confirmButtonColor: "#ef4444",
-      cancelButtonColor: "#64748b",
-      confirmButtonText: "Yes, delete it!",
+      confirmButtonColor: '#ef4444',
+      cancelButtonColor: '#64748b',
+      confirmButtonText: 'Yes, delete it!',
     });
 
     if (result.isConfirmed) {
@@ -72,30 +69,23 @@ export default function MyScreensTab({
         await marketplaceApi.deleteLayout(layoutId);
         setLayouts((prev) => prev.filter((l) => l.layoutId !== layoutId));
         Swal.fire({
-          title: "Deleted!",
-          text: "Your screen has been deleted.",
-          icon: "success",
+          title: 'Deleted!',
+          text: 'Your screen has been deleted.',
+          icon: 'success',
           timer: 2000,
           showConfirmButton: false,
         });
       } catch (err) {
-        console.error("Failed to delete layout:", err);
-        Swal.fire(
-          "Error",
-          "Failed to delete screen. Please try again.",
-          "error",
-        );
+        console.error('Failed to delete layout:', err);
+        Swal.fire('Error', 'Failed to delete screen. Please try again.', 'error');
       }
     }
   };
 
   const liveUrl = (layout: any) => {
-    const isLocal =
-      typeof window !== "undefined" && window.location.hostname === "localhost";
-    const baseUrl = isLocal
-      ? "http://localhost:3000"
-      : "https://screen.aurify.ae";
-    return `${baseUrl}/${layout.merchantSlug || "merchant"}/${layout.screenSlug}`;
+    const isLocal = typeof window !== 'undefined' && window.location.hostname === 'localhost';
+    const baseUrl = isLocal ? 'http://localhost:3000' : 'https://screen.aurify.ae';
+    return `${baseUrl}/${layout.merchantSlug || 'merchant'}/${layout.screenSlug}`;
   };
 
   return (
@@ -147,22 +137,22 @@ export default function MyScreensTab({
         <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
           {layouts.map((layout) => {
             const url = liveUrl(layout);
-            const isPublished = layout.status === "published";
+            const isPublished = layout.status === 'published';
             return (
               <div
                 key={layout.layoutId}
                 className={`overflow-hidden flex flex-col rounded-2xl border transition-all hover:shadow-xl bg-white ${
                   isPublished
-                    ? "border-emerald-200 shadow-sm hover:border-emerald-300"
-                    : "border-slate-200 hover:border-slate-300"
+                    ? 'border-emerald-200 shadow-sm hover:border-emerald-300'
+                    : 'border-slate-200 hover:border-slate-300'
                 }`}
               >
                 {/* Header / Cover Replacement */}
                 <div
                   className={`p-5 flex flex-col gap-3 relative ${
                     isPublished
-                      ? "bg-gradient-to-br from-emerald-500 to-teal-700"
-                      : "bg-gradient-to-br from-slate-700 to-slate-900"
+                      ? 'bg-gradient-to-br from-emerald-500 to-teal-700'
+                      : 'bg-gradient-to-br from-slate-700 to-slate-900'
                   }`}
                 >
                   <div className="flex justify-between items-start">
@@ -172,8 +162,8 @@ export default function MyScreensTab({
                     <span
                       className={`rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider border backdrop-blur-md ${
                         isPublished
-                          ? "bg-emerald-400/20 text-white border-emerald-300/30"
-                          : "bg-white/10 text-white border-white/20"
+                          ? 'bg-emerald-400/20 text-white border-emerald-300/30'
+                          : 'bg-white/10 text-white border-white/20'
                       }`}
                     >
                       {layout.status}
@@ -196,9 +186,7 @@ export default function MyScreensTab({
                 <div className="p-5 flex-1 flex flex-col">
                   {isPublished ? (
                     <div className="mb-5 flex items-center gap-2 rounded-xl bg-slate-50 border border-slate-100 px-3 py-2.5">
-                      <span className="text-[10px] font-bold uppercase text-slate-400">
-                        URL
-                      </span>
+                      <span className="text-[10px] font-bold uppercase text-slate-400">URL</span>
                       <span
                         className="flex-1 truncate text-xs text-slate-600 font-mono"
                         title={url}
@@ -219,8 +207,7 @@ export default function MyScreensTab({
                     </div>
                   ) : (
                     <div className="mb-5 text-xs text-slate-500 bg-slate-50 p-3 rounded-xl border border-slate-100">
-                      This screen is currently a draft. Publish it to get your
-                      live URL.
+                      This screen is currently a draft. Publish it to get your live URL.
                     </div>
                   )}
 

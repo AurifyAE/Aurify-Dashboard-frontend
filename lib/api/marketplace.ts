@@ -1,7 +1,7 @@
-import { BACKEND_URL } from "@/lib/env";
-import { getToken } from "@/lib/auth";
+import { BACKEND_URL } from '@/lib/env';
+import { getToken } from '@/lib/auth';
 
-export type MerchantStatus = "Pending" | "Active" | "Suspended";
+export type MerchantStatus = 'Pending' | 'Active' | 'Suspended';
 
 export interface Merchant {
   merchantId: string;
@@ -48,13 +48,12 @@ export interface ScreenLayout {
   themeId?: string;
   widgets: string[];
   styles: Record<string, unknown>;
-  status: "draft" | "published" | "archived";
+  status: 'draft' | 'published' | 'archived';
   body?: Record<string, unknown>;
   header?: Record<string, unknown>;
   footer?: Record<string, unknown>;
   assignedDevices?: string[];
 }
-
 
 export interface MerchantNews {
   _id: string;
@@ -81,9 +80,9 @@ export interface MerchantCommodity {
 }
 
 function headers(): HeadersInit {
-  const h: HeadersInit = { "Content-Type": "application/json" };
-  const token = typeof window !== "undefined" ? getToken() : null;
-  if (token) (h as Record<string, string>)["Authorization"] = `Bearer ${token}`;
+  const h: HeadersInit = { 'Content-Type': 'application/json' };
+  const token = typeof window !== 'undefined' ? getToken() : null;
+  if (token) (h as Record<string, string>)['Authorization'] = `Bearer ${token}`;
   return h;
 }
 
@@ -91,18 +90,16 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
   const res = await fetch(`${BACKEND_URL}/api/marketplace${path}`, {
     ...init,
     headers: { ...headers(), ...(init?.headers || {}) },
-    credentials: "include",
+    credentials: 'include',
   });
 
-  const contentType = res.headers.get("content-type") || "";
-  const json = contentType.includes("application/json")
-    ? await res.json().catch(() => ({}))
-    : {};
+  const contentType = res.headers.get('content-type') || '';
+  const json = contentType.includes('application/json') ? await res.json().catch(() => ({})) : {};
 
   if (!res.ok) {
-    if (res.status === 404 && !contentType.includes("application/json")) {
+    if (res.status === 404 && !contentType.includes('application/json')) {
       throw new Error(
-        "Marketplace API is unavailable. Restart the backend server (npm run dev in /server).",
+        'Marketplace API is unavailable. Restart the backend server (npm run dev in /server).'
       );
     }
     throw new Error(json.message || `Request failed (${res.status})`);
@@ -112,53 +109,52 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
 }
 
 export const marketplaceApi = {
-  myMerchant: () => request<Merchant | null>("/merchant/me"),
+  myMerchant: () => request<Merchant | null>('/merchant/me'),
   registerMerchant: (body: unknown) =>
-    request<Merchant>("/merchant/register", { method: "POST", body: JSON.stringify(body) }),
-  getProfile: () => request<{ merchant: Merchant; profile: Record<string, unknown> }>("/profile"),
+    request<Merchant>('/merchant/register', { method: 'POST', body: JSON.stringify(body) }),
+  getProfile: () => request<{ merchant: Merchant; profile: Record<string, unknown> }>('/profile'),
   updateProfile: (body: unknown) =>
-    request<{ merchant: Merchant; profile: Record<string, unknown> }>("/profile", {
-      method: "PUT",
+    request<{ merchant: Merchant; profile: Record<string, unknown> }>('/profile', {
+      method: 'PUT',
       body: JSON.stringify(body),
     }),
-  themes: () => request<MarketplaceTheme[]>("/themes"),
-  installedThemes: () => request<MerchantTheme[]>("/themes/installed"),
+  themes: () => request<MarketplaceTheme[]>('/themes'),
+  installedThemes: () => request<MerchantTheme[]>('/themes/installed'),
   installTheme: (themeId: string) =>
-    request<MerchantTheme>(`/themes/${themeId}/install`, { method: "POST" }),
-  layouts: () => request<ScreenLayout[]>("/layouts"),
-  deleteLayout: (layoutId: string) =>
-    request<void>(`/layouts/${layoutId}`, { method: "DELETE" }),
+    request<MerchantTheme>(`/themes/${themeId}/install`, { method: 'POST' }),
+  layouts: () => request<ScreenLayout[]>('/layouts'),
+  deleteLayout: (layoutId: string) => request<void>(`/layouts/${layoutId}`, { method: 'DELETE' }),
   saveLayout: (body: unknown) =>
-    request<ScreenLayout>("/layouts", { method: "PUT", body: JSON.stringify(body) }),
+    request<ScreenLayout>('/layouts', { method: 'PUT', body: JSON.stringify(body) }),
   publishLayout: (layoutId: string, body: unknown) =>
     request<{ liveUrl: string; screen: Record<string, unknown> }>(`/layouts/${layoutId}/publish`, {
-      method: "POST",
+      method: 'POST',
       body: JSON.stringify(body),
     }),
-  commodities: () => request<MerchantCommodity[]>("/merchant-commodities"),
+  commodities: () => request<MerchantCommodity[]>('/merchant-commodities'),
   saveCommodity: (body: unknown, id?: string) =>
-    request<MerchantCommodity>(id ? `/merchant-commodities/${id}` : "/merchant-commodities", {
-      method: id ? "PATCH" : "POST",
+    request<MerchantCommodity>(id ? `/merchant-commodities/${id}` : '/merchant-commodities', {
+      method: id ? 'PATCH' : 'POST',
       body: JSON.stringify(body),
     }),
   deleteCommodity: (id: string) =>
     request<{ success: boolean; message: string }>(`/merchant-commodities/${id}`, {
-      method: "DELETE",
+      method: 'DELETE',
     }),
-  news: () => request<MerchantNews[]>("/news"),
+  news: () => request<MerchantNews[]>('/news'),
   saveNews: (body: unknown, id?: string) =>
-    request<MerchantNews>(id ? `/news/${id}` : "/news", {
-      method: id ? "PATCH" : "POST",
+    request<MerchantNews>(id ? `/news/${id}` : '/news', {
+      method: id ? 'PATCH' : 'POST',
       body: JSON.stringify(body),
     }),
-  allLiveScreens: () => request<any[]>("/screens/all"),
+  allLiveScreens: () => request<any[]>('/screens/all'),
 };
 
-export async function fetchLiveScreen(merchantSlug: string, screenSlug = "main") {
+export async function fetchLiveScreen(merchantSlug: string, screenSlug = 'main') {
   const res = await fetch(`${BACKEND_URL}/api/marketplace/live/${merchantSlug}/${screenSlug}`, {
-    cache: "no-store",
+    cache: 'no-store',
   });
   const json = await res.json().catch(() => ({}));
-  if (!res.ok) throw new Error(json.message || "Live screen unavailable");
+  if (!res.ok) throw new Error(json.message || 'Live screen unavailable');
   return json.data;
 }

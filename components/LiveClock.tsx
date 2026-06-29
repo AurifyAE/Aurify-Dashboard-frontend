@@ -1,7 +1,7 @@
-"use client";
+'use client';
 
-import { useEffect, useState } from "react";
-import { cn } from "@/lib/utils";
+import { useEffect, useState } from 'react';
+import { cn } from '@/lib/utils';
 
 interface LiveClockProps {
   className?: string;
@@ -9,41 +9,41 @@ interface LiveClockProps {
   timeZone?: string;
   /** @deprecated use variant="datetime" */
   showDate?: boolean;
-  variant?: "time" | "date" | "datetime";
+  variant?: 'time' | 'date' | 'datetime';
 }
 
-const PLACEHOLDER = "--:--";
+const PLACEHOLDER = '--:--';
 
 function formatClock(
   now: Date,
   timeZone?: string,
-  variant: "time" | "date" | "datetime" = "time",
+  variant: 'time' | 'date' | 'datetime' = 'time'
 ): string {
   try {
-    if (variant === "date") {
-      return new Intl.DateTimeFormat("en-US", {
+    if (variant === 'date') {
+      return new Intl.DateTimeFormat('en-US', {
         timeZone,
-        weekday: "short",
-        month: "short",
-        day: "numeric",
+        weekday: 'short',
+        month: 'short',
+        day: 'numeric',
       }).format(now);
     }
-    if (variant === "datetime") {
-      return new Intl.DateTimeFormat("en-US", {
+    if (variant === 'datetime') {
+      return new Intl.DateTimeFormat('en-US', {
         timeZone,
-        weekday: "short",
-        month: "short",
-        day: "numeric",
-        hour: "2-digit",
-        minute: "2-digit",
+        weekday: 'short',
+        month: 'short',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
         hour12: true,
       }).format(now);
     }
     if (timeZone) {
-      return new Intl.DateTimeFormat("en-US", {
+      return new Intl.DateTimeFormat('en-US', {
         timeZone,
-        hour: "2-digit",
-        minute: "2-digit",
+        hour: '2-digit',
+        minute: '2-digit',
         hour12: true,
       }).format(now);
     }
@@ -61,7 +61,7 @@ export default function LiveClock({
   showDate,
   variant,
 }: LiveClockProps) {
-  const resolvedVariant = variant ?? (showDate ? "datetime" : "time");
+  const resolvedVariant = variant ?? (showDate ? 'datetime' : 'time');
   const [text, setText] = useState(PLACEHOLDER);
 
   useEffect(() => {

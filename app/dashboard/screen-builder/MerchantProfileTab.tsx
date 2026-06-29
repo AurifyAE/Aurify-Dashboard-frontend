@@ -1,10 +1,7 @@
-"use client";
+'use client';
 
-import React, { useEffect, useState } from "react";
-import {
-  marketplaceApi,
-  type Merchant,
-} from "@/lib/api/marketplace";
+import React, { useEffect, useState } from 'react';
+import { marketplaceApi, type Merchant } from '@/lib/api/marketplace';
 import {
   AlertCircle,
   ArrowLeft,
@@ -22,65 +19,65 @@ import {
   Smartphone,
   Store,
   XCircle,
-} from "lucide-react";
-import { Select, MenuItem } from "@mui/material";
+} from 'lucide-react';
+import { Select, MenuItem } from '@mui/material';
 
 const BUSINESS_TYPES = [
-  "Jewellery Shop",
-  "Bullion Dealer",
-  "Gold Trader",
-  "Silver Trader",
-  "Precious Metal Dealer",
-  "Pawn Shop",
-  "Luxury Retailer",
-  "Other",
+  'Jewellery Shop',
+  'Bullion Dealer',
+  'Gold Trader',
+  'Silver Trader',
+  'Precious Metal Dealer',
+  'Pawn Shop',
+  'Luxury Retailer',
+  'Other',
 ];
 
 const FONT_FAMILIES = [
-  "Inter",
-  "Roboto",
-  "Poppins",
-  "DM Sans",
-  "Playfair Display",
-  "Cinzel",
-  "Cairo",
-  "Montserrat",
+  'Inter',
+  'Roboto',
+  'Poppins',
+  'DM Sans',
+  'Playfair Display',
+  'Cinzel',
+  'Cairo',
+  'Montserrat',
 ];
 
 const defaultBranding = {
-  primaryColor: "#d4a017",
-  secondaryColor: "#111827",
-  accentColor: "#38bdf8",
-  fontFamily: "Inter",
+  primaryColor: '#d4a017',
+  secondaryColor: '#111827',
+  accentColor: '#38bdf8',
+  fontFamily: 'Inter',
 };
 
 const defaultServices = { tvDisplay: true, mobileApp: false, website: false };
 
 const SERVICE_CARDS = [
   {
-    key: "tvDisplay",
+    key: 'tvDisplay',
     icon: Monitor,
-    title: "TV Display Solution",
-    description: "Live gold & silver rates on showroom TVs",
+    title: 'TV Display Solution',
+    description: 'Live gold & silver rates on showroom TVs',
   },
   {
-    key: "mobileApp",
+    key: 'mobileApp',
     icon: Smartphone,
-    title: "Mobile Application",
-    description: "Custom branded app for your customers",
+    title: 'Mobile Application',
+    description: 'Custom branded app for your customers',
   },
   {
-    key: "website",
+    key: 'website',
     icon: Globe,
-    title: "Website Development",
-    description: "Professional website for your business",
+    title: 'Website Development',
+    description: 'Professional website for your business',
   },
 ];
 
 const STEPS = [
-  { id: 1, label: "Company Info" },
-  { id: 2, label: "Services" },
-  { id: 3, label: "Branding" },
+  { id: 1, label: 'Company Info' },
+  { id: 2, label: 'Services' },
+  { id: 3, label: 'Branding' },
 ];
 
 type FormState = {
@@ -104,7 +101,7 @@ type FormState = {
 };
 
 function StatusBanner({ merchant }: { merchant: Merchant }) {
-  if (merchant.status === "Pending") {
+  if (merchant.status === 'Pending') {
     return (
       <div className="mb-6 flex items-start gap-4 rounded-2xl border border-blue-200 bg-blue-50/50 p-5">
         <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-blue-100">
@@ -113,14 +110,14 @@ function StatusBanner({ merchant }: { merchant: Merchant }) {
         <div>
           <p className="font-semibold text-blue-800">Pending Admin Approval</p>
           <p className="mt-0.5 text-sm text-blue-700">
-            Your merchant registration is under review. You'll receive access
-            once approved. This usually takes 1–2 business days.
+            Your merchant registration is under review. You'll receive access once approved. This
+            usually takes 1–2 business days.
           </p>
         </div>
       </div>
     );
   }
-  if (merchant.status === "Active") {
+  if (merchant.status === 'Active') {
     return (
       <div className="mb-6 flex items-start gap-4 rounded-2xl border border-emerald-200 bg-gradient-to-r from-emerald-50 to-green-50 p-5">
         <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-emerald-100">
@@ -129,14 +126,13 @@ function StatusBanner({ merchant }: { merchant: Merchant }) {
         <div>
           <p className="font-semibold text-emerald-800">Account Active</p>
           <p className="mt-0.5 text-sm text-emerald-700">
-            Your merchant account is fully approved. You can now publish screens
-            and go live.
+            Your merchant account is fully approved. You can now publish screens and go live.
           </p>
         </div>
       </div>
     );
   }
-  if (merchant.status === "Suspended") {
+  if (merchant.status === 'Suspended') {
     return (
       <div className="mb-6 flex items-start gap-4 rounded-2xl border border-red-200 bg-gradient-to-r from-red-50 to-rose-50 p-5">
         <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-red-100">
@@ -156,16 +152,14 @@ function StatusBanner({ merchant }: { merchant: Merchant }) {
 
 function ApprovalTimeline({ status }: { status: string }) {
   const steps = [
-    { label: "Registration", done: true },
-    { label: "Pending Review", done: status === "Active" || status === "Suspended" },
-    { label: "Admin Approved", done: status === "Active" },
-    { label: "Dashboard Access", done: status === "Active" },
+    { label: 'Registration', done: true },
+    { label: 'Pending Review', done: status === 'Active' || status === 'Suspended' },
+    { label: 'Admin Approved', done: status === 'Active' },
+    { label: 'Dashboard Access', done: status === 'Active' },
   ];
   return (
     <div className="mb-6 rounded-2xl border border-slate-200 bg-white p-5">
-      <p className="mb-4 text-sm font-semibold text-slate-700">
-        Registration Progress
-      </p>
+      <p className="mb-4 text-sm font-semibold text-slate-700">Registration Progress</p>
       <div className="flex items-center gap-0">
         {steps.map((step, i) => (
           <React.Fragment key={step.label}>
@@ -173,15 +167,15 @@ function ApprovalTimeline({ status }: { status: string }) {
               <div
                 className={`flex h-8 w-8 items-center justify-center rounded-full border-2 text-xs font-bold transition-all ${
                   step.done
-                    ? "border-emerald-500 bg-emerald-500 text-white"
-                    : "border-slate-200 bg-white text-slate-400"
+                    ? 'border-emerald-500 bg-emerald-500 text-white'
+                    : 'border-slate-200 bg-white text-slate-400'
                 }`}
               >
                 {step.done ? <Check className="h-4 w-4" /> : i + 1}
               </div>
               <span
                 className={`text-center text-[10px] font-medium leading-tight ${
-                  step.done ? "text-emerald-600" : "text-slate-400"
+                  step.done ? 'text-emerald-600' : 'text-slate-400'
                 }`}
                 style={{ maxWidth: 72 }}
               >
@@ -191,7 +185,7 @@ function ApprovalTimeline({ status }: { status: string }) {
             {i < steps.length - 1 && (
               <div
                 className={`h-0.5 flex-1 -translate-y-3 transition-all ${
-                  steps[i + 1].done ? "bg-emerald-500" : "bg-slate-200"
+                  steps[i + 1].done ? 'bg-emerald-500' : 'bg-slate-200'
                 }`}
               />
             )}
@@ -207,20 +201,20 @@ export default function MerchantProfileTab() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [step, setStep] = useState(1);
-  const [message, setMessage] = useState("");
-  const [messageType, setMessageType] = useState<"success" | "error">("success");
+  const [message, setMessage] = useState('');
+  const [messageType, setMessageType] = useState<'success' | 'error'>('success');
 
   const [form, setForm] = useState<FormState>({
-    companyName: "",
-    companyLogo: "",
-    businessType: "Jewellery Shop",
-    country: "United Arab Emirates",
-    city: "Dubai",
-    address: "",
-    website: "",
-    email: "",
-    phone: "",
-    whatsapp: "",
+    companyName: '',
+    companyLogo: '',
+    businessType: 'Jewellery Shop',
+    country: 'United Arab Emirates',
+    city: 'Dubai',
+    address: '',
+    website: '',
+    email: '',
+    phone: '',
+    whatsapp: '',
     services: defaultServices,
     branding: defaultBranding,
   });
@@ -233,12 +227,12 @@ export default function MerchantProfileTab() {
         if (m) {
           setForm((prev) => ({
             ...prev,
-            companyName: m.companyName || "",
-            email: m.email || "",
-            phone: m.phone || "",
-            whatsapp: m.whatsapp || "",
-            website: m.website || "",
-            address: m.address || "",
+            companyName: m.companyName || '',
+            email: m.email || '',
+            phone: m.phone || '',
+            whatsapp: m.whatsapp || '',
+            website: m.website || '',
+            address: m.address || '',
             country: m.country || prev.country,
             city: m.city || prev.city,
             businessType: (m as any).businessType || prev.businessType,
@@ -249,31 +243,31 @@ export default function MerchantProfileTab() {
       })
       .catch((err) => {
         setMessage(err.message);
-        setMessageType("error");
+        setMessageType('error');
       })
       .finally(() => setLoading(false));
   }, []);
 
   const register = async () => {
     setSaving(true);
-    setMessage("");
+    setMessage('');
     try {
       const saved = await marketplaceApi.registerMerchant(form);
       setMerchant(saved);
-      setMessage("Registration updated successfully!");
-      setMessageType("success");
+      setMessage('Registration updated successfully!');
+      setMessageType('success');
     } catch (err) {
-      setMessage(err instanceof Error ? err.message : "Registration failed");
-      setMessageType("error");
+      setMessage(err instanceof Error ? err.message : 'Registration failed');
+      setMessageType('error');
     } finally {
       setSaving(false);
     }
   };
 
   const inputClass =
-    "w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm text-slate-800 placeholder-slate-400 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all";
+    'w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm text-slate-800 placeholder-slate-400 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all';
 
-  const labelClass = "block mb-1.5 text-xs font-semibold uppercase tracking-wide text-slate-500";
+  const labelClass = 'block mb-1.5 text-xs font-semibold uppercase tracking-wide text-slate-500';
 
   if (loading) {
     return (
@@ -288,9 +282,7 @@ export default function MerchantProfileTab() {
     <div className="space-y-6">
       <div className="flex flex-col gap-1 lg:flex-row lg:items-center lg:justify-between">
         <div>
-          <h2 className="text-xl font-bold text-slate-900">
-            Merchant Settings & Registration
-          </h2>
+          <h2 className="text-xl font-bold text-slate-900">Merchant Settings & Registration</h2>
           <p className="mt-0.5 text-sm text-slate-500">
             Configure your business services, showroom TV branding colors, and contact info.
           </p>
@@ -298,20 +290,22 @@ export default function MerchantProfileTab() {
         {merchant && (
           <span
             className={`inline-flex items-center gap-1.5 rounded-full px-4 py-1.5 text-xs font-bold tracking-wide ${
-              merchant.status === "Active"
-                ? "bg-emerald-100 text-emerald-700"
-                : merchant.status === "Suspended"
-                  ? "bg-red-100 text-red-700"
-                  : "bg-blue-100 text-blue-700"
+              merchant.status === 'Active'
+                ? 'bg-emerald-100 text-emerald-700'
+                : merchant.status === 'Suspended'
+                  ? 'bg-red-100 text-red-700'
+                  : 'bg-blue-100 text-blue-700'
             }`}
           >
-            <span className={`h-1.5 w-1.5 rounded-full ${
-              merchant.status === "Active"
-                ? "bg-emerald-500"
-                : merchant.status === "Suspended"
-                  ? "bg-red-500"
-                  : "bg-blue-500 animate-pulse"
-            }`} />
+            <span
+              className={`h-1.5 w-1.5 rounded-full ${
+                merchant.status === 'Active'
+                  ? 'bg-emerald-500'
+                  : merchant.status === 'Suspended'
+                    ? 'bg-red-500'
+                    : 'bg-blue-500 animate-pulse'
+              }`}
+            />
             {merchant.status}
           </span>
         )}
@@ -327,12 +321,12 @@ export default function MerchantProfileTab() {
       {message && (
         <div
           className={`flex items-start gap-3 rounded-xl border p-4 text-sm ${
-            messageType === "success"
-              ? "border-emerald-200 bg-emerald-50 text-emerald-800"
-              : "border-red-200 bg-red-50 text-red-800"
+            messageType === 'success'
+              ? 'border-emerald-200 bg-emerald-50 text-emerald-800'
+              : 'border-red-200 bg-red-50 text-red-800'
           }`}
         >
-          {messageType === "success" ? (
+          {messageType === 'success' ? (
             <CheckCircle2 className="h-4 w-4 mt-0.5 flex-shrink-0" />
           ) : (
             <AlertCircle className="h-4 w-4 mt-0.5 flex-shrink-0" />
@@ -352,19 +346,19 @@ export default function MerchantProfileTab() {
               onClick={() => setStep(s.id)}
               className={`flex flex-1 items-center justify-center gap-2 px-4 py-4 text-sm font-semibold transition-all cursor-pointer ${
                 step === s.id
-                  ? "border-b-2 border-blue-600 bg-white text-blue-700"
+                  ? 'border-b-2 border-blue-600 bg-white text-blue-700'
                   : step > s.id
-                    ? "text-emerald-600"
-                    : "text-slate-400 hover:text-slate-700"
+                    ? 'text-emerald-600'
+                    : 'text-slate-400 hover:text-slate-700'
               }`}
             >
               <span
                 className={`flex h-6 w-6 items-center justify-center rounded-full text-xs font-bold ${
                   step === s.id
-                    ? "bg-blue-600 text-white"
+                    ? 'bg-blue-600 text-white'
                     : step > s.id
-                      ? "bg-emerald-500 text-white"
-                      : "bg-slate-200 text-slate-500"
+                      ? 'bg-emerald-500 text-white'
+                      : 'bg-slate-200 text-slate-500'
                 }`}
               >
                 {step > s.id ? <Check className="h-3 w-3" /> : s.id}
@@ -379,9 +373,7 @@ export default function MerchantProfileTab() {
           {step === 1 && (
             <div className="space-y-6">
               <div>
-                <h3 className="text-lg font-bold text-slate-900">
-                  Company Information
-                </h3>
+                <h3 className="text-lg font-bold text-slate-900">Company Information</h3>
                 <p className="mt-1 text-sm text-slate-500">
                   Business info displayed across showroom screens.
                 </p>
@@ -393,18 +385,14 @@ export default function MerchantProfileTab() {
                     className={inputClass}
                     placeholder="e.g. Al Fardan Jewellery"
                     value={form.companyName}
-                    onChange={(e) =>
-                      setForm({ ...form, companyName: e.target.value })
-                    }
+                    onChange={(e) => setForm({ ...form, companyName: e.target.value })}
                   />
                 </div>
                 <div>
                   <label className={labelClass}>Business Type</label>
                   <Select
                     value={form.businessType}
-                    onChange={(e) =>
-                      setForm({ ...form, businessType: e.target.value as string })
-                    }
+                    onChange={(e) => setForm({ ...form, businessType: e.target.value as string })}
                     displayEmpty
                     fullWidth
                     size="small"
@@ -415,12 +403,19 @@ export default function MerchantProfileTab() {
                       backgroundColor: '#fff',
                       '& .MuiOutlinedInput-notchedOutline': { borderColor: '#e2e8f0' },
                       '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: '#cbd5e1' },
-                      '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: '#3b82f6', borderWidth: '1px' }
+                      '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                        borderColor: '#3b82f6',
+                        borderWidth: '1px',
+                      },
                     }}
                   >
-                    <MenuItem value="" disabled>Select type</MenuItem>
+                    <MenuItem value="" disabled>
+                      Select type
+                    </MenuItem>
                     {BUSINESS_TYPES.map((t) => (
-                      <MenuItem key={t} value={t}>{t}</MenuItem>
+                      <MenuItem key={t} value={t}>
+                        {t}
+                      </MenuItem>
                     ))}
                   </Select>
                 </div>
@@ -430,9 +425,7 @@ export default function MerchantProfileTab() {
                     className={inputClass}
                     placeholder="https://..."
                     value={form.companyLogo}
-                    onChange={(e) =>
-                      setForm({ ...form, companyLogo: e.target.value })
-                    }
+                    onChange={(e) => setForm({ ...form, companyLogo: e.target.value })}
                   />
                 </div>
                 <div>
@@ -440,9 +433,7 @@ export default function MerchantProfileTab() {
                   <input
                     className={inputClass}
                     value={form.country}
-                    onChange={(e) =>
-                      setForm({ ...form, country: e.target.value })
-                    }
+                    onChange={(e) => setForm({ ...form, country: e.target.value })}
                   />
                 </div>
                 <div>
@@ -460,9 +451,7 @@ export default function MerchantProfileTab() {
                     className={inputClass}
                     placeholder="Street, Building, Area"
                     value={form.address}
-                    onChange={(e) =>
-                      setForm({ ...form, address: e.target.value })
-                    }
+                    onChange={(e) => setForm({ ...form, address: e.target.value })}
                   />
                 </div>
                 <div>
@@ -475,9 +464,7 @@ export default function MerchantProfileTab() {
                     className={inputClass}
                     placeholder="info@company.com"
                     value={form.email}
-                    onChange={(e) =>
-                      setForm({ ...form, email: e.target.value })
-                    }
+                    onChange={(e) => setForm({ ...form, email: e.target.value })}
                   />
                 </div>
                 <div>
@@ -489,9 +476,7 @@ export default function MerchantProfileTab() {
                     className={inputClass}
                     placeholder="https://company.com"
                     value={form.website}
-                    onChange={(e) =>
-                      setForm({ ...form, website: e.target.value })
-                    }
+                    onChange={(e) => setForm({ ...form, website: e.target.value })}
                   />
                 </div>
                 <div>
@@ -503,9 +488,7 @@ export default function MerchantProfileTab() {
                     className={inputClass}
                     placeholder="+971 ..."
                     value={form.phone}
-                    onChange={(e) =>
-                      setForm({ ...form, phone: e.target.value })
-                    }
+                    onChange={(e) => setForm({ ...form, phone: e.target.value })}
                   />
                 </div>
                 <div>
@@ -517,9 +500,7 @@ export default function MerchantProfileTab() {
                     className={inputClass}
                     placeholder="+971 ..."
                     value={form.whatsapp}
-                    onChange={(e) =>
-                      setForm({ ...form, whatsapp: e.target.value })
-                    }
+                    onChange={(e) => setForm({ ...form, whatsapp: e.target.value })}
                   />
                 </div>
               </div>
@@ -540,9 +521,7 @@ export default function MerchantProfileTab() {
           {step === 2 && (
             <div className="space-y-6">
               <div>
-                <h3 className="text-lg font-bold text-slate-900">
-                  Select Services
-                </h3>
+                <h3 className="text-lg font-bold text-slate-900">Select Services</h3>
                 <p className="mt-1 text-sm text-slate-500">
                   Choose the services your business requires.
                 </p>
@@ -565,8 +544,8 @@ export default function MerchantProfileTab() {
                       }
                       className={`relative flex flex-col items-start gap-3 rounded-2xl border-2 p-5 text-left transition-all cursor-pointer ${
                         selected
-                          ? "border-blue-400 bg-blue-50/50 shadow-sm"
-                          : "border-slate-200 bg-white hover:border-slate-300"
+                          ? 'border-blue-400 bg-blue-50/50 shadow-sm'
+                          : 'border-slate-200 bg-white hover:border-slate-300'
                       }`}
                     >
                       {selected && (
@@ -576,20 +555,14 @@ export default function MerchantProfileTab() {
                       )}
                       <div
                         className={`flex h-10 w-10 items-center justify-center rounded-xl transition-all shadow-sm ${
-                          selected
-                            ? "bg-blue-600 text-white"
-                            : "bg-slate-100 text-slate-600"
+                          selected ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-600'
                         }`}
                       >
                         <svc.icon className="h-5 w-5" />
                       </div>
                       <div>
-                        <p className="font-semibold text-slate-900">
-                          {svc.title}
-                        </p>
-                        <p className="mt-0.5 text-xs text-slate-500">
-                          {svc.description}
-                        </p>
+                        <p className="font-semibold text-slate-900">{svc.title}</p>
+                        <p className="mt-0.5 text-xs text-slate-500">{svc.description}</p>
                       </div>
                     </button>
                   );
@@ -620,9 +593,7 @@ export default function MerchantProfileTab() {
           {step === 3 && (
             <div className="space-y-6">
               <div>
-                <h3 className="text-lg font-bold text-slate-900">
-                  Brand Identity
-                </h3>
+                <h3 className="text-lg font-bold text-slate-900">Brand Identity</h3>
                 <p className="mt-1 text-sm text-slate-500">
                   Define showroom TV screen branding colors.
                 </p>
@@ -631,47 +602,43 @@ export default function MerchantProfileTab() {
               <div className="grid gap-6 lg:grid-cols-2">
                 {/* Color Pickers */}
                 <div className="space-y-4">
-                  <h4 className="text-sm font-semibold text-slate-700">
-                    Color Palette
-                  </h4>
+                  <h4 className="text-sm font-semibold text-slate-700">Color Palette</h4>
                   {[
                     {
-                      key: "primaryColor",
-                      label: "Primary Color",
-                      hint: "Main brand color, used for headings & accents",
+                      key: 'primaryColor',
+                      label: 'Primary Color',
+                      hint: 'Main brand color, used for headings & accents',
                     },
                     {
-                      key: "secondaryColor",
-                      label: "Secondary Color",
-                      hint: "Background or supporting color",
+                      key: 'secondaryColor',
+                      label: 'Secondary Color',
+                      hint: 'Background or supporting color',
                     },
                     {
-                      key: "accentColor",
-                      label: "Accent Color",
-                      hint: "Highlight color for prices & badges",
+                      key: 'accentColor',
+                      label: 'Accent Color',
+                      hint: 'Highlight color for prices & badges',
                     },
                   ].map((field) => (
                     <div key={field.key} className="flex items-center gap-4">
                       <div className="relative">
                         <input
-                           type="color"
-                           value={(form.branding as any)[field.key]}
-                           onChange={(e) =>
-                             setForm((prev) => ({
-                               ...prev,
-                               branding: {
-                                 ...prev.branding,
-                                 [field.key]: e.target.value,
-                               },
-                             }))
-                           }
-                           className="h-12 w-12 cursor-pointer rounded-xl border-2 border-slate-200 p-0.5"
+                          type="color"
+                          value={(form.branding as any)[field.key]}
+                          onChange={(e) =>
+                            setForm((prev) => ({
+                              ...prev,
+                              branding: {
+                                ...prev.branding,
+                                [field.key]: e.target.value,
+                              },
+                            }))
+                          }
+                          className="h-12 w-12 cursor-pointer rounded-xl border-2 border-slate-200 p-0.5"
                         />
                       </div>
                       <div className="flex-1">
-                        <p className="text-sm font-medium text-slate-700">
-                          {field.label}
-                        </p>
+                        <p className="text-sm font-medium text-slate-700">{field.label}</p>
                         <p className="text-xs text-slate-400">{field.hint}</p>
                         <p className="mt-0.5 font-mono text-xs text-slate-500">
                           {(form.branding as any)[field.key]}
@@ -683,9 +650,7 @@ export default function MerchantProfileTab() {
 
                 {/* Live Preview */}
                 <div className="space-y-4">
-                  <h4 className="text-sm font-semibold text-slate-700">
-                    Live Preview
-                  </h4>
+                  <h4 className="text-sm font-semibold text-slate-700">Live Preview</h4>
                   <div
                     className="relative overflow-hidden rounded-2xl p-5 shadow-inner"
                     style={{
@@ -699,11 +664,9 @@ export default function MerchantProfileTab() {
                           className="text-lg font-bold"
                           style={{ color: form.branding.primaryColor }}
                         >
-                          {form.companyName || "Your Company"}
+                          {form.companyName || 'Your Company'}
                         </p>
-                        <p className="text-xs opacity-60 text-white">
-                          Jewellery & Bullion
-                        </p>
+                        <p className="text-xs opacity-60 text-white">Jewellery & Bullion</p>
                       </div>
                       <div
                         className="rounded-lg px-3 py-1 text-xs font-bold"
@@ -716,7 +679,7 @@ export default function MerchantProfileTab() {
                       </div>
                     </div>
                     <div className="grid grid-cols-2 gap-2">
-                      {["GOLD", "SILVER"].map((metal, i) => (
+                      {['GOLD', 'SILVER'].map((metal, i) => (
                         <div
                           key={metal}
                           className="rounded-lg p-3"
@@ -727,12 +690,15 @@ export default function MerchantProfileTab() {
                         >
                           <p
                             className="text-[10px] font-bold"
-                            style={{ color: i === 0 ? form.branding.primaryColor : form.branding.accentColor }}
+                            style={{
+                              color:
+                                i === 0 ? form.branding.primaryColor : form.branding.accentColor,
+                            }}
                           >
                             {metal}
                           </p>
                           <p className="text-sm font-bold text-white">
-                            {i === 0 ? "2,345.60" : "28.40"}
+                            {i === 0 ? '2,345.60' : '28.40'}
                           </p>
                           <p className="text-[9px] text-white/50">USD/oz</p>
                         </div>
@@ -774,10 +740,15 @@ export default function MerchantProfileTab() {
                         fontFamily: form.branding.fontFamily,
                         '& .MuiOutlinedInput-notchedOutline': { borderColor: '#e2e8f0' },
                         '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: '#cbd5e1' },
-                        '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: '#3b82f6', borderWidth: '1px' }
+                        '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                          borderColor: '#3b82f6',
+                          borderWidth: '1px',
+                        },
                       }}
                     >
-                      <MenuItem value="" disabled>Select font</MenuItem>
+                      <MenuItem value="" disabled>
+                        Select font
+                      </MenuItem>
                       {FONT_FAMILIES.map((f) => (
                         <MenuItem key={f} value={f} style={{ fontFamily: f }}>
                           {f}
@@ -811,7 +782,7 @@ export default function MerchantProfileTab() {
                   ) : (
                     <>
                       <Rocket className="h-4 w-4" />
-                      {merchant ? "Update Registration" : "Submit Registration"}
+                      {merchant ? 'Update Registration' : 'Submit Registration'}
                     </>
                   )}
                 </button>

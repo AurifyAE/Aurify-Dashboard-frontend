@@ -2,8 +2,8 @@ export interface User {
   id: string;
   name: string;
   email: string;
-  role: "super_admin" | "admin" | "user" | "moderator";
-  status: "active" | "inactive" | "suspended";
+  role: 'super_admin' | 'admin' | 'user' | 'moderator';
+  status: 'active' | 'inactive' | 'suspended';
   avatar?: string;
   lastLogin: string;
   createdAt: string;
@@ -22,7 +22,7 @@ export interface ActivityLog {
   target: string;
   timestamp: string;
   ip?: string;
-  status: "success" | "failed" | "warning";
+  status: 'success' | 'failed' | 'warning';
 }
 
 export interface SystemHealth {

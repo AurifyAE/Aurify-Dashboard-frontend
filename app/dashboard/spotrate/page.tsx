@@ -1,5 +1,5 @@
-"use client";
+'use client';
 
-import SpotRate from "./spotRate";
+import SpotRate from './spotRate';
 
 export default SpotRate;

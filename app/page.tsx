@@ -1,6 +1,6 @@
-import Image from "next/image";
-import DashboardPage from "./dashboard/page";
-import Login from "./(auth)/login/page";
+import Image from 'next/image';
+import DashboardPage from './dashboard/page';
+import Login from './(auth)/login/page';
 
 export default function Home() {
   return (

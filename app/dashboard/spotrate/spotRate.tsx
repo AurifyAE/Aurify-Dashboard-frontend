@@ -1,7 +1,7 @@
-"use client";
+'use client';
 
-import DeleteIcon from "@mui/icons-material/Delete";
-import EditIcon from "@mui/icons-material/Edit";
+import DeleteIcon from '@mui/icons-material/Delete';
+import EditIcon from '@mui/icons-material/Edit';
 import {
   Box,
   Button,
@@ -20,17 +20,17 @@ import {
   TableHead,
   TableRow,
   Typography,
-} from "@mui/material";
-import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { ToastContainer, toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
-import io from "socket.io-client";
-import axiosInstance from "../../axios/axiosInstance";
-import { useCurrency } from "@/context/CurrencyContext";
-import { useAuth } from "@/context/AuthContext";
-import DashboardShell from "@/components/dashboard/DashboardShell";
-import AddCommodityModal from "./AddCommodityModal";
-import { API_URL, API_KEY, SOCKET_SECRET } from "@/lib/env";
+} from '@mui/material';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import io from 'socket.io-client';
+import axiosInstance from '../../axios/axiosInstance';
+import { useCurrency } from '@/context/CurrencyContext';
+import { useAuth } from '@/context/AuthContext';
+import DashboardShell from '@/components/dashboard/DashboardShell';
+import AddCommodityModal from './AddCommodityModal';
+import { API_URL, API_KEY, SOCKET_SECRET } from '@/lib/env';
 
 interface CurrencySelectorProps {
   onCurrencyChange: (currency: string, exchangeRate: number) => void;
@@ -38,21 +38,24 @@ interface CurrencySelectorProps {
 
 const CurrencySelector: React.FC<CurrencySelectorProps> = React.memo(({ onCurrencyChange }) => {
   const { currency, setCurrency } = useCurrency();
-  const exchangeRates = useMemo<Record<string, number>>(() => ({ AED: 3.674, USD: 1, EUR: 0.92, GBP: 0.79 }), []);
+  const exchangeRates = useMemo<Record<string, number>>(
+    () => ({ AED: 3.674, USD: 1, EUR: 0.92, GBP: 0.79 }),
+    []
+  );
 
   const handleChange = useCallback(
     (newCurrency: string) => {
       setCurrency(newCurrency);
       onCurrencyChange(newCurrency, exchangeRates[newCurrency]);
     },
-    [onCurrencyChange, setCurrency, exchangeRates],
+    [onCurrencyChange, setCurrency, exchangeRates]
   );
 
   const options = [
-    { value: "AED", label: "AED", flag: "🇦🇪" },
-    { value: "USD", label: "USD", flag: "🇺🇸" },
-    { value: "EUR", label: "EUR", flag: "🇪🇺" },
-    { value: "GBP", label: "GBP", flag: "🇬🇧" },
+    { value: 'AED', label: 'AED', flag: '🇦🇪' },
+    { value: 'USD', label: 'USD', flag: '🇺🇸' },
+    { value: 'EUR', label: 'EUR', flag: '🇪🇺' },
+    { value: 'GBP', label: 'GBP', flag: '🇬🇧' },
   ];
 
   return (
@@ -66,8 +69,8 @@ const CurrencySelector: React.FC<CurrencySelectorProps> = React.memo(({ onCurren
             onClick={() => handleChange(opt.value)}
             className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer select-none ${
               isSelected
-                ? "bg-white text-blue-700 shadow-sm border border-slate-200/50"
-                : "text-slate-500 hover:text-slate-800 hover:bg-white/40"
+                ? 'bg-white text-blue-700 shadow-sm border border-slate-200/50'
+                : 'text-slate-500 hover:text-slate-800 hover:bg-white/40'
             }`}
           >
             <span>{opt.flag}</span>
@@ -79,7 +82,7 @@ const CurrencySelector: React.FC<CurrencySelectorProps> = React.memo(({ onCurren
   );
 });
 
-CurrencySelector.displayName = "CurrencySelector";
+CurrencySelector.displayName = 'CurrencySelector';
 
 interface MetalTheme {
   color: string;
@@ -91,12 +94,12 @@ interface MetalTheme {
 }
 
 const defaultBlueTheme: MetalTheme = {
-  color: "#3b82f6",
-  text: "text-blue-600",
-  bg: "bg-blue-50/50",
-  border: "border-blue-200/50",
-  accent: "bg-blue-500",
-  glow: "focus:ring-blue-500/20 focus:border-blue-500",
+  color: '#3b82f6',
+  text: 'text-blue-600',
+  bg: 'bg-blue-50/50',
+  border: 'border-blue-200/50',
+  accent: 'bg-blue-500',
+  glow: 'focus:ring-blue-500/20 focus:border-blue-500',
 };
 
 const metalThemes: Record<string, MetalTheme> = {
@@ -158,7 +161,7 @@ const PriceCard: React.FC<PriceCardProps> = React.memo(
     }, [metal, type, tempSpread, onSpreadUpdate]);
 
     const theme = useMemo(() => {
-      const lower = (metal || "").toLowerCase();
+      const lower = (metal || '').toLowerCase();
       return metalThemes[lower] || metalThemes.default;
     }, [metal]);
 
@@ -175,18 +178,13 @@ const PriceCard: React.FC<PriceCardProps> = React.memo(
       );
     }
 
-    const priceValue = initialPrice !== undefined && initialPrice !== null
-      ? parseFloat(initialPrice)
-      : 0;
-    const spreadValue = spread !== undefined && spread !== null
-      ? parseFloat(spread)
-      : 0;
+    const priceValue =
+      initialPrice !== undefined && initialPrice !== null ? parseFloat(initialPrice) : 0;
+    const spreadValue = spread !== undefined && spread !== null ? parseFloat(spread) : 0;
     const finalPrice = (priceValue + spreadValue).toFixed(4);
 
     return (
-      <div
-        className="relative overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-sm hover:shadow-md transition-all duration-300 p-5"
-      >
+      <div className="relative overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-sm hover:shadow-md transition-all duration-300 p-5">
         <div
           className="absolute top-0 left-0 right-0 h-[3px]"
           style={{ backgroundColor: theme.color }}
@@ -221,15 +219,19 @@ const PriceCard: React.FC<PriceCardProps> = React.memo(
 
         <div className="pt-6 grid grid-cols-3 gap-4">
           <div className="flex flex-col">
-            <h6 className="text-slate-400 mb-1 text-[10px] font-bold uppercase tracking-wider">{title} Spot</h6>
+            <h6 className="text-slate-400 mb-1 text-[10px] font-bold uppercase tracking-wider">
+              {title} Spot
+            </h6>
             <p className="text-slate-800 font-extrabold text-[15px] tracking-tight">
               {initialPrice !== undefined && initialPrice !== null
                 ? parseFloat(initialPrice).toFixed(4)
-                : "N/A"}
+                : 'N/A'}
             </p>
           </div>
           <div className="flex flex-col">
-            <h6 className="text-slate-400 mb-1 text-[10px] font-bold uppercase tracking-wider">Spread</h6>
+            <h6 className="text-slate-400 mb-1 text-[10px] font-bold uppercase tracking-wider">
+              Spread
+            </h6>
             <div className="h-8 w-24">
               {isEditing ? (
                 <input
@@ -241,24 +243,28 @@ const PriceCard: React.FC<PriceCardProps> = React.memo(
                 />
               ) : (
                 <p className="text-slate-700 font-bold text-[15px]">
-                  {spread !== undefined && spread !== null ? parseFloat(spread).toFixed(4) : "0.0000"}
+                  {spread !== undefined && spread !== null
+                    ? parseFloat(spread).toFixed(4)
+                    : '0.0000'}
                 </p>
               )}
             </div>
           </div>
           <div className="flex flex-col">
             <h6 className="text-slate-400 mb-1 text-[10px] font-bold uppercase tracking-wider">{`${title}ing Price`}</h6>
-            <p className={`font-black text-[15px] tracking-tight ${title === "Bid" ? "text-emerald-600" : "text-rose-600"}`}>
+            <p
+              className={`font-black text-[15px] tracking-tight ${title === 'Bid' ? 'text-emerald-600' : 'text-rose-600'}`}
+            >
               {finalPrice}
             </p>
           </div>
         </div>
       </div>
     );
-  },
+  }
 );
 
-PriceCard.displayName = "PriceCard";
+PriceCard.displayName = 'PriceCard';
 
 interface ValueCardProps {
   lowValue: any;
@@ -271,14 +277,7 @@ interface ValueCardProps {
 
 // ValueCard Component
 const ValueCard: React.FC<ValueCardProps> = React.memo(
-  ({
-    lowValue,
-    highValue,
-    spreadMarginData,
-    metal,
-    onMarginUpdate,
-    getSpreadOrMarginFromDB,
-  }) => {
+  ({ lowValue, highValue, spreadMarginData, metal, onMarginUpdate, getSpreadOrMarginFromDB }) => {
     const getLowMargin = useCallback(() => {
       const key = `${metal.toLowerCase()}LowMargin`;
       return spreadMarginData[key] || 0;
@@ -288,13 +287,9 @@ const ValueCard: React.FC<ValueCardProps> = React.memo(
       const key = `${metal.toLowerCase()}HighMargin`;
       return spreadMarginData[key] || 0;
     }, [spreadMarginData, metal]);
-    
-    const [lowMargin, setLowMargin] = useState(() =>
-      getSpreadOrMarginFromDB(metal, "low"),
-    );
-    const [highMargin, setHighMargin] = useState(() =>
-      getSpreadOrMarginFromDB(metal, "high"),
-    );
+
+    const [lowMargin, setLowMargin] = useState(() => getSpreadOrMarginFromDB(metal, 'low'));
+    const [highMargin, setHighMargin] = useState(() => getSpreadOrMarginFromDB(metal, 'high'));
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
@@ -310,10 +305,11 @@ const ValueCard: React.FC<ValueCardProps> = React.memo(
     }, []);
 
     const handleMarginChange = useCallback(
-      (setter: React.Dispatch<React.SetStateAction<any>>) => (e: React.ChangeEvent<HTMLInputElement>) => {
-        setter(e.target.value);
-      },
-      [],
+      (setter: React.Dispatch<React.SetStateAction<any>>) =>
+        (e: React.ChangeEvent<HTMLInputElement>) => {
+          setter(e.target.value);
+        },
+      []
     );
 
     const handleSave = useCallback(() => {
@@ -323,13 +319,13 @@ const ValueCard: React.FC<ValueCardProps> = React.memo(
       setLowMargin(lowVal);
       setHighMargin(highVal);
       if (onMarginUpdate) {
-        onMarginUpdate(metal, "low", lowVal);
-        onMarginUpdate(metal, "high", highVal);
+        onMarginUpdate(metal, 'low', lowVal);
+        onMarginUpdate(metal, 'high', highVal);
       }
     }, [metal, lowMargin, highMargin, onMarginUpdate]);
 
     const theme = useMemo(() => {
-      const lower = (metal || "").toLowerCase();
+      const lower = (metal || '').toLowerCase();
       return metalThemes[lower] || metalThemes.default;
     }, [metal]);
 
@@ -354,9 +350,7 @@ const ValueCard: React.FC<ValueCardProps> = React.memo(
     const newHighVal = (highSpot + highMarg).toFixed(4);
 
     return (
-      <div
-        className="relative overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-sm hover:shadow-md transition-all duration-300 p-5"
-      >
+      <div className="relative overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-sm hover:shadow-md transition-all duration-300 p-5">
         <div
           className="absolute top-0 left-0 right-0 h-[3px]"
           style={{ backgroundColor: theme.color }}
@@ -391,11 +385,17 @@ const ValueCard: React.FC<ValueCardProps> = React.memo(
         <div className="space-y-3 pt-6">
           <div className="grid grid-cols-3 gap-4">
             <div className="flex flex-col">
-              <h6 className="text-slate-400 mb-1 text-[10px] font-bold uppercase tracking-wider">Low Spot</h6>
-              <p className="text-slate-800 font-extrabold text-[15px] tracking-tight">{lowSpot.toFixed(4)}</p>
+              <h6 className="text-slate-400 mb-1 text-[10px] font-bold uppercase tracking-wider">
+                Low Spot
+              </h6>
+              <p className="text-slate-800 font-extrabold text-[15px] tracking-tight">
+                {lowSpot.toFixed(4)}
+              </p>
             </div>
             <div className="flex flex-col">
-              <h6 className="text-slate-400 mb-1 text-[10px] font-bold uppercase tracking-wider">Margin</h6>
+              <h6 className="text-slate-400 mb-1 text-[10px] font-bold uppercase tracking-wider">
+                Margin
+              </h6>
               <div className="h-8 w-24">
                 {isEditing ? (
                   <input
@@ -406,27 +406,31 @@ const ValueCard: React.FC<ValueCardProps> = React.memo(
                     className={`text-slate-800 font-bold text-xs p-1.5 border border-slate-200 rounded-lg w-full h-full focus:outline-none transition-all shadow-inner ${theme.glow}`}
                   />
                 ) : (
-                  <p className="text-slate-700 font-bold text-[15px]">
-                    {lowMarg.toFixed(4)}
-                  </p>
+                  <p className="text-slate-700 font-bold text-[15px]">{lowMarg.toFixed(4)}</p>
                 )}
               </div>
             </div>
             <div className="flex flex-col">
-              <h6 className="text-slate-400 mb-1 text-[10px] font-bold uppercase tracking-wider">Low New Price</h6>
-              <p className="text-slate-800 font-black text-[15px] tracking-tight">
-                {newLowVal}
-              </p>
+              <h6 className="text-slate-400 mb-1 text-[10px] font-bold uppercase tracking-wider">
+                Low New Price
+              </h6>
+              <p className="text-slate-800 font-black text-[15px] tracking-tight">{newLowVal}</p>
             </div>
           </div>
 
           <div className="grid grid-cols-3 gap-4 pt-3 border-t border-slate-100">
             <div className="flex flex-col">
-              <h6 className="text-slate-400 mb-1 text-[10px] font-bold uppercase tracking-wider">High Spot</h6>
-              <p className="text-slate-800 font-extrabold text-[15px] tracking-tight">{highSpot.toFixed(4)}</p>
+              <h6 className="text-slate-400 mb-1 text-[10px] font-bold uppercase tracking-wider">
+                High Spot
+              </h6>
+              <p className="text-slate-800 font-extrabold text-[15px] tracking-tight">
+                {highSpot.toFixed(4)}
+              </p>
             </div>
             <div className="flex flex-col">
-              <h6 className="text-slate-400 mb-1 text-[10px] font-bold uppercase tracking-wider">Margin</h6>
+              <h6 className="text-slate-400 mb-1 text-[10px] font-bold uppercase tracking-wider">
+                Margin
+              </h6>
               <div className="h-8 w-24">
                 {isEditing ? (
                   <input
@@ -437,26 +441,24 @@ const ValueCard: React.FC<ValueCardProps> = React.memo(
                     className={`text-slate-800 font-bold text-xs p-1.5 border border-slate-200 rounded-lg w-full h-full focus:outline-none transition-all shadow-inner ${theme.glow}`}
                   />
                 ) : (
-                  <p className="text-slate-700 font-bold text-[15px]">
-                    {highMarg.toFixed(4)}
-                  </p>
+                  <p className="text-slate-700 font-bold text-[15px]">{highMarg.toFixed(4)}</p>
                 )}
               </div>
             </div>
             <div className="flex flex-col">
-              <h6 className="text-slate-400 mb-1 text-[10px] font-bold uppercase tracking-wider">High New Price</h6>
-              <p className="text-slate-800 font-black text-[15px] tracking-tight">
-                {newHighVal}
-              </p>
+              <h6 className="text-slate-400 mb-1 text-[10px] font-bold uppercase tracking-wider">
+                High New Price
+              </h6>
+              <p className="text-slate-800 font-black text-[15px] tracking-tight">{newHighVal}</p>
             </div>
           </div>
         </div>
       </div>
     );
-  },
+  }
 );
 
-ValueCard.displayName = "ValueCard";
+ValueCard.displayName = 'ValueCard';
 
 interface TradingViewWidgetProps {
   symbol: string;
@@ -474,14 +476,14 @@ const TradingViewWidget: React.FC<TradingViewWidgetProps> = React.memo(({ symbol
   }, []);
 
   const theme = useMemo(() => {
-    const lower = (title || "").toLowerCase();
+    const lower = (title || '').toLowerCase();
     return metalThemes[lower] || metalThemes.default;
   }, [title]);
 
   return (
     <div
       className="relative overflow-hidden rounded-2xl bg-white border border-slate-200/80 shadow-sm hover:shadow-md transition-all duration-300 flex flex-col justify-between"
-      style={{ height: "392px" }}
+      style={{ height: '392px' }}
     >
       <div
         className="absolute top-0 left-0 right-0 h-[3px]"
@@ -509,12 +511,7 @@ const TradingViewWidget: React.FC<TradingViewWidgetProps> = React.memo(({ symbol
       {/* Chart Area */}
       <div className="relative flex-1 bg-slate-50">
         {isLoading && (
-          <Skeleton
-            variant="rectangular"
-            width="100%"
-            height="100%"
-            className="absolute inset-0"
-          />
+          <Skeleton variant="rectangular" width="100%" height="100%" className="absolute inset-0" />
         )}
 
         <div className="w-full h-full">
@@ -527,9 +524,9 @@ const TradingViewWidget: React.FC<TradingViewWidgetProps> = React.memo(({ symbol
             lang="en"
             className="w-full h-full"
             style={{
-              userSelect: "none",
-              boxSizing: "border-box",
-              display: "block",
+              userSelect: 'none',
+              boxSizing: 'border-box',
+              display: 'block',
             }}
             onLoad={handleIframeLoad}
           />
@@ -539,7 +536,7 @@ const TradingViewWidget: React.FC<TradingViewWidgetProps> = React.memo(({ symbol
   );
 });
 
-TradingViewWidget.displayName = "TradingViewWidget";
+TradingViewWidget.displayName = 'TradingViewWidget';
 
 // Main SpotRate Component
 const SpotRate: React.FC = () => {
@@ -551,8 +548,8 @@ const SpotRate: React.FC = () => {
   const [marketData, setMarketData] = useState<Record<string, any>>({});
   const [error, setError] = useState<string | null>(null);
   const [symbols, setSymbols] = useState<string[]>([]);
-  const [serverURL, setServerURL] = useState("");
-  const [adminId, setAdminId] = useState("");
+  const [serverURL, setServerURL] = useState('');
+  const [adminId, setAdminId] = useState('');
   const [commodities, setCommodities] = useState<any[]>([]);
   const [uniqueMetals, setUniqueMetals] = useState<string[]>([]);
   const [isEditing, setIsEditing] = useState(false);
@@ -561,37 +558,38 @@ const SpotRate: React.FC = () => {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [commodityToDelete, setCommodityToDelete] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const availableMetals = useMemo(() => ["Gold", "Silver", "Platinum", "Copper"], []);
-  const [visibleMetals, setVisibleMetals] = useState<string[]>(["Gold", "Silver"]);
+  const availableMetals = useMemo(() => ['Gold', 'Silver', 'Platinum', 'Copper'], []);
+  const [visibleMetals, setVisibleMetals] = useState<string[]>(['Gold', 'Silver']);
 
   const handleToggleMetal = useCallback((metal: string) => {
-    setVisibleMetals(prev => 
-      prev.includes(metal) ? prev.filter(m => m !== metal) : [...prev, metal]
+    setVisibleMetals((prev) =>
+      prev.includes(metal) ? prev.filter((m) => m !== metal) : [...prev, metal]
     );
   }, []);
 
   const getSpreadOrMarginFromDB = useCallback(
     (metal: string, type: string) => {
       const lowerMetal = metal.toLowerCase();
-      const key = `${lowerMetal}${type.charAt(0).toUpperCase() + type.slice(1)
-        }${type === "low" || type === "high" ? "Margin" : "Spread"}`;
+      const key = `${lowerMetal}${
+        type.charAt(0).toUpperCase() + type.slice(1)
+      }${type === 'low' || type === 'high' ? 'Margin' : 'Spread'}`;
       return spreadMarginData[key] || 0;
     },
-    [spreadMarginData],
+    [spreadMarginData]
   );
 
   const getUnitMultiplier = useCallback((unit: any) => {
     const lowerCaseUnit = String(unit).toLowerCase();
     switch (lowerCaseUnit) {
-      case "gram":
+      case 'gram':
         return 1;
-      case "kg":
+      case 'kg':
         return 1000;
-      case "oz":
+      case 'oz':
         return 31.1034768;
-      case "tola":
+      case 'tola':
         return 11.664;
-      case "ttb":
+      case 'ttb':
         return 116.64;
       default:
         return 1;
@@ -602,7 +600,7 @@ const SpotRate: React.FC = () => {
     try {
       setIsLoading(true);
       const userName = user?.email;
-      
+
       if (!userName) {
         setIsLoading(false);
         return; // Don't fetch if no userName is present
@@ -610,12 +608,12 @@ const SpotRate: React.FC = () => {
 
       const [serverURLResponse, adminDataResponse] = await Promise.all([
         fetch(`${API_URL}/get-server`, {
-          headers: { "Content-Type": "application/json", "X-Secret-Key": API_KEY },
-          credentials: "include",
-        }).then(res => res.json()),
+          headers: { 'Content-Type': 'application/json', 'X-Secret-Key': API_KEY },
+          credentials: 'include',
+        }).then((res) => res.json()),
         axiosInstance.get(`/data/${userName}`),
       ]);
-      const serverUrlResult = 
+      const serverUrlResult =
         serverURLResponse?.data?.info?.serverURL ||
         serverURLResponse?.data?.info?.serverUrl ||
         serverURLResponse?.data?.serverURL ||
@@ -623,49 +621,44 @@ const SpotRate: React.FC = () => {
         serverURLResponse?.serverURL ||
         serverURLResponse?.serverUrl ||
         serverURLResponse?.info?.serverURL ||
-        serverURLResponse?.info?.serverUrl || null;
-        
+        serverURLResponse?.info?.serverUrl ||
+        null;
+
       setServerURL(serverUrlResult);
       setAdminId(adminDataResponse.data.data._id);
 
       const uniqueSymbols = [
         ...new Set<string>(
-          adminDataResponse.data.data.commodities.map(
-            (commodity: any) => commodity.symbol,
-          ),
+          adminDataResponse.data.data.commodities.map((commodity: any) => commodity.symbol)
         ),
       ];
-      const uppercaseSymbols = uniqueSymbols.map((symbol) =>
-        symbol.toUpperCase(),
-      );
+      const uppercaseSymbols = uniqueSymbols.map((symbol) => symbol.toUpperCase());
       setSymbols(uppercaseSymbols);
       setUniqueMetals(uniqueSymbols);
 
       if (adminDataResponse.data.data._id) {
         const commoditiesResponse = await axiosInstance.get(
-          `/spotrates/${adminDataResponse.data.data._id}`,
+          `/spotrates/${adminDataResponse.data.data._id}`
         );
         if (commoditiesResponse.data) {
           setSpreadMarginData(commoditiesResponse.data);
         }
         if (commoditiesResponse.data && commoditiesResponse.data.commodities) {
-          const parsedCommodities = commoditiesResponse.data.commodities.map(
-            (commodity: any) => ({
-              ...commodity,
-              metal_name: commodity.metal_name ?? null,
-              purity: parseFloat(commodity.purity),
-              unit: parseFloat(commodity.unit),
-              weight: commodity.weight,
-              sellCharge: parseFloat(commodity.sellCharge),
-              buyCharge: parseFloat(commodity.buyCharge),
-            }),
-          );
+          const parsedCommodities = commoditiesResponse.data.commodities.map((commodity: any) => ({
+            ...commodity,
+            metal_name: commodity.metal_name ?? null,
+            purity: parseFloat(commodity.purity),
+            unit: parseFloat(commodity.unit),
+            weight: commodity.weight,
+            sellCharge: parseFloat(commodity.sellCharge),
+            buyCharge: parseFloat(commodity.buyCharge),
+          }));
           setCommodities(parsedCommodities);
         }
       }
     } catch (err) {
-      console.error("Error fetching data:", err);
-      setError("An error occurred while fetching data");
+      console.error('Error fetching data:', err);
+      setError('An error occurred while fetching data');
     } finally {
       setTimeout(() => {
         setIsLoading(false);
@@ -696,39 +689,24 @@ const SpotRate: React.FC = () => {
     setCommodities((prevCommodities) =>
       prevCommodities.map((commodity) => {
         const updatedCommodity = { ...commodity };
-        const metal = commodity.metal.toLowerCase().includes("gold")
-          ? "Gold"
-          : commodity.metal;
+        const metal = commodity.metal.toLowerCase().includes('gold') ? 'Gold' : commodity.metal;
         if (marketData[metal]) {
           const metalBiddingPrice =
-            parseFloat(marketData[metal].bid) +
-            parseFloat(getSpreadOrMarginFromDB(metal, "bid"));
+            parseFloat(marketData[metal].bid) + parseFloat(getSpreadOrMarginFromDB(metal, 'bid'));
           const metalAskingPrice =
             parseFloat(marketData[metal].bid) +
-            parseFloat(getSpreadOrMarginFromDB(metal, "bid")) +
-            parseFloat(getSpreadOrMarginFromDB(metal, "ask")) +
-            (metal === "Gold" ? 0.5 : 0.05);
+            parseFloat(getSpreadOrMarginFromDB(metal, 'bid')) +
+            parseFloat(getSpreadOrMarginFromDB(metal, 'ask')) +
+            (metal === 'Gold' ? 0.5 : 0.05);
 
-          updatedCommodity.sellAED = calculatePrice(
-            metalBiddingPrice,
-            commodity,
-            "sell",
-          );
-          updatedCommodity.buyAED = calculatePrice(
-            metalAskingPrice,
-            commodity,
-            "buy",
-          );
-          updatedCommodity.sellUSD = (
-            updatedCommodity.sellAED / exchangeRate
-          ).toFixed(4);
-          updatedCommodity.buyUSD = (
-            updatedCommodity.buyAED / exchangeRate
-          ).toFixed(4);
+          updatedCommodity.sellAED = calculatePrice(metalBiddingPrice, commodity, 'sell');
+          updatedCommodity.buyAED = calculatePrice(metalAskingPrice, commodity, 'buy');
+          updatedCommodity.sellUSD = (updatedCommodity.sellAED / exchangeRate).toFixed(4);
+          updatedCommodity.buyUSD = (updatedCommodity.buyAED / exchangeRate).toFixed(4);
         }
 
         return updatedCommodity;
-      }),
+      })
     );
   }, [marketData, getSpreadOrMarginFromDB, exchangeRate]);
 
@@ -744,48 +722,35 @@ const SpotRate: React.FC = () => {
     }
 
     const valueStr = value.toString();
-    const [integerPart] = valueStr.split(".");
+    const [integerPart] = valueStr.split('.');
     return integerPart.length;
   }, []);
 
   const calculatePrice = useCallback(
     (metalPrice: number, commodity: any, type: string) => {
       const unitMultiplier = getUnitMultiplier(commodity.weight);
-      const digitsBeforeDecimal = getNumberOfDigitsBeforeDecimal(
-        commodity.purity,
-      );
-      const premium =
-        type === "sell" ? commodity.sellPremium : commodity.buyPremium;
-      const charge =
-        type === "sell" ? commodity.sellCharge : commodity.buyCharge;
-      const metal = commodity.metal.toLowerCase().includes("gold")
-        ? "Gold"
-        : commodity.metal;
-      const spread = parseFloat(
-        getSpreadOrMarginFromDB(metal, type === "sell" ? "ask" : "bid"),
-      );
+      const digitsBeforeDecimal = getNumberOfDigitsBeforeDecimal(commodity.purity);
+      const premium = type === 'sell' ? commodity.sellPremium : commodity.buyPremium;
+      const charge = type === 'sell' ? commodity.sellCharge : commodity.buyCharge;
+      const metal = commodity.metal.toLowerCase().includes('gold') ? 'Gold' : commodity.metal;
+      const spread = parseFloat(getSpreadOrMarginFromDB(metal, type === 'sell' ? 'ask' : 'bid'));
 
       return (
         ((metalPrice + spread + premium) / 31.103) *
-        exchangeRate *
-        commodity.unit *
-        unitMultiplier *
-        (parseInt(commodity.purity) / Math.pow(10, digitsBeforeDecimal)) +
+          exchangeRate *
+          commodity.unit *
+          unitMultiplier *
+          (parseInt(commodity.purity) / Math.pow(10, digitsBeforeDecimal)) +
         parseFloat(charge)
       ).toFixed(4);
     },
-    [
-      getUnitMultiplier,
-      getNumberOfDigitsBeforeDecimal,
-      getSpreadOrMarginFromDB,
-      exchangeRate,
-    ],
+    [getUnitMultiplier, getNumberOfDigitsBeforeDecimal, getSpreadOrMarginFromDB, exchangeRate]
   );
 
   const handleSpreadOrMarginUpdate = useCallback(
     async (metal: string, type: string, newValue: number) => {
       try {
-        const response = await axiosInstance.post("/update-spread", {
+        const response = await axiosInstance.post('/update-spread', {
           adminId,
           metal,
           type,
@@ -799,10 +764,10 @@ const SpotRate: React.FC = () => {
           }));
         }
       } catch (err) {
-        console.error("Error updating spread:", err);
+        console.error('Error updating spread:', err);
       }
     },
-    [adminId],
+    [adminId]
   );
 
   const handleDeleteClick = useCallback((commodity: any) => {
@@ -813,17 +778,13 @@ const SpotRate: React.FC = () => {
   const handleDeleteConfirm = useCallback(async () => {
     if (commodityToDelete) {
       try {
-        await axiosInstance.delete(
-          `/commodities/${adminId}/${commodityToDelete._id}`,
-        );
+        await axiosInstance.delete(`/commodities/${adminId}/${commodityToDelete._id}`);
         setCommodities((prevCommodities) =>
-          prevCommodities.filter(
-            (commodity) => commodity._id !== commodityToDelete._id,
-          ),
+          prevCommodities.filter((commodity) => commodity._id !== commodityToDelete._id)
         );
         setDeleteDialogOpen(false);
-        toast.success("Commodity deleted successfully!", {
-          position: "top-right",
+        toast.success('Commodity deleted successfully!', {
+          position: 'top-right',
           autoClose: 3000,
           hideProgressBar: false,
           closeOnClick: true,
@@ -831,7 +792,7 @@ const SpotRate: React.FC = () => {
           draggable: true,
         });
       } catch (err) {
-        console.error("Error deleting commodity:", err);
+        console.error('Error deleting commodity:', err);
       }
     }
   }, [adminId, commodityToDelete]);
@@ -843,32 +804,32 @@ const SpotRate: React.FC = () => {
 
   useEffect(() => {
     if (!serverURL) {
-      console.log("Waiting for Server URL for socket connection...");
+      console.log('Waiting for Server URL for socket connection...');
       return;
     }
 
     if (!SOCKET_SECRET) {
-      console.error("Socket secret is not defined in environment variables");
+      console.error('Socket secret is not defined in environment variables');
       return;
     }
 
     const socket = io(serverURL, {
       query: { secret: SOCKET_SECRET },
-      transports: ["websocket"],
+      transports: ['websocket'],
       withCredentials: true,
     });
 
-    socket.on("connect", () => {
-      socket.emit("request-data", symbols);
+    socket.on('connect', () => {
+      socket.emit('request-data', symbols);
     });
 
     const SPOT_RATE_EVENT_NAMES = [
-      "market-data",
-      "spotrate",
-      "spot-rate",
-      "spot-rates",
-      "rates",
-      "data",
+      'market-data',
+      'spotrate',
+      'spot-rate',
+      'spot-rates',
+      'rates',
+      'data',
     ] as const;
 
     const handleSpotRatePayload = (data: any) => {
@@ -883,8 +844,8 @@ const SpotRate: React.FC = () => {
               bidChanged:
                 prevData[item.symbol] && item.bid !== prevData[item.symbol].bid
                   ? item.bid > prevData[item.symbol].bid
-                    ? "up"
-                    : "down"
+                    ? 'up'
+                    : 'down'
                   : null,
             },
           }));
@@ -896,9 +857,9 @@ const SpotRate: React.FC = () => {
       socket.on(eventName, handleSpotRatePayload);
     }
 
-    socket.on("error", (err: any) => {
-      console.error("Socket error:", err);
-      setError("An error occurred while receiving data");
+    socket.on('error', (err: any) => {
+      console.error('Socket error:', err);
+      setError('An error occurred while receiving data');
     });
 
     return () => {
@@ -911,13 +872,11 @@ const SpotRate: React.FC = () => {
       if (isEditMode) {
         setCommodities((prevCommodities) =>
           prevCommodities.map((commodity) =>
-            commodity._id === commodityData._id
-              ? { ...commodity, ...commodityData }
-              : commodity,
-          ),
+            commodity._id === commodityData._id ? { ...commodity, ...commodityData } : commodity
+          )
         );
-        toast.success("Commodity updated successfully!", {
-          position: "top-right",
+        toast.success('Commodity updated successfully!', {
+          position: 'top-right',
           autoClose: 3000,
           hideProgressBar: false,
           closeOnClick: true,
@@ -925,12 +884,9 @@ const SpotRate: React.FC = () => {
           draggable: true,
         });
       } else {
-        setCommodities((prevCommodities) => [
-          ...prevCommodities,
-          commodityData,
-        ]);
-        toast.success("Commodity added successfully!", {
-          position: "top-right",
+        setCommodities((prevCommodities) => [...prevCommodities, commodityData]);
+        toast.success('Commodity added successfully!', {
+          position: 'top-right',
           autoClose: 3000,
           hideProgressBar: false,
           closeOnClick: true,
@@ -944,22 +900,20 @@ const SpotRate: React.FC = () => {
         try {
           const response = await axiosInstance.get(`/spotrates/${adminId}`);
           if (response.data && response.data.commodities) {
-            const normalizedCommodities = response.data.commodities.map(
-              (commodity: any) => ({
-                ...commodity,
-                metal_name: commodity.metal_name ?? null,
-              }),
-            );
+            const normalizedCommodities = response.data.commodities.map((commodity: any) => ({
+              ...commodity,
+              metal_name: commodity.metal_name ?? null,
+            }));
             setCommodities(normalizedCommodities);
           }
         } catch (err) {
-          console.error("Error fetching updated commodities:", err);
+          console.error('Error fetching updated commodities:', err);
         }
       };
 
       fetchUpdatedCommodities();
     },
-    [adminId],
+    [adminId]
   );
 
   const handleCloseModal = useCallback(() => {
@@ -971,7 +925,7 @@ const SpotRate: React.FC = () => {
   const handleEditCommodity = useCallback((commodity: any) => {
     setSelectedCommodity({
       ...commodity,
-      metal_name: commodity.metal_name ?? "",
+      metal_name: commodity.metal_name ?? '',
     });
     setIsEditing(true);
     setOpenModal(true);
@@ -982,7 +936,7 @@ const SpotRate: React.FC = () => {
       setCurrency(newCurrency);
       setExchangeRate(parseFloat(String(newExchangeRate)));
     },
-    [setCurrency],
+    [setCurrency]
   );
 
   const renderCommodityRows = () => {
@@ -1000,22 +954,20 @@ const SpotRate: React.FC = () => {
     return commodities.map((row) => {
       const isGoldRelated =
         row.metal &&
-        (row.metal.toLowerCase().includes("gold") ||
-          row.metal.toLowerCase().includes("minted bar"));
-      const metal = isGoldRelated ? "Gold" : row.metal || "Unknown";
+        (row.metal.toLowerCase().includes('gold') ||
+          row.metal.toLowerCase().includes('minted bar'));
+      const metal = isGoldRelated ? 'Gold' : row.metal || 'Unknown';
       const metalBiddingPrice =
-        marketData[metal] && marketData[metal].bid
-          ? parseFloat(marketData[metal].bid)
-          : 0;
+        marketData[metal] && marketData[metal].bid ? parseFloat(marketData[metal].bid) : 0;
       const metalAskingPrice =
         marketData[metal] && marketData[metal].bid
           ? parseFloat(marketData[metal].bid) +
-          parseFloat(getSpreadOrMarginFromDB(metal, "bid")) +
-          (isGoldRelated ? 0.5 : 0.05)
+            parseFloat(getSpreadOrMarginFromDB(metal, 'bid')) +
+            (isGoldRelated ? 0.5 : 0.05)
           : 0;
 
-      const sellPrice = calculatePrice(metalAskingPrice, row, "sell");
-      const buyPrice = calculatePrice(metalBiddingPrice, row, "buy");
+      const sellPrice = calculatePrice(metalAskingPrice, row, 'sell');
+      const buyPrice = calculatePrice(metalBiddingPrice, row, 'buy');
 
       const rowTheme = metalThemes[metal.toLowerCase()] || metalThemes.default;
 
@@ -1023,35 +975,49 @@ const SpotRate: React.FC = () => {
         <TableRow
           key={row._id}
           sx={{
-            "&:hover": {
-              backgroundColor: "rgba(248, 250, 252, 0.6)",
+            '&:hover': {
+              backgroundColor: 'rgba(248, 250, 252, 0.6)',
             },
-            transition: "background-color 0.2s ease",
-            borderBottom: "1px solid #f1f5f9",
+            transition: 'background-color 0.2s ease',
+            borderBottom: '1px solid #f1f5f9',
           }}
         >
-          <TableCell sx={{ fontWeight: "bold", color: "#1e293b", py: 1.5 }}>
+          <TableCell sx={{ fontWeight: 'bold', color: '#1e293b', py: 1.5 }}>
             <div className="flex items-center gap-2">
               <span className={`w-2 h-2 rounded-full ${rowTheme.accent}`} />
               {row.metal_name?.trim() || row.metal}
             </div>
           </TableCell>
           <TableCell sx={{ py: 1.5 }}>
-            <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${rowTheme.bg} ${rowTheme.text} border ${rowTheme.border}`}>
+            <span
+              className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${rowTheme.bg} ${rowTheme.text} border ${rowTheme.border}`}
+            >
               {row.purity}
             </span>
           </TableCell>
-          <TableCell sx={{ color: "#475569", fontWeight: "500", py: 1.5 }}>
+          <TableCell sx={{ color: '#475569', fontWeight: '500', py: 1.5 }}>
             <span className="bg-slate-100/80 px-2 py-1 rounded-lg text-xs font-bold text-slate-600 border border-slate-200/40">
               {`${row.unit} ${row.weight}`}
             </span>
           </TableCell>
-          <TableCell sx={{ fontWeight: "bold", color: "#dc2626", py: 1.5 }}>{sellPrice}</TableCell>
-          <TableCell sx={{ fontWeight: "bold", color: "#16a34a", py: 1.5 }}>{buyPrice}</TableCell>
-          <TableCell sx={{ color: "#475569", py: 1.5 }}>{row.sellPremium !== undefined && row.sellPremium !== null ? `+${row.sellPremium}` : "0.00"}</TableCell>
-          <TableCell sx={{ color: "#475569", py: 1.5 }}>{row.buyPremium !== undefined && row.buyPremium !== null ? `+${row.buyPremium}` : "0.00"}</TableCell>
-          <TableCell sx={{ color: "#475569", py: 1.5 }}>{row.sellCharge !== undefined && row.sellCharge !== null ? `${row.sellCharge}` : "0.00"}</TableCell>
-          <TableCell sx={{ color: "#475569", py: 1.5 }}>{row.buyCharge !== undefined && row.buyCharge !== null ? `${row.buyCharge}` : "0.00"}</TableCell>
+          <TableCell sx={{ fontWeight: 'bold', color: '#dc2626', py: 1.5 }}>{sellPrice}</TableCell>
+          <TableCell sx={{ fontWeight: 'bold', color: '#16a34a', py: 1.5 }}>{buyPrice}</TableCell>
+          <TableCell sx={{ color: '#475569', py: 1.5 }}>
+            {row.sellPremium !== undefined && row.sellPremium !== null
+              ? `+${row.sellPremium}`
+              : '0.00'}
+          </TableCell>
+          <TableCell sx={{ color: '#475569', py: 1.5 }}>
+            {row.buyPremium !== undefined && row.buyPremium !== null
+              ? `+${row.buyPremium}`
+              : '0.00'}
+          </TableCell>
+          <TableCell sx={{ color: '#475569', py: 1.5 }}>
+            {row.sellCharge !== undefined && row.sellCharge !== null ? `${row.sellCharge}` : '0.00'}
+          </TableCell>
+          <TableCell sx={{ color: '#475569', py: 1.5 }}>
+            {row.buyCharge !== undefined && row.buyCharge !== null ? `${row.buyCharge}` : '0.00'}
+          </TableCell>
           <TableCell sx={{ py: 1.5 }}>
             <div className="flex gap-1.5">
               <IconButton
@@ -1059,40 +1025,40 @@ const SpotRate: React.FC = () => {
                 sx={{
                   width: 32,
                   height: 32,
-                  borderRadius: "8px",
-                  background: "#fff",
-                  color: "#3b82f6",
-                  border: "1px solid #e2e8f0",
-                  transition: "all 0.2s ease",
-                  "&:hover": {
-                    background: "#eff6ff",
-                    borderColor: "#bfdbfe",
-                    transform: "translateY(-1px)",
-                    boxShadow: "0 2px 6px rgba(59, 130, 246, 0.1)",
+                  borderRadius: '8px',
+                  background: '#fff',
+                  color: '#3b82f6',
+                  border: '1px solid #e2e8f0',
+                  transition: 'all 0.2s ease',
+                  '&:hover': {
+                    background: '#eff6ff',
+                    borderColor: '#bfdbfe',
+                    transform: 'translateY(-1px)',
+                    boxShadow: '0 2px 6px rgba(59, 130, 246, 0.1)',
                   },
                 }}
               >
-                <EditIcon sx={{ fontSize: "15px" }} />
+                <EditIcon sx={{ fontSize: '15px' }} />
               </IconButton>
               <IconButton
                 onClick={() => handleDeleteClick(row)}
                 sx={{
                   width: 32,
                   height: 32,
-                  borderRadius: "8px",
-                  background: "#fff",
-                  color: "#ef4444",
-                  border: "1px solid #e2e8f0",
-                  transition: "all 0.2s ease",
-                  "&:hover": {
-                    background: "#fef2f2",
-                    borderColor: "#fecaca",
-                    transform: "translateY(-1px)",
-                    boxShadow: "0 2px 6px rgba(239, 68, 68, 0.1)",
+                  borderRadius: '8px',
+                  background: '#fff',
+                  color: '#ef4444',
+                  border: '1px solid #e2e8f0',
+                  transition: 'all 0.2s ease',
+                  '&:hover': {
+                    background: '#fef2f2',
+                    borderColor: '#fecaca',
+                    transform: 'translateY(-1px)',
+                    boxShadow: '0 2px 6px rgba(239, 68, 68, 0.1)',
                   },
                 }}
               >
-                <DeleteIcon sx={{ fontSize: "15px" }} />
+                <DeleteIcon sx={{ fontSize: '15px' }} />
               </IconButton>
             </div>
           </TableCell>
@@ -1101,14 +1067,14 @@ const SpotRate: React.FC = () => {
     });
   };
   const symbolMap: Record<string, string> = {
-    copper: "COMEX:HG1!",
-    gold: "TVC:GOLD",
-    silver: "TVC:SILVER",
-    platinum: "TVC:PLATINUM",
+    copper: 'COMEX:HG1!',
+    gold: 'TVC:GOLD',
+    silver: 'TVC:SILVER',
+    platinum: 'TVC:PLATINUM',
   };
 
   const handleCloseDialog = (event: any, reason: string) => {
-    if (reason && reason === "backdropClick") return;
+    if (reason && reason === 'backdropClick') return;
     handleDeleteCancel();
   };
 
@@ -1120,13 +1086,12 @@ const SpotRate: React.FC = () => {
         <div className="relative flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between z-10">
           <div>
             <h1 className="text-2xl font-extrabold text-slate-800 tracking-tight flex items-center gap-2.5">
-              <span className="text-blue-600">
-                Spot Rates & Spreads
-              </span>
+              <span className="text-blue-600">Spot Rates & Spreads</span>
               <span className="text-slate-400 text-lg font-light">Console</span>
             </h1>
             <p className="mt-1 text-sm text-slate-500 max-w-2xl">
-              Configure spreads, margins, and manage your commodity catalog with live price calculations.
+              Configure spreads, margins, and manage your commodity catalog with live price
+              calculations.
             </p>
           </div>
           <div className="flex-shrink-0">
@@ -1145,9 +1110,9 @@ const SpotRate: React.FC = () => {
               key={m}
               onClick={() => handleToggleMetal(m)}
               className={`px-3 py-1.5 rounded-full text-xs font-bold transition-all ${
-                isActive 
-                  ? "bg-blue-600 text-white shadow-sm border border-transparent" 
-                  : "bg-slate-100 text-slate-500 border border-slate-200 hover:bg-slate-200"
+                isActive
+                  ? 'bg-blue-600 text-white shadow-sm border border-transparent'
+                  : 'bg-slate-100 text-slate-500 border border-slate-200 hover:bg-slate-200'
               }`}
             >
               {m}
@@ -1165,26 +1130,23 @@ const SpotRate: React.FC = () => {
               key={metal}
               className={`col-span-1 ${
                 index === visibleMetals.length - 1 && visibleMetals.length % 2 !== 0
-                  ? "md:col-span-2"
-                  : ""
+                  ? 'md:col-span-2'
+                  : ''
               }`}
             >
               <div
                 className={`grid gap-4 ${
                   index === visibleMetals.length - 1 && visibleMetals.length % 2 !== 0
-                    ? "md:grid-cols-2"
-                    : "grid-cols-1"
+                    ? 'md:grid-cols-2'
+                    : 'grid-cols-1'
                 }`}
               >
-                <TradingViewWidget
-                  symbol={symbolMap[metal.toLowerCase()]}
-                  title={metal}
-                />
+                <TradingViewWidget symbol={symbolMap[metal.toLowerCase()]} title={metal} />
                 <div className="space-y-4">
                   <PriceCard
                     title="Bid"
                     initialPrice={marketData[metal]?.bid}
-                    initialSpread={getSpreadOrMarginFromDB(metal, "bid")}
+                    initialSpread={getSpreadOrMarginFromDB(metal, 'bid')}
                     metal={metal}
                     type="bid"
                     onSpreadUpdate={handleSpreadOrMarginUpdate}
@@ -1194,10 +1156,10 @@ const SpotRate: React.FC = () => {
                     title="Ask"
                     initialPrice={
                       parseFloat(marketData[metal]?.bid) +
-                      getSpreadOrMarginFromDB(metal, "bid") +
-                      (metal === "Gold" ? 0.5 : 0.05)
+                      getSpreadOrMarginFromDB(metal, 'bid') +
+                      (metal === 'Gold' ? 0.5 : 0.05)
                     }
-                    initialSpread={getSpreadOrMarginFromDB(metal, "ask")}
+                    initialSpread={getSpreadOrMarginFromDB(metal, 'ask')}
                     metal={metal}
                     type="ask"
                     onSpreadUpdate={handleSpreadOrMarginUpdate}
@@ -1228,11 +1190,20 @@ const SpotRate: React.FC = () => {
           {visibleMetals.map((metal) => {
             const theme = metalThemes[metal.toLowerCase()] || metalThemes.default;
             const usdVal = isLoading
-              ? "—"
-              : ((parseFloat(marketData[metal]?.bid) + parseFloat(getSpreadOrMarginFromDB(metal, "bid"))) / 31.103).toFixed(4);
+              ? '—'
+              : (
+                  (parseFloat(marketData[metal]?.bid) +
+                    parseFloat(getSpreadOrMarginFromDB(metal, 'bid'))) /
+                  31.103
+                ).toFixed(4);
             const curVal = isLoading
-              ? "—"
-              : (((parseFloat(marketData[metal]?.bid) + parseFloat(getSpreadOrMarginFromDB(metal, "bid"))) / 31.103) * exchangeRate).toFixed(4);
+              ? '—'
+              : (
+                  ((parseFloat(marketData[metal]?.bid) +
+                    parseFloat(getSpreadOrMarginFromDB(metal, 'bid'))) /
+                    31.103) *
+                  exchangeRate
+                ).toFixed(4);
 
             return (
               <div
@@ -1247,7 +1218,9 @@ const SpotRate: React.FC = () => {
                   <span className="text-xs font-extrabold uppercase text-slate-500 tracking-wider">
                     {metal} 1GM
                   </span>
-                  <span className={`px-2 py-0.5 rounded-full text-[9px] font-bold ${theme.bg} ${theme.text} border ${theme.border}`}>
+                  <span
+                    className={`px-2 py-0.5 rounded-full text-[9px] font-bold ${theme.bg} ${theme.text} border ${theme.border}`}
+                  >
                     LIVE FEED
                   </span>
                 </div>
@@ -1257,7 +1230,9 @@ const SpotRate: React.FC = () => {
                     <p className="text-sm font-black text-slate-800">{usdVal}</p>
                   </div>
                   <div className="rounded-xl bg-slate-50 border border-slate-100 p-2.5 text-center">
-                    <p className="text-[9px] font-bold text-slate-400 uppercase mb-0.5">{currency}</p>
+                    <p className="text-[9px] font-bold text-slate-400 uppercase mb-0.5">
+                      {currency}
+                    </p>
                     <p className="text-sm font-black text-blue-700">{curVal}</p>
                   </div>
                 </div>
@@ -1273,7 +1248,8 @@ const SpotRate: React.FC = () => {
           <div>
             <h2 className="text-lg font-bold text-slate-800">Commodity Pricing Catalog</h2>
             <p className="text-xs text-slate-400 font-medium mt-0.5">
-              Add, update, and manage your gold, silver, or custom metal products pricing structures.
+              Add, update, and manage your gold, silver, or custom metal products pricing
+              structures.
             </p>
           </div>
           <button
@@ -1295,20 +1271,123 @@ const SpotRate: React.FC = () => {
           </button>
         </div>
 
-        <TableContainer component={Paper} className="shadow-none border border-slate-100 rounded-2xl overflow-hidden">
+        <TableContainer
+          component={Paper}
+          className="shadow-none border border-slate-100 rounded-2xl overflow-hidden"
+        >
           <Table sx={{ minWidth: 650 }} aria-label="commodity table">
             <TableHead>
               <TableRow className="bg-slate-50/80 border-b border-slate-200/60">
-                <TableCell sx={{ fontWeight: "bold", color: "#64748b", fontSize: "12px", textTransform: "uppercase", py: 1.5 }}>Metal</TableCell>
-                <TableCell sx={{ fontWeight: "bold", color: "#64748b", fontSize: "12px", textTransform: "uppercase", py: 1.5 }}>Purity</TableCell>
-                <TableCell sx={{ fontWeight: "bold", color: "#64748b", fontSize: "12px", textTransform: "uppercase", py: 1.5 }}>Unit</TableCell>
-                <TableCell sx={{ fontWeight: "bold", color: "#64748b", fontSize: "12px", textTransform: "uppercase", py: 1.5 }}>Sell ({currency})</TableCell>
-                <TableCell sx={{ fontWeight: "bold", color: "#64748b", fontSize: "12px", textTransform: "uppercase", py: 1.5 }}>Buy ({currency})</TableCell>
-                <TableCell sx={{ fontWeight: "bold", color: "#64748b", fontSize: "12px", textTransform: "uppercase", py: 1.5 }}>Sell Premium</TableCell>
-                <TableCell sx={{ fontWeight: "bold", color: "#64748b", fontSize: "12px", textTransform: "uppercase", py: 1.5 }}>Buy Premium</TableCell>
-                <TableCell sx={{ fontWeight: "bold", color: "#64748b", fontSize: "12px", textTransform: "uppercase", py: 1.5 }}>Sell Charges</TableCell>
-                <TableCell sx={{ fontWeight: "bold", color: "#64748b", fontSize: "12px", textTransform: "uppercase", py: 1.5 }}>Buy Charges</TableCell>
-                <TableCell sx={{ fontWeight: "bold", color: "#64748b", fontSize: "12px", textTransform: "uppercase", py: 1.5 }}>Action</TableCell>
+                <TableCell
+                  sx={{
+                    fontWeight: 'bold',
+                    color: '#64748b',
+                    fontSize: '12px',
+                    textTransform: 'uppercase',
+                    py: 1.5,
+                  }}
+                >
+                  Metal
+                </TableCell>
+                <TableCell
+                  sx={{
+                    fontWeight: 'bold',
+                    color: '#64748b',
+                    fontSize: '12px',
+                    textTransform: 'uppercase',
+                    py: 1.5,
+                  }}
+                >
+                  Purity
+                </TableCell>
+                <TableCell
+                  sx={{
+                    fontWeight: 'bold',
+                    color: '#64748b',
+                    fontSize: '12px',
+                    textTransform: 'uppercase',
+                    py: 1.5,
+                  }}
+                >
+                  Unit
+                </TableCell>
+                <TableCell
+                  sx={{
+                    fontWeight: 'bold',
+                    color: '#64748b',
+                    fontSize: '12px',
+                    textTransform: 'uppercase',
+                    py: 1.5,
+                  }}
+                >
+                  Sell ({currency})
+                </TableCell>
+                <TableCell
+                  sx={{
+                    fontWeight: 'bold',
+                    color: '#64748b',
+                    fontSize: '12px',
+                    textTransform: 'uppercase',
+                    py: 1.5,
+                  }}
+                >
+                  Buy ({currency})
+                </TableCell>
+                <TableCell
+                  sx={{
+                    fontWeight: 'bold',
+                    color: '#64748b',
+                    fontSize: '12px',
+                    textTransform: 'uppercase',
+                    py: 1.5,
+                  }}
+                >
+                  Sell Premium
+                </TableCell>
+                <TableCell
+                  sx={{
+                    fontWeight: 'bold',
+                    color: '#64748b',
+                    fontSize: '12px',
+                    textTransform: 'uppercase',
+                    py: 1.5,
+                  }}
+                >
+                  Buy Premium
+                </TableCell>
+                <TableCell
+                  sx={{
+                    fontWeight: 'bold',
+                    color: '#64748b',
+                    fontSize: '12px',
+                    textTransform: 'uppercase',
+                    py: 1.5,
+                  }}
+                >
+                  Sell Charges
+                </TableCell>
+                <TableCell
+                  sx={{
+                    fontWeight: 'bold',
+                    color: '#64748b',
+                    fontSize: '12px',
+                    textTransform: 'uppercase',
+                    py: 1.5,
+                  }}
+                >
+                  Buy Charges
+                </TableCell>
+                <TableCell
+                  sx={{
+                    fontWeight: 'bold',
+                    color: '#64748b',
+                    fontSize: '12px',
+                    textTransform: 'uppercase',
+                    py: 1.5,
+                  }}
+                >
+                  Action
+                </TableCell>
               </TableRow>
             </TableHead>
             <TableBody>{renderCommodityRows()}</TableBody>
@@ -1332,7 +1411,7 @@ const SpotRate: React.FC = () => {
       <Dialog
         open={deleteDialogOpen}
         onClose={(event, reason) => {
-          if (reason !== "backdropClick" && reason !== "escapeKeyDown") {
+          if (reason !== 'backdropClick' && reason !== 'escapeKeyDown') {
             handleCloseDialog(event, reason);
           }
         }}
@@ -1341,17 +1420,17 @@ const SpotRate: React.FC = () => {
         {...({
           PaperProps: {
             sx: {
-              borderRadius: "16px",
+              borderRadius: '16px',
               padding: 1,
-            }
-          }
+            },
+          },
         } as any)}
       >
-        <DialogTitle sx={{ fontWeight: "bold", color: "#1e293b" }}>Confirm Deletion</DialogTitle>
+        <DialogTitle sx={{ fontWeight: 'bold', color: '#1e293b' }}>Confirm Deletion</DialogTitle>
         <DialogContent>
           <DialogContentText
             id="alert-dialog-description"
-            sx={{ marginTop: 1, color: "#64748b", fontSize: "14px" }}
+            sx={{ marginTop: 1, color: '#64748b', fontSize: '14px' }}
           >
             Are you sure you want to delete this commodity? This action cannot be undone.
           </DialogContentText>
@@ -1360,12 +1439,12 @@ const SpotRate: React.FC = () => {
           <Button
             onClick={handleDeleteCancel}
             sx={{
-              color: "#64748b",
-              fontWeight: "bold",
-              textTransform: "none",
-              borderRadius: "8px",
-              "&:hover": {
-                backgroundColor: "#f1f5f9",
+              color: '#64748b',
+              fontWeight: 'bold',
+              textTransform: 'none',
+              borderRadius: '8px',
+              '&:hover': {
+                backgroundColor: '#f1f5f9',
               },
             }}
           >
@@ -1376,15 +1455,15 @@ const SpotRate: React.FC = () => {
             variant="contained"
             color="error"
             sx={{
-              background: "linear-gradient(270deg, #ef4444 0%, #f43f5e 100%)",
-              color: "white",
-              fontWeight: "bold",
-              textTransform: "none",
-              borderRadius: "8px",
-              boxShadow: "none",
-              "&:hover": {
-                background: "linear-gradient(270deg, #dc2626 0%, #e11d48 100%)",
-                boxShadow: "none",
+              background: 'linear-gradient(270deg, #ef4444 0%, #f43f5e 100%)',
+              color: 'white',
+              fontWeight: 'bold',
+              textTransform: 'none',
+              borderRadius: '8px',
+              boxShadow: 'none',
+              '&:hover': {
+                background: 'linear-gradient(270deg, #dc2626 0%, #e11d48 100%)',
+                boxShadow: 'none',
               },
             }}
             autoFocus

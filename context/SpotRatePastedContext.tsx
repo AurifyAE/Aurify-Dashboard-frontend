@@ -1,7 +1,7 @@
-"use client";
+'use client';
 
-import React, { createContext, useCallback, useContext, useState, ReactNode } from "react";
-import axiosInstance from "../app/axios/axiosInstance";
+import React, { createContext, useCallback, useContext, useState, ReactNode } from 'react';
+import axiosInstance from '../app/axios/axiosInstance';
 
 export interface SpotRatePastedContextValue {
   marketData: Record<string, any>;
@@ -26,18 +26,18 @@ export const SpotRatePastedProvider: React.FC<{ children: ReactNode }> = ({ chil
   const [commodities, setCommodities] = useState<any[]>([]);
   const [spreadMarginData, setSpreadMarginData] = useState<Record<string, any>>({});
   const [categoryId, setCategoryId] = useState<string | null>(null);
-  const [adminId, setAdminId] = useState("");
+  const [adminId, setAdminId] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [bidAskPrices, setBidAskPrices] = useState<Record<string, { bid: number; ask: number }>>({});
+  const [bidAskPrices, setBidAskPrices] = useState<Record<string, { bid: number; ask: number }>>(
+    {}
+  );
 
   const fetchData = useCallback(async () => {
     if (!categoryId || !adminId) return;
 
     try {
       setIsLoading(true);
-      const response = await axiosInstance.get(
-        `/spotrates/${adminId}/${categoryId}`
-      );
+      const response = await axiosInstance.get(`/spotrates/${adminId}/${categoryId}`);
 
       if (response.data) {
         setSpreadMarginData(response.data);
@@ -49,7 +49,7 @@ export const SpotRatePastedProvider: React.FC<{ children: ReactNode }> = ({ chil
         }
       }
     } catch (error) {
-      console.error("Error fetching data:", error);
+      console.error('Error fetching data:', error);
     } finally {
       setIsLoading(false);
     }
@@ -74,7 +74,7 @@ export const SpotRatePastedProvider: React.FC<{ children: ReactNode }> = ({ chil
       const lowerMetal = metal.toLowerCase();
       const key = `${lowerMetal}${
         type.charAt(0).toUpperCase() + type.slice(1)
-      }${type === "low" || type === "high" ? "Margin" : "Spread"}`;
+      }${type === 'low' || type === 'high' ? 'Margin' : 'Spread'}`;
       return spreadMarginData[key] || 0;
     },
     [spreadMarginData]
@@ -116,17 +116,13 @@ export const SpotRatePastedProvider: React.FC<{ children: ReactNode }> = ({ chil
     updateBidAskPrices,
   };
 
-  return (
-    <SpotRateContext.Provider value={value}>
-      {children}
-    </SpotRateContext.Provider>
-  );
+  return <SpotRateContext.Provider value={value}>{children}</SpotRateContext.Provider>;
 };
 
 export const useSpotRatePasted = (): SpotRatePastedContextValue => {
   const context = useContext(SpotRateContext);
   if (!context) {
-    throw new Error("useSpotRatePasted must be used inside <SpotRatePastedProvider>");
+    throw new Error('useSpotRatePasted must be used inside <SpotRatePastedProvider>');
   }
   return context;
 };

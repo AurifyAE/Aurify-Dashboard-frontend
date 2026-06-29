@@ -1,6 +1,6 @@
-"use client";
+'use client';
 
-import LiveClock from "@/components/LiveClock";
+import LiveClock from '@/components/LiveClock';
 
 interface LiveScreenClockProps {
   accent?: string;

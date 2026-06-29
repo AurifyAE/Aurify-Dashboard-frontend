@@ -1,16 +1,16 @@
-"use client";
+'use client';
 
-import React, { useEffect, useState, useRef } from "react";
-import Link from "next/link";
-import LiveClock from "@/components/LiveClock";
-import Theme1Layout from "@/components/live-screen/theme1/Theme1Layout";
-import Theme2Layout from "@/components/live-screen/theme2/Theme2Layout";
+import React, { useEffect, useState, useRef } from 'react';
+import Link from 'next/link';
+import LiveClock from '@/components/LiveClock';
+import Theme1Layout from '@/components/live-screen/theme1/Theme1Layout';
+import Theme2Layout from '@/components/live-screen/theme2/Theme2Layout';
 import {
   marketplaceApi,
   type Merchant,
   type MerchantTheme,
   type ScreenLayout,
-} from "@/lib/api/marketplace";
+} from '@/lib/api/marketplace';
 import {
   ArrowDown,
   ArrowLeft,
@@ -27,65 +27,58 @@ import {
   Settings2,
   Tv,
   XCircle,
-} from "lucide-react";
-import Loader from "@/components/loader/loader";
+} from 'lucide-react';
+import Loader from '@/components/loader/loader';
 
-const WIDGETS = [
-  "Spot Rates",
-  "Commodity Table",
-  "News",
-  "Clock",
-  "Date",
-  "London Fix",
-];
+const WIDGETS = ['Spot Rates', 'Commodity Table', 'News', 'Clock', 'Date', 'London Fix'];
 
 const LAYOUTS = [
-  { 
-    id: "theme1", 
-    label: "Theme 1 (Classic)",
+  {
+    id: 'theme1',
+    label: 'Theme 1 (Classic)',
     colors: [
-      { key: "primary", label: "Primary", default: "#d4a017" },
-      { key: "secondary", label: "Secondary", default: "#111827" },
-      { key: "accent", label: "Accent", default: "#38bdf8" },
-      { key: "backgroundColor", label: "Background", default: "#140b10" },
-      { key: "tableHeaderBg", label: "Table Header Bg", default: "#280f05" },
-      { key: "tableRowBg", label: "Table Row Bg", default: "#140802" },
-      { key: "tableText", label: "Table Text", default: "#ffffff" },
-      { key: "buyBg", label: "Buy Box Bg", default: "#280f05" },
-      { key: "buyText", label: "Buy Text", default: "#20c997" },
-      { key: "sellBg", label: "Sell Box Bg", default: "#280f05" },
-      { key: "sellText", label: "Sell Text", default: "#ff4d4d" },
-      { key: "clockText", label: "Clock Text", default: "#ffffff" },
-      { key: "newsBg", label: "News Bg", default: "#111827" },
-      { key: "newsText", label: "News Text", default: "#ffffff" },
-    ]
+      { key: 'primary', label: 'Primary', default: '#d4a017' },
+      { key: 'secondary', label: 'Secondary', default: '#111827' },
+      { key: 'accent', label: 'Accent', default: '#38bdf8' },
+      { key: 'backgroundColor', label: 'Background', default: '#140b10' },
+      { key: 'tableHeaderBg', label: 'Table Header Bg', default: '#280f05' },
+      { key: 'tableRowBg', label: 'Table Row Bg', default: '#140802' },
+      { key: 'tableText', label: 'Table Text', default: '#ffffff' },
+      { key: 'buyBg', label: 'Buy Box Bg', default: '#280f05' },
+      { key: 'buyText', label: 'Buy Text', default: '#20c997' },
+      { key: 'sellBg', label: 'Sell Box Bg', default: '#280f05' },
+      { key: 'sellText', label: 'Sell Text', default: '#ff4d4d' },
+      { key: 'clockText', label: 'Clock Text', default: '#ffffff' },
+      { key: 'newsBg', label: 'News Bg', default: '#111827' },
+      { key: 'newsText', label: 'News Text', default: '#ffffff' },
+    ],
   },
-  { 
-    id: "theme2", 
-    label: "Theme 2 (Modern)",
+  {
+    id: 'theme2',
+    label: 'Theme 2 (Modern)',
     colors: [
-      { key: "primary", label: "Primary", default: "#d4a017" },
-      { key: "secondary", label: "Secondary", default: "#111827" },
-      { key: "accent", label: "Accent", default: "#38bdf8" },
-    ]
+      { key: 'primary', label: 'Primary', default: '#d4a017' },
+      { key: 'secondary', label: 'Secondary', default: '#111827' },
+      { key: 'accent', label: 'Accent', default: '#38bdf8' },
+    ],
   },
 ];
 
 const SECTIONS = [
-  { id: "header", label: "Header" },
-  { id: "spotRates", label: "Spot Rates" },
-  { id: "commodities", label: "Commodity Table" },
-  { id: "news", label: "News Ticker" },
+  { id: 'header', label: 'Header' },
+  { id: 'spotRates', label: 'Spot Rates' },
+  { id: 'commodities', label: 'Commodity Table' },
+  { id: 'news', label: 'News Ticker' },
 ];
 
-import { Newspaper } from "lucide-react";
-import NewsManagementTab from "./NewsManagementTab";
+import { Newspaper } from 'lucide-react';
+import NewsManagementTab from './NewsManagementTab';
 
 const STEPS = [
-  { id: 1, label: "Setup & Theme", icon: Settings2 },
-  { id: 2, label: "Customize", icon: Palette },
-  { id: 3, label: "News & Content", icon: Newspaper },
-  { id: 4, label: "Go Live", icon: Monitor },
+  { id: 1, label: 'Setup & Theme', icon: Settings2 },
+  { id: 2, label: 'Customize', icon: Palette },
+  { id: 3, label: 'News & Content', icon: Newspaper },
+  { id: 4, label: 'Go Live', icon: Monitor },
 ];
 
 type DraftState = {
@@ -106,19 +99,34 @@ type DraftState = {
 };
 
 const defaultDraft: DraftState = {
-  layoutId: "",
-  name: "Main Showroom Screen",
-  screenSlug: "main",
-  selectedLayout: "theme1",
-  themeId: "",
-  widgets: ["Spot Rates", "Commodity Table", "News", "Clock"],
-  sectionOrder: ["header", "spotRates", "commodities", "news"],
-  assignedDevices: "TV 1, TV 2",
-  colorOverride: { primary: "#d4a017", secondary: "#111827", accent: "#38bdf8", backgroundColor: "#140b10", tableHeaderBg: "#280f05", tableRowBg: "#140802", tableText: "#ffffff", buyBg: "#280f05", buyText: "#20c997", sellBg: "#280f05", sellText: "#ff4d4d", clockText: "#ffffff", newsBg: "#111827", newsText: "#ffffff" },
+  layoutId: '',
+  name: 'Main Showroom Screen',
+  screenSlug: 'main',
+  selectedLayout: 'theme1',
+  themeId: '',
+  widgets: ['Spot Rates', 'Commodity Table', 'News', 'Clock'],
+  sectionOrder: ['header', 'spotRates', 'commodities', 'news'],
+  assignedDevices: 'TV 1, TV 2',
+  colorOverride: {
+    primary: '#d4a017',
+    secondary: '#111827',
+    accent: '#38bdf8',
+    backgroundColor: '#140b10',
+    tableHeaderBg: '#280f05',
+    tableRowBg: '#140802',
+    tableText: '#ffffff',
+    buyBg: '#280f05',
+    buyText: '#20c997',
+    sellBg: '#280f05',
+    sellText: '#ff4d4d',
+    clockText: '#ffffff',
+    newsBg: '#111827',
+    newsText: '#ffffff',
+  },
   showLogo: true,
   showName: true,
-  logoUrl: "",
-  backgroundUrl: "",
+  logoUrl: '',
+  backgroundUrl: '',
 };
 
 interface ScreenBuilderTabProps {
@@ -153,7 +161,7 @@ const TVPreviewRenderer = ({ data }: { data: any }) => {
         colorOverride: data.layout?.colorOverride || data.layout?.styles?.colorOverride,
         showLogo: data.layout?.showLogo,
         showName: data.layout?.showName,
-      }
+      },
     },
     merchant: {
       ...data.merchant,
@@ -170,22 +178,38 @@ const TVPreviewRenderer = ({ data }: { data: any }) => {
   };
 
   return (
-    <div ref={containerRef} className="w-full relative overflow-hidden" style={{ aspectRatio: "16/9" }}>
+    <div
+      ref={containerRef}
+      className="w-full relative overflow-hidden"
+      style={{ aspectRatio: '16/9' }}
+    >
       <div
         style={{
           transform: `scale(${scale})`,
-          transformOrigin: "top left",
-          width: "1920px",
-          height: "1080px",
-          position: "absolute",
+          transformOrigin: 'top left',
+          width: '1920px',
+          height: '1080px',
+          position: 'absolute',
           top: 0,
           left: 0,
         }}
       >
-        <div style={{ position: "absolute", top: 0, left: 0, zIndex: 9999, background: "red", color: "white", padding: "10px", fontSize: "24px", fontWeight: "bold" }}>
+        <div
+          style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            zIndex: 9999,
+            background: 'red',
+            color: 'white',
+            padding: '10px',
+            fontSize: '24px',
+            fontWeight: 'bold',
+          }}
+        >
           DEBUG: {enhancedData?.layout?.selectedLayout}
         </div>
-        {enhancedData?.layout?.selectedLayout === "theme2" ? (
+        {enhancedData?.layout?.selectedLayout === 'theme2' ? (
           <Theme2Layout data={enhancedData} isPreview={true} />
         ) : (
           <Theme1Layout data={enhancedData} isPreview={true} />
@@ -206,26 +230,29 @@ export default function ScreenBuilderTab({
   const [themes, setThemes] = useState<MerchantTheme[]>([]);
   const [layouts, setLayouts] = useState<ScreenLayout[]>([]);
   const [news, setNews] = useState<any[]>([]);
-  const [message, setMessage] = useState("");
-  const [messageType, setMessageType] = useState<"info" | "success" | "error">("info");
-  const [previewSize, setPreviewSize] = useState<"1920x1080" | "3840x2160">("1920x1080");
+  const [message, setMessage] = useState('');
+  const [messageType, setMessageType] = useState<'info' | 'success' | 'error'>('info');
+  const [previewSize, setPreviewSize] = useState<'1920x1080' | '3840x2160'>('1920x1080');
   const [draft, setDraft] = useState<DraftState>(defaultDraft);
   const [draggedSection, setDraggedSection] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>, field: "logoUrl" | "backgroundUrl") => {
+  const handleImageUpload = (
+    e: React.ChangeEvent<HTMLInputElement>,
+    field: 'logoUrl' | 'backgroundUrl'
+  ) => {
     const file = e.target.files?.[0];
     if (file) {
       const reader = new FileReader();
       reader.onloadend = () => {
-        setDraft(prev => ({ ...prev, [field]: reader.result as string }));
+        setDraft((prev) => ({ ...prev, [field]: reader.result as string }));
       };
       reader.readAsDataURL(file);
     }
   };
 
-  const showMessage = (text: string, type: "info" | "success" | "error" = "info") => {
+  const showMessage = (text: string, type: 'info' | 'success' | 'error' = 'info') => {
     setMessage(text);
     setMessageType(type);
   };
@@ -244,7 +271,7 @@ export default function ScreenBuilderTab({
       setLayouts(savedLayouts);
       setNews(newsItems);
 
-      const currentThemeId = installed[0]?.themeId || "";
+      const currentThemeId = installed[0]?.themeId || '';
 
       if (editingLayoutId) {
         const target = savedLayouts.find((l) => l.layoutId === editingLayoutId);
@@ -253,14 +280,14 @@ export default function ScreenBuilderTab({
             layoutId: target.layoutId,
             name: target.name,
             screenSlug: target.screenSlug,
-            selectedLayout: (target.header as any)?.layout || "theme1",
-            newsHeading: (target.header as any)?.newsHeading || "",
+            selectedLayout: (target.header as any)?.layout || 'theme1',
+            newsHeading: (target.header as any)?.newsHeading || '',
             themeId: target.themeId || currentThemeId,
             widgets: target.widgets?.length ? target.widgets : defaultDraft.widgets,
             sectionOrder: (target.body as any)?.sectionOrder || defaultDraft.sectionOrder,
             assignedDevices: Array.isArray(target.assignedDevices)
-              ? target.assignedDevices.join(", ")
-              : (target.assignedDevices || ""),
+              ? target.assignedDevices.join(', ')
+              : target.assignedDevices || '',
             colorOverride: (target.styles as any)?.colorOverride || defaultDraft.colorOverride,
             showLogo: (target.styles as any)?.showLogo ?? true,
             showName: (target.styles as any)?.showName ?? true,
@@ -273,7 +300,7 @@ export default function ScreenBuilderTab({
         });
       }
     } catch (err) {
-      showMessage(err instanceof Error ? err.message : "Failed to load builder", "error");
+      showMessage(err instanceof Error ? err.message : 'Failed to load builder', 'error');
     } finally {
       setLoading(false);
     }
@@ -285,10 +312,11 @@ export default function ScreenBuilderTab({
 
   const selectedTheme = themes.find((t) => t.themeId === draft.themeId);
   const themeColors = selectedTheme?.customizations as
-    | { colors?: { primary?: string; secondary?: string; accent?: string } }
-    | undefined;
+    { colors?: { primary?: string; secondary?: string; accent?: string } } | undefined;
 
-  const canGoLive = Boolean(merchant?.status === "Active" && draft.selectedLayout && draft.name.trim());
+  const canGoLive = Boolean(
+    merchant?.status === 'Active' && draft.selectedLayout && draft.name.trim()
+  );
 
   const moveSection = (targetSection: string) => {
     if (!draggedSection || draggedSection === targetSection) return;
@@ -317,10 +345,14 @@ export default function ScreenBuilderTab({
     name: draft.name,
     screenSlug: draft.screenSlug,
     themeId,
-    header: { company: merchant?.companyName, layout: draft.selectedLayout, newsHeading: draft.newsHeading },
+    header: {
+      company: merchant?.companyName,
+      layout: draft.selectedLayout,
+      newsHeading: draft.newsHeading,
+    },
     body: { previewSize, sectionOrder: draft.sectionOrder },
     sidebar: {},
-    footer: { ticker: "enabled" },
+    footer: { ticker: 'enabled' },
     widgets: draft.widgets,
     styles: {
       ...((selectedTheme?.customizations as Record<string, unknown>) || {}),
@@ -328,27 +360,27 @@ export default function ScreenBuilderTab({
       showLogo: draft.showLogo,
       showName: draft.showName,
       logoUrl: draft.logoUrl,
-      backgroundUrl: draft.backgroundUrl
+      backgroundUrl: draft.backgroundUrl,
     },
   });
 
   const save = async () => {
     if (!draft.name.trim()) {
-      showMessage("Give your screen a name first.", "error");
+      showMessage('Give your screen a name first.', 'error');
       setStep(1);
       return;
     }
-    const themeId = draft.themeId || themes[0]?.themeId || "default";
+    const themeId = draft.themeId || themes[0]?.themeId || 'default';
     setSaving(true);
     try {
       const saved = await marketplaceApi.saveLayout(buildPayload(themeId));
       setDraft((prev) => ({ ...prev, layoutId: saved.layoutId, themeId }));
       setEditingLayoutId(saved.layoutId);
       await load();
-      showMessage("Draft saved successfully.", "success");
+      showMessage('Draft saved successfully.', 'success');
       if (onSaveSuccess) onSaveSuccess();
     } catch (err) {
-      showMessage(err instanceof Error ? err.message : "Save failed", "error");
+      showMessage(err instanceof Error ? err.message : 'Save failed', 'error');
     } finally {
       setSaving(false);
     }
@@ -357,10 +389,10 @@ export default function ScreenBuilderTab({
   const publish = async () => {
     if (!canGoLive) {
       showMessage(
-        merchant?.status !== "Active"
-          ? "Your account must be approved before going live."
-          : "Select a theme and screen name first.",
-        "error"
+        merchant?.status !== 'Active'
+          ? 'Your account must be approved before going live.'
+          : 'Select a theme and screen name first.',
+        'error'
       );
       return;
     }
@@ -372,14 +404,17 @@ export default function ScreenBuilderTab({
       setEditingLayoutId(layoutId);
 
       const result = await marketplaceApi.publishLayout(layoutId, {
-        assignedDevices: draft.assignedDevices.split(",").map((d) => d.trim()).filter(Boolean),
+        assignedDevices: draft.assignedDevices
+          .split(',')
+          .map((d) => d.trim())
+          .filter(Boolean),
       });
       setDraft((prev) => ({ ...prev, layoutId }));
-      showMessage(`🎉 Screen is live: ${result.liveUrl}`, "success");
+      showMessage(`🎉 Screen is live: ${result.liveUrl}`, 'success');
       await load();
       if (onSaveSuccess) onSaveSuccess();
     } catch (err) {
-      showMessage(err instanceof Error ? err.message : "Publish failed", "error");
+      showMessage(err instanceof Error ? err.message : 'Publish failed', 'error');
     } finally {
       setSaving(false);
     }
@@ -389,20 +424,25 @@ export default function ScreenBuilderTab({
     setEditingLayoutId(undefined);
     setDraft(defaultDraft);
     setStep(1);
-    showMessage("Form reset. Creating a new screen config.", "info");
+    showMessage('Form reset. Creating a new screen config.', 'info');
   };
 
   const inputClass =
-    "w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm text-slate-800 placeholder-slate-400 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all";
+    'w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm text-slate-800 placeholder-slate-400 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all';
 
-  if (loading) return <div className="py-20"><Loader /></div>;
+  if (loading)
+    return (
+      <div className="py-20">
+        <Loader />
+      </div>
+    );
 
   return (
     <div className="space-y-6">
       <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
         <div>
           <h2 className="text-xl font-bold text-slate-900">
-            {draft.layoutId ? `Edit Screen: ${draft.name}` : "Create New Screen"}
+            {draft.layoutId ? `Edit Screen: ${draft.name}` : 'Create New Screen'}
           </h2>
           <p className="text-sm text-slate-500">
             Customize and publish your live showroom TV rate boards.
@@ -410,20 +450,11 @@ export default function ScreenBuilderTab({
         </div>
         <div className="flex gap-2">
           {draft.layoutId && (
-            <button
-              type="button"
-              onClick={resetForm}
-              className="btn-secondary"
-            >
+            <button type="button" onClick={resetForm} className="btn-secondary">
               Start New Screen
             </button>
           )}
-          <button
-            type="button"
-            onClick={save}
-            disabled={saving}
-            className="btn-secondary"
-          >
+          <button type="button" onClick={save} disabled={saving} className="btn-secondary">
             {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
             Save Draft
           </button>
@@ -447,15 +478,21 @@ export default function ScreenBuilderTab({
               onClick={() => setStep(s.id)}
               className={`flex flex-1 items-center justify-center gap-2 rounded-xl px-3 py-2.5 text-sm font-semibold transition-all whitespace-nowrap ${
                 step === s.id
-                  ? "bg-white text-blue-700 shadow-sm"
+                  ? 'bg-white text-blue-700 shadow-sm'
                   : step > s.id
-                    ? "text-emerald-600"
-                    : "text-slate-400 hover:text-slate-700"
+                    ? 'text-emerald-600'
+                    : 'text-slate-400 hover:text-slate-700'
               }`}
             >
-              <span className={`flex h-6 w-6 items-center justify-center rounded-full text-xs font-bold ${
-                step === s.id ? "bg-blue-600 text-white" : step > s.id ? "bg-emerald-500 text-white" : "bg-slate-200 text-slate-500"
-              }`}>
+              <span
+                className={`flex h-6 w-6 items-center justify-center rounded-full text-xs font-bold ${
+                  step === s.id
+                    ? 'bg-blue-600 text-white'
+                    : step > s.id
+                      ? 'bg-emerald-500 text-white'
+                      : 'bg-slate-200 text-slate-500'
+                }`}
+              >
                 {step > s.id ? <Check className="h-3 w-3" /> : s.id}
               </span>
               <span className="hidden sm:block">{s.label}</span>
@@ -465,13 +502,20 @@ export default function ScreenBuilderTab({
       </div>
 
       {message && (
-        <div className={`flex items-start gap-2 rounded-xl border p-3 text-sm ${
-          messageType === "success" ? "border-emerald-200 bg-emerald-50 text-emerald-800"
-          : messageType === "error" ? "border-red-200 bg-red-50 text-red-800"
-          : "border-slate-200 bg-slate-50 text-slate-700"
-        }`}>
-          {messageType === "success" ? <CheckCircle2 className="h-4 w-4 mt-0.5 flex-shrink-0" />
-          : messageType === "error" ? <XCircle className="h-4 w-4 mt-0.5 flex-shrink-0" /> : null}
+        <div
+          className={`flex items-start gap-2 rounded-xl border p-3 text-sm ${
+            messageType === 'success'
+              ? 'border-emerald-200 bg-emerald-50 text-emerald-800'
+              : messageType === 'error'
+                ? 'border-red-200 bg-red-50 text-red-800'
+                : 'border-slate-200 bg-slate-50 text-slate-700'
+          }`}
+        >
+          {messageType === 'success' ? (
+            <CheckCircle2 className="h-4 w-4 mt-0.5 flex-shrink-0" />
+          ) : messageType === 'error' ? (
+            <XCircle className="h-4 w-4 mt-0.5 flex-shrink-0" />
+          ) : null}
           {message}
         </div>
       )}
@@ -483,40 +527,66 @@ export default function ScreenBuilderTab({
             <div className="space-y-4">
               <h3 className="font-bold text-slate-800 text-sm">Screen Details</h3>
               <div>
-                <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-500">Screen Name</label>
-                <input className={inputClass} placeholder="e.g. Main Showroom" value={draft.name} onChange={(e) => setDraft({ ...draft, name: e.target.value })} />
+                <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-500">
+                  Screen Name
+                </label>
+                <input
+                  className={inputClass}
+                  placeholder="e.g. Main Showroom"
+                  value={draft.name}
+                  onChange={(e) => setDraft({ ...draft, name: e.target.value })}
+                />
               </div>
 
               <div>
-                <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-500">URL Slug</label>
-                <input className={inputClass} placeholder="main" value={draft.screenSlug} onChange={(e) => setDraft({ ...draft, screenSlug: e.target.value })} />
+                <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-500">
+                  URL Slug
+                </label>
+                <input
+                  className={inputClass}
+                  placeholder="main"
+                  value={draft.screenSlug}
+                  onChange={(e) => setDraft({ ...draft, screenSlug: e.target.value })}
+                />
               </div>
               <div>
-                <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-500">Assigned Devices</label>
+                <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-500">
+                  Assigned Devices
+                </label>
                 <div className="flex gap-2 flex-wrap">
-                  {["TV 1", "TV 2", "TV 3", "TV 4", "TV 5", "Lobby Display", "Window Display"].map((device) => {
-                    const devicesArray = draft.assignedDevices.split(",").map(d => d.trim()).filter(Boolean);
-                    const isSelected = devicesArray.includes(device);
-                    return (
-                      <label key={device} className={`flex items-center gap-2 p-2 rounded-xl border text-sm cursor-pointer transition-colors ${isSelected ? 'border-blue-500 bg-blue-50 text-blue-700' : 'border-slate-200 hover:bg-slate-50'}`}>
-                        <input
-                          type="checkbox"
-                          className="hidden"
-                          checked={isSelected}
-                          onChange={(e) => {
-                            let newDevices = [...devicesArray];
-                            if (e.target.checked) newDevices.push(device);
-                            else newDevices = newDevices.filter(d => d !== device);
-                            setDraft({ ...draft, assignedDevices: newDevices.join(", ") });
-                          }}
-                        />
-                        <div className={`h-4 w-4 rounded border flex items-center justify-center ${isSelected ? 'bg-blue-600 border-blue-600' : 'border-slate-300'}`}>
-                          {isSelected && <Check className="h-3 w-3 text-white" />}
-                        </div>
-                        {device}
-                      </label>
-                    );
-                  })}
+                  {['TV 1', 'TV 2', 'TV 3', 'TV 4', 'TV 5', 'Lobby Display', 'Window Display'].map(
+                    (device) => {
+                      const devicesArray = draft.assignedDevices
+                        .split(',')
+                        .map((d) => d.trim())
+                        .filter(Boolean);
+                      const isSelected = devicesArray.includes(device);
+                      return (
+                        <label
+                          key={device}
+                          className={`flex items-center gap-2 p-2 rounded-xl border text-sm cursor-pointer transition-colors ${isSelected ? 'border-blue-500 bg-blue-50 text-blue-700' : 'border-slate-200 hover:bg-slate-50'}`}
+                        >
+                          <input
+                            type="checkbox"
+                            className="hidden"
+                            checked={isSelected}
+                            onChange={(e) => {
+                              let newDevices = [...devicesArray];
+                              if (e.target.checked) newDevices.push(device);
+                              else newDevices = newDevices.filter((d) => d !== device);
+                              setDraft({ ...draft, assignedDevices: newDevices.join(', ') });
+                            }}
+                          />
+                          <div
+                            className={`h-4 w-4 rounded border flex items-center justify-center ${isSelected ? 'bg-blue-600 border-blue-600' : 'border-slate-300'}`}
+                          >
+                            {isSelected && <Check className="h-3 w-3 text-white" />}
+                          </div>
+                          {device}
+                        </label>
+                      );
+                    }
+                  )}
                 </div>
               </div>
               {/* Theme Selection */}
@@ -530,14 +600,16 @@ export default function ScreenBuilderTab({
                       onClick={() => setDraft({ ...draft, selectedLayout: l.id })}
                       className={`w-full flex items-center justify-between rounded-xl border-2 p-4 text-left transition-all ${
                         draft.selectedLayout === l.id
-                          ? "border-blue-500 bg-blue-50/50"
-                          : "border-slate-100 hover:border-slate-200"
+                          ? 'border-blue-500 bg-blue-50/50'
+                          : 'border-slate-100 hover:border-slate-200'
                       }`}
                     >
                       <div>
                         <span className="font-bold text-slate-800 block text-sm">{l.label}</span>
                         <span className="text-xs text-slate-500">
-                          {l.id === "theme1" ? "Classic layout with gradients" : "Modern layout with glassmorphism"}
+                          {l.id === 'theme1'
+                            ? 'Classic layout with gradients'
+                            : 'Modern layout with glassmorphism'}
                         </span>
                       </div>
                       {draft.selectedLayout === l.id && (
@@ -560,34 +632,73 @@ export default function ScreenBuilderTab({
           {step === 2 && (
             <div className="space-y-4">
               <h3 className="font-bold text-slate-800 text-sm">Customize Details</h3>
-              
+
               <div className="space-y-4">
-                <h4 className="font-semibold text-slate-700 text-xs uppercase tracking-wide">Branding & Assets</h4>
+                <h4 className="font-semibold text-slate-700 text-xs uppercase tracking-wide">
+                  Branding & Assets
+                </h4>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-500">Upload Logo</label>
-                    <input type="file" accept="image/*" onChange={(e) => handleImageUpload(e, "logoUrl")} className="block w-full text-xs text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer" />
+                    <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-500">
+                      Upload Logo
+                    </label>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => handleImageUpload(e, 'logoUrl')}
+                      className="block w-full text-xs text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer"
+                    />
                   </div>
                   <div>
-                    <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-500">Background Image</label>
-                    <input type="file" accept="image/*" onChange={(e) => handleImageUpload(e, "backgroundUrl")} className="block w-full text-xs text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer" />
+                    <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-500">
+                      Background Image
+                    </label>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => handleImageUpload(e, 'backgroundUrl')}
+                      className="block w-full text-xs text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer"
+                    />
                   </div>
                 </div>
-                
+
                 <div className="pt-2">
-                  <label className="mb-2 block text-xs font-semibold uppercase tracking-wide text-slate-500">Advanced Colors</label>
+                  <label className="mb-2 block text-xs font-semibold uppercase tracking-wide text-slate-500">
+                    Advanced Colors
+                  </label>
                   <div className="flex gap-3 flex-wrap">
-                    {(LAYOUTS.find(l => l.id === (draft.selectedLayout === "Layout A" ? "theme1" : draft.selectedLayout))?.colors || []).map(color => (
-                      <div key={color.key} className="bg-slate-50 rounded-xl p-1.5 border border-slate-100 flex flex-col gap-1">
-                        <label className="text-[10px] font-bold uppercase tracking-wide text-slate-500">{color.label}</label>
+                    {(
+                      LAYOUTS.find(
+                        (l) =>
+                          l.id ===
+                          (draft.selectedLayout === 'Layout A' ? 'theme1' : draft.selectedLayout)
+                      )?.colors || []
+                    ).map((color) => (
+                      <div
+                        key={color.key}
+                        className="bg-slate-50 rounded-xl p-1.5 border border-slate-100 flex flex-col gap-1"
+                      >
+                        <label className="text-[10px] font-bold uppercase tracking-wide text-slate-500">
+                          {color.label}
+                        </label>
                         <div className="flex items-center gap-2">
-                          <input 
-                            type="color" 
-                            className="h-8 w-8 cursor-pointer rounded bg-transparent border-0 p-0" 
-                            value={draft.colorOverride[color.key] || color.default} 
-                            onChange={(e) => setDraft({ ...draft, colorOverride: { ...draft.colorOverride, [color.key]: e.target.value } })} 
+                          <input
+                            type="color"
+                            className="h-8 w-8 cursor-pointer rounded bg-transparent border-0 p-0"
+                            value={draft.colorOverride[color.key] || color.default}
+                            onChange={(e) =>
+                              setDraft({
+                                ...draft,
+                                colorOverride: {
+                                  ...draft.colorOverride,
+                                  [color.key]: e.target.value,
+                                },
+                              })
+                            }
                           />
-                          <span className="text-xs font-mono text-slate-600">{draft.colorOverride[color.key] || color.default}</span>
+                          <span className="text-xs font-mono text-slate-600">
+                            {draft.colorOverride[color.key] || color.default}
+                          </span>
                         </div>
                       </div>
                     ))}
@@ -600,13 +711,21 @@ export default function ScreenBuilderTab({
                 <h3 className="font-bold text-slate-800 text-sm mb-3">Visible Elements</h3>
                 <div className="grid grid-cols-2 gap-3">
                   {WIDGETS.map((widget) => (
-                    <label key={widget} className="flex items-center gap-2 text-sm text-slate-700 cursor-pointer">
+                    <label
+                      key={widget}
+                      className="flex items-center gap-2 text-sm text-slate-700 cursor-pointer"
+                    >
                       <input
                         type="checkbox"
                         checked={draft.widgets.includes(widget)}
                         onChange={(e) => {
-                          if (e.target.checked) setDraft({ ...draft, widgets: [...draft.widgets, widget] });
-                          else setDraft({ ...draft, widgets: draft.widgets.filter(w => w !== widget) });
+                          if (e.target.checked)
+                            setDraft({ ...draft, widgets: [...draft.widgets, widget] });
+                          else
+                            setDraft({
+                              ...draft,
+                              widgets: draft.widgets.filter((w) => w !== widget),
+                            });
                         }}
                         className="rounded border-slate-300 text-blue-600 focus:ring-blue-600 h-4 w-4 cursor-pointer"
                       />
@@ -632,10 +751,17 @@ export default function ScreenBuilderTab({
             <div className="space-y-4">
               <h3 className="font-bold text-slate-800 text-sm">News & Content</h3>
               <div>
-                <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-500">Page Content Title (News Heading)</label>
-                <input className={inputClass} placeholder="e.g. Live Updates" value={draft.newsHeading || ""} onChange={(e) => setDraft({ ...draft, newsHeading: e.target.value })} />
+                <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-500">
+                  Page Content Title (News Heading)
+                </label>
+                <input
+                  className={inputClass}
+                  placeholder="e.g. Live Updates"
+                  value={draft.newsHeading || ''}
+                  onChange={(e) => setDraft({ ...draft, newsHeading: e.target.value })}
+                />
               </div>
-              
+
               <div className="border-t border-slate-100 pt-4">
                 <NewsManagementTab isEmbedded={true} />
               </div>
@@ -658,18 +784,22 @@ export default function ScreenBuilderTab({
 
               {/* Resolution Toggle */}
               <div>
-                <h4 className="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-500">Resolution</h4>
+                <h4 className="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-500">
+                  Resolution
+                </h4>
                 <div className="flex gap-2">
-                  {(["1920x1080", "3840x2160"] as const).map((res) => (
+                  {(['1920x1080', '3840x2160'] as const).map((res) => (
                     <button
                       key={res}
                       type="button"
                       onClick={() => setPreviewSize(res)}
                       className={`flex-1 rounded-xl border-2 py-2 text-xs font-bold transition-all ${
-                        previewSize === res ? "border-blue-500 bg-blue-50 text-blue-700" : "border-slate-200 text-slate-500 hover:border-slate-300"
+                        previewSize === res
+                          ? 'border-blue-500 bg-blue-50 text-blue-700'
+                          : 'border-slate-200 text-slate-500 hover:border-slate-300'
                       }`}
                     >
-                      {res === "1920x1080" ? "Full HD" : "4K UHD"}
+                      {res === '1920x1080' ? 'Full HD' : '4K UHD'}
                     </button>
                   ))}
                 </div>
@@ -679,9 +809,9 @@ export default function ScreenBuilderTab({
               <div className="rounded-xl border border-slate-200 bg-slate-50/60 p-4 space-y-2">
                 <p className="text-sm font-semibold text-slate-800 mb-3">Publish Checklist</p>
                 {[
-                  { label: "Screen name set", done: Boolean(draft.name.trim()) },
-                  { label: "Theme selected", done: Boolean(draft.selectedLayout) },
-                  { label: "Merchant approved", done: merchant?.status === "Active" },
+                  { label: 'Screen name set', done: Boolean(draft.name.trim()) },
+                  { label: 'Theme selected', done: Boolean(draft.selectedLayout) },
+                  { label: 'Merchant approved', done: merchant?.status === 'Active' },
                 ].map((item) => (
                   <div key={item.label} className="flex items-center gap-2 text-sm">
                     {item.done ? (
@@ -689,7 +819,7 @@ export default function ScreenBuilderTab({
                     ) : (
                       <XCircle className="h-4 w-4 text-slate-300 flex-shrink-0" />
                     )}
-                    <span className={item.done ? "text-slate-700" : "text-slate-400"}>
+                    <span className={item.done ? 'text-slate-700' : 'text-slate-400'}>
                       {item.label}
                     </span>
                   </div>
@@ -700,7 +830,12 @@ export default function ScreenBuilderTab({
                 <button type="button" onClick={() => setStep(3)} className="btn-secondary">
                   <ArrowLeft className="h-4 w-4" /> Back
                 </button>
-                <button type="button" onClick={publish} disabled={saving || !canGoLive} className="btn-primary flex-1">
+                <button
+                  type="button"
+                  onClick={publish}
+                  disabled={saving || !canGoLive}
+                  className="btn-primary flex-1"
+                >
                   <Rocket className="h-4 w-4" /> Go Live
                 </button>
               </div>
@@ -716,13 +851,21 @@ export default function ScreenBuilderTab({
               Live TV Preview
             </div>
             <div className="text-xs font-semibold text-slate-400 uppercase tracking-wide">
-              {previewSize === "1920x1080" ? "Full HD · 1080p" : "4K UHD · 2160p"}
+              {previewSize === '1920x1080' ? 'Full HD · 1080p' : '4K UHD · 2160p'}
             </div>
           </div>
 
           {/* TV Screen */}
           {/* @ts-ignore */}
-          <TVPreviewRenderer data={{ merchant, theme: selectedTheme, layout: draft, commodities: (merchant as any)?.commodities || [], news: news }} />
+          <TVPreviewRenderer
+            data={{
+              merchant,
+              theme: selectedTheme,
+              layout: draft,
+              commodities: (merchant as any)?.commodities || [],
+              news: news,
+            }}
+          />
 
           {/* Saved Drafts */}
           {layouts.length > 0 && (
@@ -735,16 +878,24 @@ export default function ScreenBuilderTab({
                     type="button"
                     onClick={() => setEditingLayoutId(layout.layoutId)}
                     className={`flex items-center justify-between rounded-xl border px-3 py-2 text-left hover:border-blue-200 hover:bg-blue-50/30 transition-all ${
-                      editingLayoutId === layout.layoutId ? "border-blue-500 bg-blue-50/30" : "border-slate-100 bg-slate-50"
+                      editingLayoutId === layout.layoutId
+                        ? 'border-blue-500 bg-blue-50/30'
+                        : 'border-slate-100 bg-slate-50'
                     }`}
                   >
                     <div className="min-w-0">
-                      <span className="text-xs font-semibold text-slate-800 truncate block">{layout.name}</span>
+                      <span className="text-xs font-semibold text-slate-800 truncate block">
+                        {layout.name}
+                      </span>
                       <span className="text-[10px] text-slate-400">/{layout.screenSlug}</span>
                     </div>
-                    <span className={`rounded-full px-1.5 py-0.5 text-[8px] font-bold uppercase flex-shrink-0 ${
-                      layout.status === "published" ? "bg-emerald-100 text-emerald-700" : "bg-slate-100 text-slate-500"
-                    }`}>
+                    <span
+                      className={`rounded-full px-1.5 py-0.5 text-[8px] font-bold uppercase flex-shrink-0 ${
+                        layout.status === 'published'
+                          ? 'bg-emerald-100 text-emerald-700'
+                          : 'bg-slate-100 text-slate-500'
+                      }`}
+                    >
                       {layout.status}
                     </span>
                   </button>

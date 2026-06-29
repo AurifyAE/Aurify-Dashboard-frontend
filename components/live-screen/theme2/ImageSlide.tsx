@@ -1,32 +1,32 @@
-"use client";
-import React from "react";
-import { Box } from "@mui/material";
+'use client';
+import React from 'react';
+import { Box } from '@mui/material';
 
 // Swiper
-import { Swiper, SwiperSlide } from "swiper/react";
-import { Autoplay, EffectFade } from "swiper/modules";
+import { Swiper, SwiperSlide } from 'swiper/react';
+import { Autoplay, EffectFade } from 'swiper/modules';
 
 // Swiper styles
-import "swiper/css";
-import "swiper/css/effect-fade";
+import 'swiper/css';
+import 'swiper/css/effect-fade';
 
 const rotatingImages = [
-  "/images/gold-bars.jpg",
-  "/images/silver-bars.jpg",
-  "/images/gold-coin.avif",
-  "/images/silver-coin.jpg",
+  '/images/gold-bars.jpg',
+  '/images/silver-bars.jpg',
+  '/images/gold-coin.avif',
+  '/images/silver-coin.jpg',
 ];
 
 const ImageSlide = () => {
   return (
     <Box
       sx={{
-        width: { xs: "25vw", md: "16vw" },
-        height: { xs: "14vw", md: "7vw" },
-        borderRadius: "0.45vw",
-        overflow: "hidden",
-        margin: "0 auto",
-        boxShadow: "0 0.22vw 0.65vw rgba(0,0,0,0.3)",
+        width: { xs: '25vw', md: '16vw' },
+        height: { xs: '14vw', md: '7vw' },
+        borderRadius: '0.45vw',
+        overflow: 'hidden',
+        margin: '0 auto',
+        boxShadow: '0 0.22vw 0.65vw rgba(0,0,0,0.3)',
       }}
     >
       <Swiper
@@ -40,8 +40,8 @@ const ImageSlide = () => {
         }}
         speed={1200}
         style={{
-          width: "100%",
-          height: "100%",
+          width: '100%',
+          height: '100%',
         }}
       >
         {rotatingImages.map((image, index) => (
@@ -50,9 +50,9 @@ const ImageSlide = () => {
               src={image}
               alt={`slide-${index}`}
               style={{
-                width: "100%",
-                height: "100%",
-                objectFit: "cover",
+                width: '100%',
+                height: '100%',
+                objectFit: 'cover',
               }}
             />
           </SwiperSlide>

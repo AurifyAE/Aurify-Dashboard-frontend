@@ -1,16 +1,16 @@
-"use client";
+'use client';
 
-import React, { useEffect, useState } from "react";
-import DashboardShell from "@/components/dashboard/DashboardShell";
-import { adminApi, AdminMerchant } from "@/lib/api/admin";
-import Swal from "sweetalert2";
-import { Users, Search, Edit2, Calendar, Monitor, Tv, Trash2 } from "lucide-react";
-import { Select, MenuItem } from "@mui/material";
+import React, { useEffect, useState } from 'react';
+import DashboardShell from '@/components/dashboard/DashboardShell';
+import { adminApi, AdminMerchant } from '@/lib/api/admin';
+import Swal from 'sweetalert2';
+import { Users, Search, Edit2, Calendar, Monitor, Tv, Trash2 } from 'lucide-react';
+import { Select, MenuItem } from '@mui/material';
 
 export default function AdminClientsPage() {
   const [merchants, setMerchants] = useState<AdminMerchant[]>([]);
   const [loading, setLoading] = useState(true);
-  const [search, setSearch] = useState("");
+  const [search, setSearch] = useState('');
   const [editingMerchant, setEditingMerchant] = useState<AdminMerchant | null>(null);
 
   useEffect(() => {
@@ -24,7 +24,7 @@ export default function AdminClientsPage() {
       setMerchants(data);
     } catch (error) {
       console.error(error);
-      Swal.fire("Error", "Failed to fetch merchants", "error");
+      Swal.fire('Error', 'Failed to fetch merchants', 'error');
     } finally {
       setLoading(false);
     }
@@ -42,16 +42,16 @@ export default function AdminClientsPage() {
         serviceEndDate: editingMerchant.serviceEndDate,
         services: editingMerchant.services,
         additionalFeatures: editingMerchant.additionalFeatures,
-        allowedCommodities: editingMerchant.allowedCommodities
+        allowedCommodities: editingMerchant.allowedCommodities,
       };
 
       const updated = await adminApi.updateMerchant(editingMerchant._id, dataToSave);
-      setMerchants(merchants.map(m => m._id === updated._id ? updated : m));
+      setMerchants(merchants.map((m) => (m._id === updated._id ? updated : m)));
       setEditingMerchant(null);
       fetchMerchants();
     } catch (err) {
       console.error(err);
-      Swal.fire("Error", "Failed to update merchant", "error");
+      Swal.fire('Error', 'Failed to update merchant', 'error');
     }
   };
 
@@ -64,7 +64,7 @@ export default function AdminClientsPage() {
       inputAttributes: {
         minlength: '8',
         autocapitalize: 'off',
-        autocorrect: 'off'
+        autocorrect: 'off',
       },
       showCancelButton: true,
       confirmButtonColor: '#3b82f6',
@@ -73,7 +73,7 @@ export default function AdminClientsPage() {
         if (!value || value.length < 8) {
           return 'Password must be at least 8 characters!';
         }
-      }
+      },
     });
 
     if (newPassword) {
@@ -94,7 +94,7 @@ export default function AdminClientsPage() {
       showCancelButton: true,
       confirmButtonColor: '#ef4444',
       cancelButtonColor: '#64748b',
-      confirmButtonText: 'Yes, delete user!'
+      confirmButtonText: 'Yes, delete user!',
     });
 
     if (result.isConfirmed) {
@@ -109,9 +109,10 @@ export default function AdminClientsPage() {
     }
   };
 
-  const filteredMerchants = merchants.filter((m) =>
-    m.companyName?.toLowerCase().includes(search.toLowerCase()) ||
-    m.email?.toLowerCase().includes(search.toLowerCase())
+  const filteredMerchants = merchants.filter(
+    (m) =>
+      m.companyName?.toLowerCase().includes(search.toLowerCase()) ||
+      m.email?.toLowerCase().includes(search.toLowerCase())
   );
 
   return (
@@ -130,10 +131,10 @@ export default function AdminClientsPage() {
                 Manage all registered merchants, approve statuses, and enforce limits.
               </p>
             </div>
-            
+
             <div className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-              <input 
+              <input
                 type="text"
                 placeholder="Search clients..."
                 value={search}
@@ -176,17 +177,25 @@ export default function AdminClientsPage() {
                           <div className="text-slate-500 text-xs">{merchant.email}</div>
                         </td>
                         <td className="px-6 py-4">
-                          <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold
-                            ${merchant.status === 'Active' ? 'bg-emerald-100 text-emerald-700' : 
-                              merchant.status === 'Pending' ? 'bg-amber-100 text-amber-700' : 
-                              'bg-red-100 text-red-700'}`}>
+                          <span
+                            className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold
+                            ${
+                              merchant.status === 'Active'
+                                ? 'bg-emerald-100 text-emerald-700'
+                                : merchant.status === 'Pending'
+                                  ? 'bg-amber-100 text-amber-700'
+                                  : 'bg-red-100 text-red-700'
+                            }`}
+                          >
                             {merchant.status}
                           </span>
                         </td>
                         <td className="px-6 py-4 text-slate-600">
                           <div className="flex items-center gap-1.5">
                             <Calendar className="w-3.5 h-3.5" />
-                            {merchant.serviceEndDate ? new Date(merchant.serviceEndDate).toLocaleDateString() : 'N/A'}
+                            {merchant.serviceEndDate
+                              ? new Date(merchant.serviceEndDate).toLocaleDateString()
+                              : 'N/A'}
                           </div>
                         </td>
                         <td className="px-6 py-4">
@@ -232,22 +241,56 @@ export default function AdminClientsPage() {
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm overflow-y-auto">
           <div className="bg-white rounded-2xl w-full max-w-4xl shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200 my-8">
             <div className="p-6 border-b border-slate-100 flex items-center justify-between sticky top-0 bg-white z-10">
-              <h2 className="text-xl font-bold text-slate-800">Manage {editingMerchant.companyName}</h2>
-              <button onClick={() => setEditingMerchant(null)} className="text-slate-400 hover:text-slate-600">
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+              <h2 className="text-xl font-bold text-slate-800">
+                Manage {editingMerchant.companyName}
+              </h2>
+              <button
+                onClick={() => setEditingMerchant(null)}
+                className="text-slate-400 hover:text-slate-600"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M6 18L18 6M6 6l12 12"
+                  ></path>
+                </svg>
               </button>
             </div>
-            
+
             <form onSubmit={handleSave} className="p-6 pb-0 space-y-8 max-h-[80vh] overflow-y-auto">
-              
               {/* User Details Grid */}
               <div className="bg-slate-50 p-5 rounded-xl border border-slate-100 grid grid-cols-2 gap-4 text-sm relative">
-                <div><span className="text-slate-500 font-medium">Company:</span> <span className="text-slate-800 font-semibold">{editingMerchant.companyName}</span></div>
-                <div><span className="text-slate-500 font-medium">Email:</span> <span className="text-slate-800 font-semibold">{editingMerchant.email}</span></div>
-                <div><span className="text-slate-500 font-medium">Phone:</span> <span className="text-slate-800 font-semibold">{editingMerchant.phone || 'N/A'}</span></div>
-                <div><span className="text-slate-500 font-medium">WhatsApp:</span> <span className="text-slate-800 font-semibold">{editingMerchant.whatsapp || 'N/A'}</span></div>
-                <div className="col-span-2"><span className="text-slate-500 font-medium">Address:</span> <span className="text-slate-800 font-semibold">{editingMerchant.address || 'N/A'}</span></div>
-                
+                <div>
+                  <span className="text-slate-500 font-medium">Company:</span>{' '}
+                  <span className="text-slate-800 font-semibold">
+                    {editingMerchant.companyName}
+                  </span>
+                </div>
+                <div>
+                  <span className="text-slate-500 font-medium">Email:</span>{' '}
+                  <span className="text-slate-800 font-semibold">{editingMerchant.email}</span>
+                </div>
+                <div>
+                  <span className="text-slate-500 font-medium">Phone:</span>{' '}
+                  <span className="text-slate-800 font-semibold">
+                    {editingMerchant.phone || 'N/A'}
+                  </span>
+                </div>
+                <div>
+                  <span className="text-slate-500 font-medium">WhatsApp:</span>{' '}
+                  <span className="text-slate-800 font-semibold">
+                    {editingMerchant.whatsapp || 'N/A'}
+                  </span>
+                </div>
+                <div className="col-span-2">
+                  <span className="text-slate-500 font-medium">Address:</span>{' '}
+                  <span className="text-slate-800 font-semibold">
+                    {editingMerchant.address || 'N/A'}
+                  </span>
+                </div>
+
                 <button
                   type="button"
                   onClick={() => handleResetPassword(editingMerchant._id)}
@@ -260,17 +303,23 @@ export default function AdminClientsPage() {
               {/* Grid 1: Status & Limits */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <h3 className="text-base font-bold text-slate-800 mb-4 pb-2 border-b border-slate-100">Account & Limits</h3>
+                  <h3 className="text-base font-bold text-slate-800 mb-4 pb-2 border-b border-slate-100">
+                    Account & Limits
+                  </h3>
                   <div className="space-y-4">
                     <div className="bg-orange-50/80 border border-orange-200 p-4 rounded-xl relative overflow-hidden">
                       <div className="absolute top-0 left-0 w-1 h-full bg-orange-500" />
                       <label className="flex items-center gap-2 text-sm font-bold text-orange-900 mb-2">
                         Account Status
-                       
                       </label>
                       <Select
                         value={editingMerchant.status}
-                        onChange={(e) => setEditingMerchant({ ...editingMerchant, status: e.target.value as string })}
+                        onChange={(e) =>
+                          setEditingMerchant({
+                            ...editingMerchant,
+                            status: e.target.value as string,
+                          })
+                        }
                         fullWidth
                         size="small"
                         sx={{
@@ -281,7 +330,10 @@ export default function AdminClientsPage() {
                           boxShadow: '0 1px 2px rgba(0,0,0,0.05)',
                           '& .MuiOutlinedInput-notchedOutline': { borderColor: '#fed7aa' },
                           '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: '#fdba74' },
-                          '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: '#f97316', borderWidth: '2px' }
+                          '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                            borderColor: '#f97316',
+                            borderWidth: '2px',
+                          },
                         }}
                       >
                         <MenuItem value="Pending">Pending</MenuItem>
@@ -290,31 +342,55 @@ export default function AdminClientsPage() {
                       </Select>
                     </div>
                     <div>
-                      <label className="block text-sm font-semibold text-slate-700 mb-1.5">Service End Date</label>
+                      <label className="block text-sm font-semibold text-slate-700 mb-1.5">
+                        Service End Date
+                      </label>
                       <input
                         type="date"
-                        value={editingMerchant.serviceEndDate ? new Date(editingMerchant.serviceEndDate).toISOString().split("T")[0] : ""}
-                        onChange={(e) => setEditingMerchant({ ...editingMerchant, serviceEndDate: e.target.value })}
+                        value={
+                          editingMerchant.serviceEndDate
+                            ? new Date(editingMerchant.serviceEndDate).toISOString().split('T')[0]
+                            : ''
+                        }
+                        onChange={(e) =>
+                          setEditingMerchant({ ...editingMerchant, serviceEndDate: e.target.value })
+                        }
                         className="w-full rounded-xl border border-slate-200 px-4 py-2.5 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none"
                         required
                       />
                     </div>
                     <div className="grid grid-cols-2 gap-4">
                       <div>
-                        <label className="block text-sm font-semibold text-slate-700 mb-1.5">Max Layouts</label>
+                        <label className="block text-sm font-semibold text-slate-700 mb-1.5">
+                          Max Layouts
+                        </label>
                         <input
-                          type="number" min="1"
+                          type="number"
+                          min="1"
                           value={editingMerchant.maxScreens || 1}
-                          onChange={(e) => setEditingMerchant({ ...editingMerchant, maxScreens: parseInt(e.target.value) })}
+                          onChange={(e) =>
+                            setEditingMerchant({
+                              ...editingMerchant,
+                              maxScreens: parseInt(e.target.value),
+                            })
+                          }
                           className="w-full rounded-xl border border-slate-200 px-4 py-2.5 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none"
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-semibold text-slate-700 mb-1.5">Max TVs</label>
+                        <label className="block text-sm font-semibold text-slate-700 mb-1.5">
+                          Max TVs
+                        </label>
                         <input
-                          type="number" min="1"
+                          type="number"
+                          min="1"
                           value={editingMerchant.maxDevices || 1}
-                          onChange={(e) => setEditingMerchant({ ...editingMerchant, maxDevices: parseInt(e.target.value) })}
+                          onChange={(e) =>
+                            setEditingMerchant({
+                              ...editingMerchant,
+                              maxDevices: parseInt(e.target.value),
+                            })
+                          }
                           className="w-full rounded-xl border border-slate-200 px-4 py-2.5 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none"
                         />
                       </div>
@@ -324,39 +400,62 @@ export default function AdminClientsPage() {
 
                 {/* Grid 2: Subscriptions & Features */}
                 <div>
-                  <h3 className="text-base font-bold text-slate-800 mb-4 pb-2 border-b border-slate-100">Service Subscriptions</h3>
+                  <h3 className="text-base font-bold text-slate-800 mb-4 pb-2 border-b border-slate-100">
+                    Service Subscriptions
+                  </h3>
                   <div className="space-y-3">
                     {['tvDisplay', 'website', 'mobileApp'].map((service) => (
                       <label key={service} className="flex items-center gap-3 cursor-pointer">
-                        <input type="checkbox" 
-                          checked={editingMerchant.services?.[service as keyof typeof editingMerchant.services] || false}
-                          onChange={(e) => setEditingMerchant({
-                            ...editingMerchant, 
-                            services: { ...editingMerchant.services, [service]: e.target.checked }
-                          })}
-                          className="w-4 h-4 rounded text-blue-600 focus:ring-blue-500" 
+                        <input
+                          type="checkbox"
+                          checked={
+                            editingMerchant.services?.[
+                              service as keyof typeof editingMerchant.services
+                            ] || false
+                          }
+                          onChange={(e) =>
+                            setEditingMerchant({
+                              ...editingMerchant,
+                              services: {
+                                ...editingMerchant.services,
+                                [service]: e.target.checked,
+                              },
+                            })
+                          }
+                          className="w-4 h-4 rounded text-blue-600 focus:ring-blue-500"
                         />
-                        <span className="text-sm font-medium text-slate-700">{service === 'tvDisplay' ? 'TV View' : service === 'website' ? 'Website' : 'Mobile App'}</span>
+                        <span className="text-sm font-medium text-slate-700">
+                          {service === 'tvDisplay'
+                            ? 'TV View'
+                            : service === 'website'
+                              ? 'Website'
+                              : 'Mobile App'}
+                        </span>
                       </label>
                     ))}
                   </div>
 
-                  <h3 className="text-base font-bold text-slate-800 mt-6 mb-4 pb-2 border-b border-slate-100">Commodity Access</h3>
+                  <h3 className="text-base font-bold text-slate-800 mt-6 mb-4 pb-2 border-b border-slate-100">
+                    Commodity Access
+                  </h3>
                   <div className="grid grid-cols-2 gap-3">
                     {['Gold', 'Silver', 'Copper', 'Platinum'].map((commodity) => {
                       const isChecked = editingMerchant.allowedCommodities?.includes(commodity);
                       return (
                         <label key={commodity} className="flex items-center gap-3 cursor-pointer">
-                          <input type="checkbox" 
+                          <input
+                            type="checkbox"
                             checked={isChecked || false}
                             onChange={(e) => {
                               const arr = editingMerchant.allowedCommodities || [];
                               setEditingMerchant({
                                 ...editingMerchant,
-                                allowedCommodities: e.target.checked ? [...arr, commodity] : arr.filter(c => c !== commodity)
+                                allowedCommodities: e.target.checked
+                                  ? [...arr, commodity]
+                                  : arr.filter((c) => c !== commodity),
                               });
                             }}
-                            className="w-4 h-4 rounded text-blue-600 focus:ring-blue-500" 
+                            className="w-4 h-4 rounded text-blue-600 focus:ring-blue-500"
                           />
                           <span className="text-sm font-medium text-slate-700">{commodity}</span>
                         </label>
@@ -368,22 +467,37 @@ export default function AdminClientsPage() {
 
               {/* Grid 3: Additional Features */}
               <div>
-                <h3 className="text-base font-bold text-slate-800 mb-4 pb-2 border-b border-slate-100">Additional Features</h3>
+                <h3 className="text-base font-bold text-slate-800 mb-4 pb-2 border-b border-slate-100">
+                  Additional Features
+                </h3>
                 <div className="grid grid-cols-2 mb-2 md:grid-cols-3 gap-4">
-                  {['Chatbot', 'Digital Marketing', '24x7 Chat', 'Shop', 'Users', 'Market Closing'].map((feature) => {
+                  {[
+                    'Chatbot',
+                    'Digital Marketing',
+                    '24x7 Chat',
+                    'Shop',
+                    'Users',
+                    'Market Closing',
+                  ].map((feature) => {
                     const isChecked = editingMerchant.additionalFeatures?.includes(feature);
                     return (
-                      <label key={feature} className="flex items-center gap-3 cursor-pointer bg-slate-50 p-3 rounded-xl border border-slate-100 hover:border-slate-200 transition-colors">
-                        <input type="checkbox" 
+                      <label
+                        key={feature}
+                        className="flex items-center gap-3 cursor-pointer bg-slate-50 p-3 rounded-xl border border-slate-100 hover:border-slate-200 transition-colors"
+                      >
+                        <input
+                          type="checkbox"
                           checked={isChecked || false}
                           onChange={(e) => {
                             const arr = editingMerchant.additionalFeatures || [];
                             setEditingMerchant({
                               ...editingMerchant,
-                              additionalFeatures: e.target.checked ? [...arr, feature] : arr.filter(f => f !== feature)
+                              additionalFeatures: e.target.checked
+                                ? [...arr, feature]
+                                : arr.filter((f) => f !== feature),
                             });
                           }}
-                          className="w-4 h-4 rounded text-blue-600 focus:ring-blue-500" 
+                          className="w-4 h-4 rounded text-blue-600 focus:ring-blue-500"
                         />
                         <span className="text-sm font-medium text-slate-700">{feature}</span>
                       </label>
