@@ -33,7 +33,7 @@ import {
 } from 'lucide-react';
 import Loader from '@/components/loader/loader';
 
-const WIDGETS = ['Spot Rates', 'Commodity Table', 'News', 'Clock', 'Date', 'London Fix'];
+const WIDGETS = ['Spot Rates', 'Commodity Table', 'News', 'Clock', 'Date'];
 
 const LAYOUTS = [
   {
@@ -54,6 +54,7 @@ const LAYOUTS = [
       { key: 'clockText', label: 'Clock Text', default: '#000000' },
       { key: 'newsBg', label: 'News Bg', default: '#111827' },
       { key: 'newsText', label: 'News Text', default: '#ffffff' },
+      { key: 'poweredByText', label: 'Powered By Text', default: '#000000' },
     ],
   },
   {
@@ -63,6 +64,7 @@ const LAYOUTS = [
       { key: 'primary', label: 'Primary', default: '#d4a017' },
       { key: 'secondary', label: 'Secondary', default: '#111827' },
       { key: 'accent', label: 'Accent', default: '#38bdf8' },
+      { key: 'poweredByText', label: 'Powered By Text', default: '#ffffff' },
     ],
   },
   {
@@ -72,6 +74,7 @@ const LAYOUTS = [
       { key: 'primary', label: 'Primary', default: '#d4a017' },
       { key: 'secondary', label: 'Secondary', default: '#111827' },
       { key: 'accent', label: 'Accent', default: '#38bdf8' },
+      { key: 'poweredByText', label: 'Powered By Text', default: '#FFC983' },
     ],
   },
 ];
@@ -116,7 +119,7 @@ const defaultDraft: DraftState = {
   screenSlug: 'main',
   selectedLayout: 'theme1',
   themeId: '',
-  widgets: ['Spot Rates', 'Commodity Table', 'News', 'Clock'],
+  widgets: ['Spot Rates', 'Commodity Table', 'News', 'Clock','Date'],
   sectionOrder: ['header', 'spotRates', 'commodities', 'news'],
   assignedDevices: 'TV 1, TV 2',
   colorOverride: {
@@ -134,6 +137,8 @@ const defaultDraft: DraftState = {
     clockText: '#ffffff',
     newsBg: '#111827',
     newsText: '#ffffff',
+    poweredByText: '#ffffff',
+    useBlackLogo: 'false',
   },
   showLogo: true,
   showName: true,
@@ -235,15 +240,6 @@ const TVPreviewRenderer = ({ data }: { data: any }) => {
 
 const COLOR_CATEGORIES = [
   {
-    title: 'Global Colors',
-    colors: [
-      { key: 'primary', label: 'Primary' },
-      { key: 'secondary', label: 'Secondary' },
-      { key: 'accent', label: 'Accent' },
-      { key: 'backgroundColor', label: 'Background' },
-    ],
-  },
-  {
     title: 'Table Settings',
     colors: [
       { key: 'tableHeaderBg', label: 'Header Bg' },
@@ -269,8 +265,13 @@ const COLOR_CATEGORIES = [
   },
   {
     title: 'Clock Settings',
+    colors: [{ key: 'clockText', label: 'Clock Text' }],
+  },
+  {
+    title: 'Footer Settings',
     colors: [
-      { key: 'clockText', label: 'Clock Text' },
+      { key: 'poweredByText', label: 'Powered By Text' },
+      { key: 'useBlackLogo', label: 'Black Logo', type: 'checkbox' },
     ],
   },
 ];
@@ -289,6 +290,7 @@ const THEME_DEFAULTS: Record<string, Record<string, string>> = {
     sellBg: '#280f05',
     sellText: '#ff4d4d',
     clockText: '#000000',
+    poweredByText: '#000',
     newsBg: '#111827',
     newsText: '#ffffff',
   },
@@ -742,25 +744,36 @@ export default function ScreenBuilderTab({
                   </label>
                   <div className="flex flex-col gap-2">
                     {COLOR_CATEGORIES.map((category) => (
-                      <div key={category.title} className="border border-slate-200 rounded-xl bg-white overflow-hidden">
+                      <div
+                        key={category.title}
+                        className="border border-slate-200 rounded-xl bg-white overflow-hidden"
+                      >
                         <button
                           type="button"
-                          onClick={() => setOpenAccordion(openAccordion === category.title ? null : category.title)}
+                          onClick={() =>
+                            setOpenAccordion(
+                              openAccordion === category.title ? null : category.title
+                            )
+                          }
                           className="w-full flex items-center justify-between px-4 py-3 bg-slate-50 hover:bg-slate-100 transition-colors"
                         >
-                          <span className="text-sm font-semibold text-slate-700">{category.title}</span>
+                          <span className="text-sm font-semibold text-slate-700">
+                            {category.title}
+                          </span>
                           {openAccordion === category.title ? (
                             <ChevronDown className="h-4 w-4 text-slate-500" />
                           ) : (
                             <ChevronRight className="h-4 w-4 text-slate-500" />
                           )}
                         </button>
-                        
+
                         {openAccordion === category.title && (
                           <div className="p-4 border-t border-slate-100 bg-white">
                             <div className="flex gap-3 flex-wrap">
                               {category.colors.map((color) => {
-                                const activeDefault = THEME_DEFAULTS[draft.selectedLayout]?.[color.key] || THEME_DEFAULTS.theme1[color.key];
+                                const activeDefault =
+                                  THEME_DEFAULTS[draft.selectedLayout]?.[color.key] ||
+                                  THEME_DEFAULTS.theme1[color.key];
                                 return (
                                   <div
                                     key={color.key}
@@ -770,23 +783,42 @@ export default function ScreenBuilderTab({
                                       {color.label}
                                     </label>
                                     <div className="flex items-center gap-2">
-                                      <input
-                                        type="color"
-                                        className="h-8 w-8 cursor-pointer rounded bg-transparent border-0 p-0"
-                                        value={draft.colorOverride[color.key] || activeDefault}
-                                        onChange={(e) =>
-                                          setDraft({
-                                            ...draft,
-                                            colorOverride: {
-                                              ...draft.colorOverride,
-                                              [color.key]: e.target.value,
-                                            },
-                                          })
-                                        }
-                                      />
-                                      <span className="text-xs font-mono text-slate-600">
-                                        {draft.colorOverride[color.key] || activeDefault}
-                                      </span>
+                                      {color.type === 'checkbox' ? (
+                                        <input
+                                          type="checkbox"
+                                          className="h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-600"
+                                          checked={draft.colorOverride[color.key] === 'true'}
+                                          onChange={(e) =>
+                                            setDraft({
+                                              ...draft,
+                                              colorOverride: {
+                                                ...draft.colorOverride,
+                                                [color.key]: e.target.checked ? 'true' : 'false',
+                                              },
+                                            })
+                                          }
+                                        />
+                                      ) : (
+                                        <>
+                                          <input
+                                            type="color"
+                                            className="h-8 w-8 cursor-pointer rounded bg-transparent border-0 p-0"
+                                            value={draft.colorOverride[color.key] || activeDefault}
+                                            onChange={(e) =>
+                                              setDraft({
+                                                ...draft,
+                                                colorOverride: {
+                                                  ...draft.colorOverride,
+                                                  [color.key]: e.target.value,
+                                                },
+                                              })
+                                            }
+                                          />
+                                          <span className="text-xs font-mono text-slate-600">
+                                            {draft.colorOverride[color.key] || activeDefault}
+                                          </span>
+                                        </>
+                                      )}
                                     </div>
                                   </div>
                                 );

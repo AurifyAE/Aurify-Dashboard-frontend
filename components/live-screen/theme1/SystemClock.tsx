@@ -63,7 +63,7 @@ const SystemClock = ({ colors = {} }: { colors?: any }) => {
             fontSize: { xs: '12px', sm: '2vw' },
             fontWeight: 400,
             letterSpacing: '2px',
-            color: colors.clockText || '#fff',
+            color: colors.clockText || '#000000',
           }}
         >
           {timeData.date || '-- --- ----'}
@@ -71,7 +71,7 @@ const SystemClock = ({ colors = {} }: { colors?: any }) => {
         <Typography
           sx={{
             fontSize: { xs: '12px', sm: '1vw' },
-            color: colors.clockText || '#fff',
+            color: colors.clockText || '#000000',
             letterSpacing: '2px',
           }}
         >

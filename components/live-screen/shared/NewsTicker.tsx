@@ -13,9 +13,20 @@ interface NewsTickerProps {
   merchantName?: string;
   newsHeading?: string;
   colors?: any;
+  containerBg?: string;
+  brandColor?: string;
+  brandBg?: string;
 }
 
-const NewsTicker = ({ newsItems = [], merchantName, newsHeading, colors }: NewsTickerProps) => {
+const NewsTicker = ({
+  newsItems = [],
+  merchantName,
+  newsHeading,
+  colors,
+  containerBg = '#010101',
+  brandColor,
+  brandBg,
+}: NewsTickerProps) => {
   const tickerItems =
     newsItems.length === 0
       ? [{ title: 'your news here' }]
@@ -34,15 +45,16 @@ const NewsTicker = ({ newsItems = [], merchantName, newsHeading, colors }: NewsT
         display: 'flex',
         alignItems: 'center',
         overflow: 'hidden',
+        background: colors?.newsBg || containerBg,
         backdropFilter: 'blur(0.3vw)',
         borderTop: '0.1vw solid #eee2d73d',
-        background: colors?.newsBg || '#00000080',
       }}
     >
+      {/* LEFT BRAND */}
       <Typography
         sx={{
-          color: '#d4a017',
-          background: '#111',
+          color: brandColor || colors?.newsText || '#fff',
+          background: brandBg || colors?.newsBg || '#202020',
           fontSize: {
             xs: '12px',
             lg: '1.2vw',
@@ -61,6 +73,7 @@ const NewsTicker = ({ newsItems = [], merchantName, newsHeading, colors }: NewsT
         {newsHeading || (merchantName ? `${merchantName} Updates` : 'Company Updates')}
       </Typography>
 
+      {/* SCROLL AREA */}
       <Box
         sx={{
           flex: 1,

@@ -3,10 +3,10 @@ import React, { useEffect, useState } from 'react';
 import { Grid, Box } from '@mui/material';
 import SpotRate from './SpotRate';
 import CommodityTable from './CommodityTable';
-import NewsTicker from './News';
+import NewsTicker from '../shared/NewsTicker';
 import WorldClockHorizontal from './WorldClock';
 import SystemClock from './SystemClock';
-import PoweredByAurify from './PoweredByAurify';
+import PoweredByAurify from '../shared/PoweredByAurify';
 import io from 'socket.io-client';
 import { API_URL, API_KEY, SOCKET_SECRET } from '@/lib/env';
 
@@ -208,12 +208,12 @@ export default function Theme3Layout({
       >
         {/* Side: SpotRate & Date Time */}
         <Grid size={{ xs: 12, md: 6 }} sx={{ padding: '1vw', gap: '1vw', display: 'grid' }}>
-          {widgets.includes('Clock') && <SystemClock colors={colors} />}
+          {widgets.includes('Date') && <SystemClock colors={colors} />}
           {widgets.includes('Clock') && <WorldClockHorizontal colors={colors} />}
           {widgets.includes('Spot Rates') && (
             <SpotRate goldData={goldData} silverData={silverData} colors={colors} />
           )}
-          <PoweredByAurify colors={colors} />
+          <PoweredByAurify colors={colors} defaultColor="#FFC983" />
         </Grid>
         <Grid
           size={{ xs: 12, md: 6 }}
@@ -272,6 +272,9 @@ export default function Theme3Layout({
               merchantName={merchant?.companyName}
               newsHeading={layout?.header?.newsHeading || layout?.newsHeading}
               colors={colors}
+              containerBg="#00000080"
+              brandColor="#d4a017"
+              brandBg="#111"
             />
           </Grid>
         )}

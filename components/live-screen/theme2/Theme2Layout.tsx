@@ -3,10 +3,10 @@ import React, { useEffect, useState } from 'react';
 import { Grid, Box, Typography } from '@mui/material';
 import SpotRate from './SpotRate';
 import CommodityTable from './CommodityTable';
-import NewsTicker from './News';
+import NewsTicker from '../shared/NewsTicker';
 import WorldClockHorizontal from './WorldClock';
 import SystemClock from './SystemClock';
-import PoweredByAurify from './PoweredByAurify';
+import PoweredByAurify from '../shared/PoweredByAurify';
 import io from 'socket.io-client';
 import { API_URL, API_KEY, SOCKET_SECRET } from '@/lib/env';
 
@@ -225,7 +225,7 @@ export default function Theme2Layout({
             gap: '1vw',
           }}
         >
-          {widgets.includes('Clock') && <SystemClock colors={colors} />}
+          {widgets.includes('Date') && <SystemClock colors={colors} />}
 
           {widgets.includes('Commodity Table') && (
             <>
@@ -278,7 +278,7 @@ export default function Theme2Layout({
           {widgets.includes('Spot Rates') && (
             <SpotRate goldData={goldData} silverData={silverData} colors={colors} />
           )}
-          <PoweredByAurify colors={colors} />
+          <PoweredByAurify colors={colors} fontSize={{ xs: '15px', md: '1vw' }} mt="auto" />
         </Grid>
 
         {widgets.includes('News') && (
@@ -299,6 +299,8 @@ export default function Theme2Layout({
               merchantName={merchant?.companyName}
               newsHeading={layout?.header?.newsHeading || layout?.newsHeading}
               colors={colors}
+              containerBg="transparent"
+              brandBg="#112251"
             />
           </Grid>
         )}

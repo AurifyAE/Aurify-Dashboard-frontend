@@ -132,7 +132,7 @@ const LiveSpotRate = ({ goldData, silverData, colors = {} }: LiveSpotRateProps) 
             letterSpacing: '0.18vw',
             textAlign: 'center',
             bgcolor: bgColor,
-            color: color,
+            color: '#fff',
             border: border,
             borderRadius: '1vw',
             fontVariantNumeric: 'tabular-nums',

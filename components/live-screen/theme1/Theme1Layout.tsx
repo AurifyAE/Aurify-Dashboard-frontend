@@ -5,10 +5,10 @@ import { Grid, Box, Typography } from '@mui/material';
 import io from 'socket.io-client';
 import CommodityTable from './CommodityTable';
 import LiveSpotRate from './LiveSpotRate';
-import NewsTicker from './NewsTicker';
+import NewsTicker from '../shared/NewsTicker';
 import WorldClockHorizontal from './WorldClock';
 import SystemClock from './SystemClock';
-import PoweredByAurify from './PoweredByAurify';
+import PoweredByAurify from '../shared/PoweredByAurify';
 import { API_URL, API_KEY, SOCKET_SECRET } from '@/lib/env';
 
 export default function Theme1Layout({
@@ -264,16 +264,12 @@ export default function Theme1Layout({
         </Grid>
 
         <Grid size={{ xs: 12, md: 6 }} sx={{ gap: '1vw', display: 'grid' }}>
-          {widgets.includes('Clock') && (
-            <>
-              <WorldClockHorizontal colors={colors} />
-              <SystemClock colors={colors} />
-            </>
-          )}
+          {widgets.includes('Clock') && <WorldClockHorizontal colors={colors} />}
+          {widgets.includes('Date') && <SystemClock colors={colors} />}
           {widgets.includes('Spot Rates') && (
             <LiveSpotRate goldData={goldData} silverData={silverData} colors={colors} />
           )}
-          <PoweredByAurify />
+          <PoweredByAurify colors={colors} defaultColor="#000000" />
         </Grid>
 
         {widgets.includes('News') && (
@@ -293,6 +289,8 @@ export default function Theme1Layout({
               merchantName={merchant?.companyName}
               newsHeading={layout?.header?.newsHeading || layout?.newsHeading}
               colors={colors}
+              containerBg="#010101"
+              brandBg="#202020"
             />
           </Grid>
         )}
