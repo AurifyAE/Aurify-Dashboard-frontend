@@ -361,6 +361,12 @@ export default function ScreenBuilderTab({
   const [draggedSection, setDraggedSection] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const isFirstLoad = useRef(true);
+
+  useEffect(() => {
+    if (isFirstLoad.current) return;
+    localStorage.setItem('aurify-builder-draft', JSON.stringify(draft));
+  }, [draft]);
 
   const handleImageUpload = (
     e: React.ChangeEvent<HTMLInputElement>,
@@ -398,33 +404,48 @@ export default function ScreenBuilderTab({
       setNews(newsItems);
 
       const currentThemeId = installed[0]?.themeId || '';
+      
+      let localDraft: DraftState | null = null;
+      try {
+        const stored = localStorage.getItem('aurify-builder-draft');
+        if (stored) localDraft = JSON.parse(stored);
+      } catch (e) {}
 
       if (editingLayoutId) {
         const target = savedLayouts.find((l) => l.layoutId === editingLayoutId);
         if (target) {
-          setDraft({
-            layoutId: target.layoutId,
-            name: target.name,
-            screenSlug: target.screenSlug,
-            selectedLayout: (target.header as any)?.layout || 'theme1',
-            newsHeading: (target.header as any)?.newsHeading || '',
-            themeId: target.themeId || currentThemeId,
-            widgets: target.widgets?.length ? target.widgets : defaultDraft.widgets,
-            sectionOrder: (target.body as any)?.sectionOrder || defaultDraft.sectionOrder,
-            assignedDevices: Array.isArray(target.assignedDevices)
-              ? target.assignedDevices.join(', ')
-              : target.assignedDevices || '',
-            colorOverride: (target.styles as any)?.colorOverride || defaultDraft.colorOverride,
-            showLogo: (target.styles as any)?.showLogo ?? true,
-            showName: (target.styles as any)?.showName ?? true,
-          });
+          if (localDraft && localDraft.layoutId === editingLayoutId) {
+            setDraft(localDraft);
+          } else {
+            setDraft({
+              layoutId: target.layoutId,
+              name: target.name,
+              screenSlug: target.screenSlug,
+              selectedLayout: (target.header as any)?.layout || 'theme1',
+              newsHeading: (target.header as any)?.newsHeading || '',
+              themeId: target.themeId || currentThemeId,
+              widgets: target.widgets?.length ? target.widgets : defaultDraft.widgets,
+              sectionOrder: (target.body as any)?.sectionOrder || defaultDraft.sectionOrder,
+              assignedDevices: Array.isArray(target.assignedDevices)
+                ? target.assignedDevices.join(', ')
+                : target.assignedDevices || '',
+              colorOverride: (target.styles as any)?.colorOverride || defaultDraft.colorOverride,
+              showLogo: (target.styles as any)?.showLogo ?? true,
+              showName: (target.styles as any)?.showName ?? true,
+            });
+          }
         }
       } else {
-        setDraft({
-          ...defaultDraft,
-          themeId: currentThemeId,
-        });
+        if (localDraft && !localDraft.layoutId) {
+          setDraft(localDraft);
+        } else {
+          setDraft({
+            ...defaultDraft,
+            themeId: currentThemeId,
+          });
+        }
       }
+      isFirstLoad.current = false;
     } catch (err) {
       showMessage(err instanceof Error ? err.message : 'Failed to load builder', 'error');
     } finally {
@@ -550,6 +571,7 @@ export default function ScreenBuilderTab({
     setEditingLayoutId(undefined);
     setDraft(defaultDraft);
     setStep(1);
+    localStorage.removeItem('aurify-builder-draft');
     showMessage('Form reset. Creating a new screen config.', 'info');
   };
 
