@@ -240,7 +240,7 @@ export default function Theme3Layout({ data, isPreview = false }: { data?: any; 
             size={{ xs: 12 }}
             sx={{
               mt: { xs: "20px", md: "0" },
-              position: isPreview ? "absolute" : "fixed",
+              position:  "fixed",
               zIndex: 1,
               bottom: "0",
               width: "100%",

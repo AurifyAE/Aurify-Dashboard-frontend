@@ -1,6 +1,7 @@
 'use client';
 import React from 'react';
 import { Box, Typography } from '@mui/material';
+import Marquee from 'react-fast-marquee';
 
 interface NewsItem {
   title?: string;
@@ -14,7 +15,7 @@ interface NewsTickerProps {
 }
 
 const NewsTicker = ({ newsItems = [], merchantName, newsHeading }: NewsTickerProps) => {
-  const tickerItems = newsItems.length <= 1 ? Array(5).fill(newsItems[0]) : newsItems;
+  const tickerItems = newsItems.length === 0 ? [{ title: 'your news here' }] : newsItems.length === 1 ? Array(5).fill(newsItems[0]) : newsItems;
 
   return (
     <Box
@@ -58,15 +59,17 @@ const NewsTicker = ({ newsItems = [], merchantName, newsHeading }: NewsTickerPro
         sx={{
           flex: 1,
           overflow: 'hidden',
+          height: '100%',
+          display: 'flex',
+          alignItems: 'center',
         }}
       >
-        <Box
-          sx={{
-            whiteSpace: 'nowrap',
-            display: 'inline-flex',
-            alignItems: 'center',
-            animation: 'ticker 70s linear infinite',
-          }}
+        <Marquee
+          speed={40}
+          gradient={false}
+          autoFill={true}
+          loop={0}
+          direction="left"
         >
           {tickerItems.map((item, index) => (
             <Typography
@@ -80,23 +83,15 @@ const NewsTicker = ({ newsItems = [], merchantName, newsHeading }: NewsTickerPro
                 },
                 fontWeight: 500,
                 whiteSpace: 'nowrap',
-                marginRight: '4vw',
+                mx: '1vw',
+                flexShrink: 0,
               }}
             >
               {item?.title ? `${item.title}${item.content ? ` - ${item.content}` : ''}` : ''}
             </Typography>
           ))}
-        </Box>
+        </Marquee>
       </Box>
-
-      <style>
-        {`
-          @keyframes ticker {
-            0% { transform: translateX(30%); }
-            100% { transform: translateX(-100%); }
-          }
-        `}
-      </style>
     </Box>
   );
 };
