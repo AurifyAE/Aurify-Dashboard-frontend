@@ -29,6 +29,7 @@
     "react-dom": "19.2.3",
     "react-dropzone": "^15.0.0",
     "react-fast-marquee": "^1.6.5",
+    "react-hot-toast": "^2.6.0",
     "react-phone-number-input": "^3.4.14",
     "react-toastify": "^11.1.0",
     "recharts": "^3.6.0",
