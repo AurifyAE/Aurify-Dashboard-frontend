@@ -15,6 +15,7 @@ import {
   Save,
   Tag,
   Trash2,
+  X,
 } from 'lucide-react';
 import { Select, MenuItem } from '@mui/material';
 import toast from 'react-hot-toast';
@@ -48,12 +49,12 @@ const defaultForm = {
   endDate: '',
 };
 
-export default function NewsManagementTab({ 
+export default function NewsManagementTab({
   isEmbedded = false,
-  onUpdate
-}: { 
-  isEmbedded?: boolean,
-  onUpdate?: () => void 
+  onUpdate,
+}: {
+  isEmbedded?: boolean;
+  onUpdate?: () => void;
 }) {
   const [items, setItems] = useState<MerchantNews[]>([]);
   const [form, setForm] = useState(defaultForm);
@@ -91,7 +92,9 @@ export default function NewsManagementTab({
       await load();
       if (onUpdate) onUpdate();
       toast.dismiss();
-      toast.success(editingId ? 'News item updated successfully.' : 'News item added successfully.');
+      toast.success(
+        editingId ? 'News item updated successfully.' : 'News item added successfully.'
+      );
       setShowForm(false);
       setSaved(true);
       setTimeout(() => setSaved(false), 3000);
@@ -135,8 +138,8 @@ export default function NewsManagementTab({
               Control news tickers, promotions and announcements shown on your TV screens.
             </p>
           </div>
-          <button 
-            type="button" 
+          <button
+            type="button"
             onClick={() => {
               if (showForm) {
                 setForm(defaultForm);
@@ -145,7 +148,7 @@ export default function NewsManagementTab({
               } else {
                 setShowForm(true);
               }
-            }} 
+            }}
             className="btn-primary"
           >
             {showForm ? <X className="h-4 w-4" /> : <Plus className="h-4 w-4" />}
@@ -173,14 +176,16 @@ export default function NewsManagementTab({
         </button>
       )}
 
-
-
       <div className={`grid gap-6 ${isEmbedded ? 'grid-cols-1' : 'xl:grid-cols-[420px_1fr]'}`}>
         {/* Form Panel */}
         {showForm && (
           <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
             <h2 className="mb-5 flex items-center gap-2 font-bold text-slate-900">
-              {editingId ? <Pencil className="h-4 w-4 text-blue-500" /> : <Plus className="h-4 w-4 text-blue-500" />}
+              {editingId ? (
+                <Pencil className="h-4 w-4 text-blue-500" />
+              ) : (
+                <Plus className="h-4 w-4 text-blue-500" />
+              )}
               {editingId ? 'Edit News Item' : 'Create News Item'}
             </h2>
             <div className="space-y-4">

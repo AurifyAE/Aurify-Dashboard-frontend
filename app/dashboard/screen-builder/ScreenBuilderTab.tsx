@@ -123,7 +123,7 @@ const defaultDraft: DraftState = {
   screenSlug: 'main',
   selectedLayout: 'theme1',
   themeId: '',
-  widgets: ['Spot Rates', 'Commodity Table', 'News', 'Clock','Date'],
+  widgets: ['Spot Rates', 'Commodity Table', 'News', 'Clock', 'Date'],
   sectionOrder: ['header', 'spotRates', 'commodities', 'news'],
   assignedDevices: 'TV 1, TV 2',
   colorOverride: {
@@ -575,6 +575,14 @@ export default function ScreenBuilderTab({
           </p>
         </div>
         <div className="flex gap-2">
+          <button
+            type="button"
+            onClick={() => setActiveTab('my-screens')}
+            className="btn-secondary hidden sm:flex"
+          >
+            <Monitor className="h-4 w-4" />
+            My Screens
+          </button>
           {draft.layoutId && (
             <button type="button" onClick={resetForm} className="btn-secondary">
               Start New Screen
@@ -626,8 +634,6 @@ export default function ScreenBuilderTab({
           </React.Fragment>
         ))}
       </div>
-
-
 
       <div className="grid gap-6 xl:grid-cols-[380px_1fr]">
         <aside className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sticky top-6 h-fit max-h-[70dvh] overflow-y-auto">
@@ -888,9 +894,14 @@ export default function ScreenBuilderTab({
               </div>
 
               <div className="border-t border-slate-100 pt-4">
-                <NewsManagementTab 
-                  isEmbedded={true} 
-                  onUpdate={() => marketplaceApi.news().then(setNews).catch(() => [])} 
+                <NewsManagementTab
+                  isEmbedded={true}
+                  onUpdate={() =>
+                    marketplaceApi
+                      .news()
+                      .then(setNews)
+                      .catch(() => [])
+                  }
                 />
               </div>
 

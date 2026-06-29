@@ -1,6 +1,14 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Box, Typography } from '@mui/material';
-const SpotRate = ({ goldData, silverData, colors }: { goldData: any; silverData: any; colors?: any }) => {
+const SpotRate = ({
+  goldData,
+  silverData,
+  colors,
+}: {
+  goldData: any;
+  silverData: any;
+  colors?: any;
+}) => {
   const [goldBidDir, setGoldBidDir] = useState('neutral');
   const [goldAskDir, setGoldAskDir] = useState('neutral');
   const [silverBidDir, setSilverBidDir] = useState('neutral');
@@ -71,9 +79,9 @@ const SpotRate = ({ goldData, silverData, colors }: { goldData: any; silverData:
         color: 'white',
       };
     return {
-      bgColor: isBid ? (colors?.buyBg || '#F0F8FF00') : (colors?.sellBg || '#F0F8FF00'),
+      bgColor: isBid ? colors?.buyBg || '#F0F8FF00' : colors?.sellBg || '#F0F8FF00',
       border: ' 1px solid #FFFFFF',
-      color: isBid ? (colors?.buyText || '#fff') : (colors?.sellText || '#fff'),
+      color: isBid ? colors?.buyText || '#fff' : colors?.sellText || '#fff',
     };
   };
 

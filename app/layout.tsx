@@ -34,8 +34,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <SpotRateProvider>
             <CurrencyProvider>
               {children}
-              <Toaster 
-                position="top-center" 
+              <Toaster
+                position="top-center"
                 toastOptions={{
                   style: {
                     background: '#1e293b', // slate-800
@@ -57,8 +57,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                       primary: '#22c55e',
                       secondary: '#fff',
                     },
-                  }
-                }} 
+                  },
+                }}
               />
             </CurrencyProvider>
           </SpotRateProvider>

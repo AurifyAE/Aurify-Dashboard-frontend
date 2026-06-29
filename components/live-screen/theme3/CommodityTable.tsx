@@ -141,7 +141,9 @@ const CommodityTable = ({ title, items, goldData, silverData, colors }: any) => 
           alignItems: 'end',
           borderRadius: '1vw',
           margin: '.4vw',
-          background: colors?.tableHeaderBg || 'linear-gradient(180deg, rgba(40,15,5,0.55) 0%, rgba(20,8,2,0.45) 100%)',
+          background:
+            colors?.tableHeaderBg ||
+            'linear-gradient(180deg, rgba(40,15,5,0.55) 0%, rgba(20,8,2,0.45) 100%)',
           backdropFilter: 'blur(0.35vw)',
           border: '0.1vw solid rgba(249 184 98 / 0.44)',
 
@@ -254,7 +256,9 @@ const CommodityTable = ({ title, items, goldData, silverData, colors }: any) => 
               borderRadius: '1vw',
 
               margin: '.4vw',
-              background: colors?.tableRowBg || 'linear-gradient(180deg, rgba(30,10,3,0.3) 0%, rgba(20,8,2,0.6) 100%)',
+              background:
+                colors?.tableRowBg ||
+                'linear-gradient(180deg, rgba(30,10,3,0.3) 0%, rgba(20,8,2,0.6) 100%)',
               backdropFilter: 'blur(0.4vw)',
               border: '0.1vw solid #FFC98370',
 

@@ -81,9 +81,9 @@ const LiveSpotRate = ({ goldData, silverData, colors = {} }: LiveSpotRateProps) 
         color: 'white',
       };
     return {
-      bgColor: isBuy ? (colors?.buyBg || '#F0F8FF00') : (colors?.sellBg || '#F0F8FF00'),
+      bgColor: isBuy ? colors?.buyBg || '#F0F8FF00' : colors?.sellBg || '#F0F8FF00',
       border: '1px solid #FFFFFF',
-      color: isBuy ? (colors?.buyText || '#fff') : (colors?.sellText || '#fff'),
+      color: isBuy ? colors?.buyText || '#fff' : colors?.sellText || '#fff',
     };
   };
 

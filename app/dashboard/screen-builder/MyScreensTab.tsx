@@ -226,6 +226,7 @@ export default function MyScreensTab({ onEditLayout, onCreateNew }: MyScreensTab
                       title="Delete Screen"
                     >
                       <Trash2 className="h-4 w-4" />
+                      Delete
                     </button>
 
                     {!isPublished ? (

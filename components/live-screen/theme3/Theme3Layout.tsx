@@ -228,7 +228,7 @@ export default function Theme3Layout({
         >
           <Box
             sx={{
-              height: {xs:'150px',sm:'250px'},
+              height: { xs: '150px', sm: '250px' },
               width: { xs: '40vw', sm: '25vw' },
               marginBottom: { xs: '20px', sm: '0vw' },
             }}
@@ -237,7 +237,7 @@ export default function Theme3Layout({
               <img
                 src={merchant?.logo || '/images/logo-placeholder.svg'}
                 alt=""
-                style={{ objectFit: 'contain', width: '100%',height:'100%' }}
+                style={{ objectFit: 'contain', width: '100%', height: '100%' }}
               />
             ) : (layout?.styles?.showName ?? true) ? (
               <Box sx={{ fontSize: '2vw', fontWeight: 'bold', color: '#fff', textAlign: 'center' }}>

@@ -101,9 +101,9 @@ const SpotRate = ({ goldData, silverData, colors }: SpotRateProps) => {
         color: 'white',
       };
     return {
-      bgColor: isBid ? (colors?.buyBg || '#F0F8FF00') : (colors?.sellBg || '#F0F8FF00'),
+      bgColor: isBid ? colors?.buyBg || '#F0F8FF00' : colors?.sellBg || '#F0F8FF00',
       border: '1px solid #FFFFFF',
-      color: isBid ? (colors?.buyText || '#fff') : (colors?.sellText || '#fff'),
+      color: isBid ? colors?.buyText || '#fff' : colors?.sellText || '#fff',
     };
   };
 

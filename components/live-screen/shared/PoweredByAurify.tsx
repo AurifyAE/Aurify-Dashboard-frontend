@@ -48,7 +48,11 @@ const PoweredByAurify = ({
         Powered by
         <Box
           component="img"
-          src={colors?.useBlackLogo === 'true' ? '/images/aurify-logo-black.svg' : '/images/aurify-logo.svg'}
+          src={
+            colors?.useBlackLogo === 'true'
+              ? '/images/aurify-logo-black.svg'
+              : '/images/aurify-logo.svg'
+          }
           alt="Aurify"
           sx={{
             height: { xs: '5vw', md: '1.5vw' },
