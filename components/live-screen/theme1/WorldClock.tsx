@@ -73,7 +73,7 @@ const WorldClockHorizontal = ({ colors = {} }: { colors?: any }) => {
           <Box sx={{ display: 'flex', alignItems: 'start', flexDirection: 'column' }}>
             <Typography
               sx={{
-                color: colors.clockText || '#fff',
+                color: colors.clockText || '#000000',
                 fontSize: { xs: '8px', lg: '0.6vw' },
                 fontWeight: '600',
                 textTransform: 'uppercase',
@@ -82,7 +82,7 @@ const WorldClockHorizontal = ({ colors = {} }: { colors?: any }) => {
               {clock.label}
             </Typography>
             <Typography
-              sx={{ fontSize: { xs: '14px', lg: '1vw' }, color: colors.clockText || '#fff' }}
+              sx={{ fontSize: { xs: '14px', lg: '1vw' }, color: colors.clockText || '#000000' }}
             >
               {times[clock.key] || '--:--'}
             </Typography>

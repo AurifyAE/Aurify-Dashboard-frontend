@@ -12,9 +12,10 @@ interface NewsTickerProps {
   newsItems?: NewsItem[];
   merchantName?: string;
   newsHeading?: string;
+  colors?: any;
 }
 
-const NewsTicker = ({ newsItems = [], merchantName, newsHeading }: NewsTickerProps) => {
+const NewsTicker = ({ newsItems = [], merchantName, newsHeading, colors }: NewsTickerProps) => {
   const tickerItems =
     newsItems.length === 0
       ? [{ title: 'your news here' }]
@@ -41,8 +42,8 @@ const NewsTicker = ({ newsItems = [], merchantName, newsHeading }: NewsTickerPro
       {/* LEFT BRAND */}
       <Typography
         sx={{
-          color: '#fff',
-          background: '#112251',
+          color: colors?.newsText || '#fff',
+          background: colors?.newsBg || '#112251',
           fontSize: {
             xs: '12px',
             lg: '1.2vw',
@@ -78,7 +79,7 @@ const NewsTicker = ({ newsItems = [], merchantName, newsHeading }: NewsTickerPro
               key={index}
               component="span"
               sx={{
-                color: '#fff',
+                color: colors?.newsText || '#fff',
                 fontSize: {
                   xs: '12px',
                   lg: '1.3vw',

@@ -23,7 +23,7 @@ const NewsTicker = ({ newsItems = [], merchantName, newsHeading, colors }: any) 
         display: 'flex',
         alignItems: 'center',
         overflow: 'hidden',
-        background: '#010101',
+        background: colors?.newsBg || '#010101',
         backdropFilter: 'blur(0.3vw)',
         borderTop: '0.1vw solid #eee2d73d',
       }}
@@ -31,8 +31,8 @@ const NewsTicker = ({ newsItems = [], merchantName, newsHeading, colors }: any) 
       {/* LEFT BRAND */}
       <Typography
         sx={{
-          color: '#fff',
-          background: '#202020',
+          color: colors?.newsText || '#fff',
+          background: colors?.newsBg || '#202020',
           fontSize: {
             xs: '12px',
             lg: '1.2vw',
@@ -68,7 +68,7 @@ const NewsTicker = ({ newsItems = [], merchantName, newsHeading, colors }: any) 
               key={index}
               component="span"
               sx={{
-                color: '#fff',
+                color: colors?.newsText || '#fff',
                 fontSize: {
                   xs: '12px',
                   lg: '1.3vw',

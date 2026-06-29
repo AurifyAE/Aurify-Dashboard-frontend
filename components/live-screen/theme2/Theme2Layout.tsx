@@ -19,6 +19,7 @@ export default function Theme2Layout({
 }) {
   const { merchant, theme, layout, commodities, news } = data || {};
   const widgets = layout?.widgets || ['Spot Rates', 'Commodity Table', 'News', 'Clock'];
+  const colors = layout?.styles?.colorOverride || layout?.colorOverride || {};
   const showLogo = layout?.styles?.showLogo ?? true;
   const showName = layout?.styles?.showName ?? true;
 
@@ -224,7 +225,7 @@ export default function Theme2Layout({
             gap: '1vw',
           }}
         >
-          {widgets.includes('Clock') && <SystemClock />}
+          {widgets.includes('Clock') && <SystemClock colors={colors} />}
 
           {widgets.includes('Commodity Table') && (
             <>
@@ -233,16 +234,18 @@ export default function Theme2Layout({
                 isCommodity={true}
                 goldData={goldData}
                 silverData={silverData}
+                colors={colors}
               />
               <CommodityTable
                 commodities={displayCommodities}
                 isMintedBar={true}
                 goldData={goldData}
                 silverData={silverData}
+                colors={colors}
               />
             </>
           )}
-          {widgets.includes('Clock') && <WorldClockHorizontal />}
+          {widgets.includes('Clock') && <WorldClockHorizontal colors={colors} />}
         </Grid>
 
         <Grid size={{ xs: 12, md: 6 }} sx={{ display: 'grid', padding: '1vw', gap: '1vw' }}>
@@ -273,9 +276,9 @@ export default function Theme2Layout({
           </Box>
 
           {widgets.includes('Spot Rates') && (
-            <SpotRate goldData={goldData} silverData={silverData} />
+            <SpotRate goldData={goldData} silverData={silverData} colors={colors} />
           )}
-          <PoweredByAurify />
+          <PoweredByAurify colors={colors} />
         </Grid>
 
         {widgets.includes('News') && (
@@ -295,6 +298,7 @@ export default function Theme2Layout({
               newsItems={news}
               merchantName={merchant?.companyName}
               newsHeading={layout?.header?.newsHeading || layout?.newsHeading}
+              colors={colors}
             />
           </Grid>
         )}

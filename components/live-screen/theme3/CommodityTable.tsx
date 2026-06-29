@@ -17,7 +17,7 @@ const UNIT_MULTIPLIER = {
   OZ: 31.103,
 };
 
-const CommodityTable = ({ title, items, goldData, silverData }: any) => {
+const CommodityTable = ({ title, items, goldData, silverData, colors }: any) => {
   // ✅ FIXED: Minted bars treated as gold
   const getSpot = (metal) => {
     const lower = metal?.toLowerCase() || '';
@@ -141,7 +141,7 @@ const CommodityTable = ({ title, items, goldData, silverData }: any) => {
           alignItems: 'end',
           borderRadius: '1vw',
           margin: '.4vw',
-          background: 'linear-gradient(180deg, rgba(40,15,5,0.55) 0%, rgba(20,8,2,0.45) 100%)',
+          background: colors?.tableHeaderBg || 'linear-gradient(180deg, rgba(40,15,5,0.55) 0%, rgba(20,8,2,0.45) 100%)',
           backdropFilter: 'blur(0.35vw)',
           border: '0.1vw solid rgba(249 184 98 / 0.44)',
 
@@ -161,7 +161,7 @@ const CommodityTable = ({ title, items, goldData, silverData }: any) => {
               xl: '1.3vw',
             },
             fontWeight: 600,
-            color: '#fff',
+            color: colors?.tableText || '#fff',
             letterSpacing: '0.04vw',
             textAlign: 'start',
           }}
@@ -179,7 +179,7 @@ const CommodityTable = ({ title, items, goldData, silverData }: any) => {
               xl: '1.3vw',
             },
             fontWeight: 600,
-            color: '#fff',
+            color: colors?.tableText || '#fff',
             textAlign: 'start',
           }}
         >
@@ -194,7 +194,7 @@ const CommodityTable = ({ title, items, goldData, silverData }: any) => {
               xl: '1.3vw',
             },
             fontWeight: 600,
-            color: '#fff',
+            color: colors?.tableText || '#fff',
             textAlign: 'center',
           }}
         >
@@ -211,7 +211,7 @@ const CommodityTable = ({ title, items, goldData, silverData }: any) => {
               xl: '1.3vw',
             },
             fontWeight: 600,
-            color: '#fff',
+            color: colors?.tableText || '#fff',
             textAlign: 'center',
           }}
         >
@@ -254,8 +254,8 @@ const CommodityTable = ({ title, items, goldData, silverData }: any) => {
               borderRadius: '1vw',
 
               margin: '.4vw',
-              background: 'linear-gradient(180deg, rgba(40,15,5,0.35) 0%, rgba(20,8,2,0.25) 100%)',
-              backdropFilter: 'blur(0.35vw)',
+              background: colors?.tableRowBg || 'linear-gradient(180deg, rgba(30,10,3,0.3) 0%, rgba(20,8,2,0.6) 100%)',
+              backdropFilter: 'blur(0.4vw)',
               border: '0.1vw solid #FFC98370',
 
               boxShadow: `
@@ -264,7 +264,6 @@ const CommodityTable = ({ title, items, goldData, silverData }: any) => {
 `,
             }}
           >
-            «
             {rows.map((row: any, index: any) => (
               <SwiperSlide key={index}>
                 <Box
@@ -289,7 +288,7 @@ const CommodityTable = ({ title, items, goldData, silverData }: any) => {
                     },
                   }}
                 >
-                  <Typography
+                  <Box
                     sx={{
                       // fontSize: "1.24vw",
 
@@ -300,7 +299,7 @@ const CommodityTable = ({ title, items, goldData, silverData }: any) => {
                         xl: '1.4vw',
                       },
                       fontWeight: 800,
-                      color: '#fff',
+                      color: colors?.tableText || '#fff',
                       display: 'grid',
                       alignItems: 'center ',
                       justifyContent: 'start',
@@ -324,14 +323,14 @@ const CommodityTable = ({ title, items, goldData, silverData }: any) => {
                           lg: '1.2vw',
                         },
                         fontWeight: 400,
-                        color: '#fff',
+                        color: colors?.tableText || '#fff',
                         // mb:'-0.5vw'
                       }}
                     >
                       {/* {row.purity} */}
                       {getPurityLabel(row.purity)}
                     </Typography>
-                  </Typography>
+                  </Box>
 
                   <Typography
                     sx={{
@@ -342,8 +341,8 @@ const CommodityTable = ({ title, items, goldData, silverData }: any) => {
                         lg: '1.3vw',
                         xl: '1.4vw',
                       },
-                      color: '#fff',
-                      textAlign: 'start',
+                      fontWeight: 600,
+                      color: colors?.tableText || '#fff',
                     }}
                   >
                     {row.unit}

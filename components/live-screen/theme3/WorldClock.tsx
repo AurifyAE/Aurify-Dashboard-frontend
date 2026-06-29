@@ -28,7 +28,7 @@ const clockConfig = [
   },
 ];
 
-const WorldClockHorizontal = () => {
+const WorldClockHorizontal = ({ colors }: { colors?: any }) => {
   const [times, setTimes] = useState({});
 
   useEffect(() => {
@@ -106,7 +106,7 @@ const WorldClockHorizontal = () => {
                   lg: '1vw',
                 },
                 fontWeight: 500,
-                color: '#FFC983',
+                color: colors?.clockText || '#FFC983',
               }}
             >
               {clock.label}
@@ -118,7 +118,7 @@ const WorldClockHorizontal = () => {
                   xs: '14px',
                   lg: '1vw',
                 },
-                color: '#FFC983',
+                color: colors?.clockText || '#FFC983',
               }}
             >
               {times[clock.key] || '--:--'}

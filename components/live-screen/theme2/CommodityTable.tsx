@@ -45,6 +45,7 @@ interface CommodityTableProps {
   isCommodity?: boolean;
   goldData?: SpotData;
   silverData?: SpotData;
+  colors?: any;
 }
 
 interface TableDataItem {
@@ -64,6 +65,7 @@ const CommodityTable = ({
   isCommodity = false,
   goldData,
   silverData,
+  colors,
 }: CommodityTableProps) => {
   /* -----------------------
      HELPERS
@@ -202,7 +204,7 @@ const CommodityTable = ({
             alignItems: 'end',
             borderRadius: '1vw',
             // background: "#aa8a4b1a",
-            background: '#aa8a4b11',
+            background: colors?.tableHeaderBg || '#aa8a4b11',
 
             backdropFilter: 'blur(0.3vw)',
             border: '0.1vw solid #eee2d73d',
@@ -220,7 +222,7 @@ const CommodityTable = ({
                 xl: '1.3vw',
               },
               fontWeight: 600,
-              color: '#fff',
+              color: colors?.tableText || '#fff',
               letterSpacing: '0.04vw',
               textAlign: 'start',
             }}
@@ -237,7 +239,7 @@ const CommodityTable = ({
                 xl: '1.3vw',
               },
               fontWeight: 600,
-              color: '#fff',
+              color: colors?.tableText || '#fff',
               textAlign: 'start',
             }}
           >
@@ -253,7 +255,7 @@ const CommodityTable = ({
                   xl: '1.3vw',
                 },
                 fontWeight: 600,
-                color: '#fff',
+                color: colors?.tableText || '#fff',
                 textAlign: 'center',
               }}
             >
@@ -270,7 +272,7 @@ const CommodityTable = ({
                 xl: '1.3vw',
               },
               fontWeight: 600,
-              color: '#fff',
+              color: colors?.tableText || '#fff',
               textAlign: 'center',
             }}
           >
@@ -311,7 +313,7 @@ const CommodityTable = ({
                 height: tableHeight,
 
                 backdropFilter: 'blur(5px)',
-                background: '#aa8a4b15',
+                background: colors?.tableRowBg || '#aa8a4b11',
                 borderRadius: '1vw',
                 border: '0.1vw solid #eee2d73d',
                 boxShadow: '0px 0px 25px  rgba(69, 79, 170, 0.25)  inset',
@@ -341,7 +343,7 @@ const CommodityTable = ({
                           xl: '1.4vw',
                         },
                         fontWeight: 800,
-                        color: '#fff',
+                        color: colors?.tableText || '#fff',
                         display: 'flex',
                         alignItems: 'center ',
                         justifyContent: 'start',
@@ -361,7 +363,7 @@ const CommodityTable = ({
                             lg: '1.2vw',
                           },
                           fontWeight: 400,
-                          color: '#fff',
+                          color: colors?.tableText || '#fff',
                           // mb:'-0.5vw'
                         }}
                       >
@@ -377,7 +379,7 @@ const CommodityTable = ({
                           lg: '1.3vw',
                           xl: '1.4vw',
                         },
-                        color: '#fff',
+                        color: colors?.tableText || '#fff',
                         textAlign: 'start',
                       }}
                     >
@@ -395,7 +397,7 @@ const CommodityTable = ({
                         textAlign: 'center',
 
                         fontWeight: 600,
-                        color: '#fff', // soft pink ASK
+                        color: colors?.tableText || '#fff', // soft pink ASK
                       }}
                     >
                       {formatPrice(row.bid)}
@@ -413,7 +415,7 @@ const CommodityTable = ({
                         textAlign: 'center',
 
                         fontWeight: 600,
-                        color: '#fff', // soft pink ASK
+                        color: colors?.tableText || '#fff', // soft pink ASK
                       }}
                     >
                       {formatPrice(row.ask)}

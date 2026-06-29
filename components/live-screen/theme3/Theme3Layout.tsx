@@ -19,6 +19,7 @@ export default function Theme3Layout({
 }) {
   const { merchant, theme, layout, commodities, news } = data || {};
   const widgets = layout?.widgets || ['Spot Rates', 'Commodity Table', 'News', 'Clock'];
+  const colors = layout?.styles?.colorOverride || layout?.colorOverride || {};
 
   const [marketData, setMarketData] = useState<Record<string, any>>({});
   const [serverURL, setServerURL] = useState<string | null>(null);
@@ -207,12 +208,12 @@ export default function Theme3Layout({
       >
         {/* Side: SpotRate & Date Time */}
         <Grid size={{ xs: 12, md: 6 }} sx={{ padding: '1vw', gap: '1vw', display: 'grid' }}>
-          {widgets.includes('Clock') && <SystemClock />}
-          {widgets.includes('Clock') && <WorldClockHorizontal />}
+          {widgets.includes('Clock') && <SystemClock colors={colors} />}
+          {widgets.includes('Clock') && <WorldClockHorizontal colors={colors} />}
           {widgets.includes('Spot Rates') && (
-            <SpotRate goldData={goldData} silverData={silverData} />
+            <SpotRate goldData={goldData} silverData={silverData} colors={colors} />
           )}
-          <PoweredByAurify />
+          <PoweredByAurify colors={colors} />
         </Grid>
         <Grid
           size={{ xs: 12, md: 6 }}
@@ -249,6 +250,7 @@ export default function Theme3Layout({
               items={displayCommodities}
               goldData={goldData}
               silverData={silverData}
+              colors={colors}
             />
           )}
         </Grid>
@@ -269,6 +271,7 @@ export default function Theme3Layout({
               newsItems={news}
               merchantName={merchant?.companyName}
               newsHeading={layout?.header?.newsHeading || layout?.newsHeading}
+              colors={colors}
             />
           </Grid>
         )}

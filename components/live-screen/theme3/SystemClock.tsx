@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Box, Typography } from '@mui/material';
 
-const SystemClock = () => {
+const SystemClock = ({ colors }: { colors?: any }) => {
   const [timeData, setTimeData] = useState({
     day: '',
     date: '',
@@ -81,7 +81,7 @@ const SystemClock = () => {
             },
             fontWeight: 400,
             letterSpacing: '2px',
-            color: '#FFC983',
+            color: colors?.clockText || '#FFC983',
           }}
         >
           {timeData.date || '-- --- ----'}
@@ -93,7 +93,7 @@ const SystemClock = () => {
               xs: '12px',
               sm: '1vw',
             },
-            color: '#FFC983',
+            color: colors?.clockText || '#FFC983',
             letterSpacing: '2px',
           }}
         >

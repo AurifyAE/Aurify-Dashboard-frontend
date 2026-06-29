@@ -19,6 +19,8 @@ import {
   ArrowUp,
   Check,
   CheckCircle2,
+  ChevronDown,
+  ChevronRight,
   GripVertical,
   Loader2,
   Monitor,
@@ -49,7 +51,7 @@ const LAYOUTS = [
       { key: 'buyText', label: 'Buy Text', default: '#20c997' },
       { key: 'sellBg', label: 'Sell Box Bg', default: '#280f05' },
       { key: 'sellText', label: 'Sell Text', default: '#ff4d4d' },
-      { key: 'clockText', label: 'Clock Text', default: '#ffffff' },
+      { key: 'clockText', label: 'Clock Text', default: '#000000' },
       { key: 'newsBg', label: 'News Bg', default: '#111827' },
       { key: 'newsText', label: 'News Text', default: '#ffffff' },
     ],
@@ -231,12 +233,106 @@ const TVPreviewRenderer = ({ data }: { data: any }) => {
   );
 };
 
+const COLOR_CATEGORIES = [
+  {
+    title: 'Global Colors',
+    colors: [
+      { key: 'primary', label: 'Primary' },
+      { key: 'secondary', label: 'Secondary' },
+      { key: 'accent', label: 'Accent' },
+      { key: 'backgroundColor', label: 'Background' },
+    ],
+  },
+  {
+    title: 'Table Settings',
+    colors: [
+      { key: 'tableHeaderBg', label: 'Header Bg' },
+      { key: 'tableRowBg', label: 'Row Bg' },
+      { key: 'tableText', label: 'Text' },
+    ],
+  },
+  {
+    title: 'Spot Rate Settings',
+    colors: [
+      { key: 'buyBg', label: 'Buy Box Bg' },
+      { key: 'buyText', label: 'Buy Text' },
+      { key: 'sellBg', label: 'Sell Box Bg' },
+      { key: 'sellText', label: 'Sell Text' },
+    ],
+  },
+  {
+    title: 'News Settings',
+    colors: [
+      { key: 'newsBg', label: 'News Bg' },
+      { key: 'newsText', label: 'News Text' },
+    ],
+  },
+  {
+    title: 'Clock Settings',
+    colors: [
+      { key: 'clockText', label: 'Clock Text' },
+    ],
+  },
+];
+
+const THEME_DEFAULTS: Record<string, Record<string, string>> = {
+  theme1: {
+    primary: '#d4a017',
+    secondary: '#111827',
+    accent: '#38bdf8',
+    backgroundColor: '#140b10',
+    tableHeaderBg: '#280f05',
+    tableRowBg: '#140802',
+    tableText: '#ffffff',
+    buyBg: '#280f05',
+    buyText: '#20c997',
+    sellBg: '#280f05',
+    sellText: '#ff4d4d',
+    clockText: '#000000',
+    newsBg: '#111827',
+    newsText: '#ffffff',
+  },
+  theme2: {
+    primary: '#d4a017',
+    secondary: '#111827',
+    accent: '#38bdf8',
+    backgroundColor: '#000000',
+    tableHeaderBg: '#1c170f',
+    tableRowBg: '#0f0c08',
+    tableText: '#ffffff',
+    buyBg: '#000000',
+    buyText: '#ffffff',
+    sellBg: '#000000',
+    sellText: '#ffffff',
+    clockText: '#ffffff',
+    newsBg: '#112251',
+    newsText: '#ffffff',
+  },
+  theme3: {
+    primary: '#d4a017',
+    secondary: '#111827',
+    accent: '#38bdf8',
+    backgroundColor: '#000000',
+    tableHeaderBg: '#280f05',
+    tableRowBg: '#1a0903',
+    tableText: '#ffffff',
+    buyBg: '#000000',
+    buyText: '#ffffff',
+    sellBg: '#000000',
+    sellText: '#ffffff',
+    clockText: '#ffc983',
+    newsBg: '#000000',
+    newsText: '#d4a017',
+  },
+};
+
 export default function ScreenBuilderTab({
   editingLayoutId,
   setEditingLayoutId,
   setActiveTab,
   onSaveSuccess,
 }: ScreenBuilderTabProps) {
+  const [openAccordion, setOpenAccordion] = useState<string | null>('Global Colors');
   const [step, setStep] = useState(1);
   const [merchant, setMerchant] = useState<Merchant | null>(null);
   const [themes, setThemes] = useState<MerchantTheme[]>([]);
@@ -570,7 +666,10 @@ export default function ScreenBuilderTab({
                     <button
                       key={l.id}
                       type="button"
-                      onClick={() => setDraft({ ...draft, selectedLayout: l.id })}
+                      onClick={() => {
+                        const defaultColors = THEME_DEFAULTS[l.id] || THEME_DEFAULTS.theme1;
+                        setDraft({ ...draft, selectedLayout: l.id, colorOverride: defaultColors });
+                      }}
                       className={`w-full flex items-center justify-between rounded-xl border-2 p-4 text-left transition-all ${
                         draft.selectedLayout === l.id
                           ? 'border-blue-500 bg-blue-50/50'
@@ -641,40 +740,60 @@ export default function ScreenBuilderTab({
                   <label className="mb-2 block text-xs font-semibold uppercase tracking-wide text-slate-500">
                     Advanced Colors
                   </label>
-                  <div className="flex gap-3 flex-wrap">
-                    {(
-                      LAYOUTS.find(
-                        (l) =>
-                          l.id ===
-                          (draft.selectedLayout === 'Layout A' ? 'theme1' : draft.selectedLayout)
-                      )?.colors || []
-                    ).map((color) => (
-                      <div
-                        key={color.key}
-                        className="bg-slate-50 rounded-xl p-1.5 border border-slate-100 flex flex-col gap-1"
-                      >
-                        <label className="text-[10px] font-bold uppercase tracking-wide text-slate-500">
-                          {color.label}
-                        </label>
-                        <div className="flex items-center gap-2">
-                          <input
-                            type="color"
-                            className="h-8 w-8 cursor-pointer rounded bg-transparent border-0 p-0"
-                            value={draft.colorOverride[color.key] || color.default}
-                            onChange={(e) =>
-                              setDraft({
-                                ...draft,
-                                colorOverride: {
-                                  ...draft.colorOverride,
-                                  [color.key]: e.target.value,
-                                },
-                              })
-                            }
-                          />
-                          <span className="text-xs font-mono text-slate-600">
-                            {draft.colorOverride[color.key] || color.default}
-                          </span>
-                        </div>
+                  <div className="flex flex-col gap-2">
+                    {COLOR_CATEGORIES.map((category) => (
+                      <div key={category.title} className="border border-slate-200 rounded-xl bg-white overflow-hidden">
+                        <button
+                          type="button"
+                          onClick={() => setOpenAccordion(openAccordion === category.title ? null : category.title)}
+                          className="w-full flex items-center justify-between px-4 py-3 bg-slate-50 hover:bg-slate-100 transition-colors"
+                        >
+                          <span className="text-sm font-semibold text-slate-700">{category.title}</span>
+                          {openAccordion === category.title ? (
+                            <ChevronDown className="h-4 w-4 text-slate-500" />
+                          ) : (
+                            <ChevronRight className="h-4 w-4 text-slate-500" />
+                          )}
+                        </button>
+                        
+                        {openAccordion === category.title && (
+                          <div className="p-4 border-t border-slate-100 bg-white">
+                            <div className="flex gap-3 flex-wrap">
+                              {category.colors.map((color) => {
+                                const activeDefault = THEME_DEFAULTS[draft.selectedLayout]?.[color.key] || THEME_DEFAULTS.theme1[color.key];
+                                return (
+                                  <div
+                                    key={color.key}
+                                    className="bg-slate-50 rounded-xl p-2 border border-slate-100 flex flex-col gap-1 w-[120px]"
+                                  >
+                                    <label className="text-[10px] font-bold uppercase tracking-wide text-slate-500 truncate">
+                                      {color.label}
+                                    </label>
+                                    <div className="flex items-center gap-2">
+                                      <input
+                                        type="color"
+                                        className="h-8 w-8 cursor-pointer rounded bg-transparent border-0 p-0"
+                                        value={draft.colorOverride[color.key] || activeDefault}
+                                        onChange={(e) =>
+                                          setDraft({
+                                            ...draft,
+                                            colorOverride: {
+                                              ...draft.colorOverride,
+                                              [color.key]: e.target.value,
+                                            },
+                                          })
+                                        }
+                                      />
+                                      <span className="text-xs font-mono text-slate-600">
+                                        {draft.colorOverride[color.key] || activeDefault}
+                                      </span>
+                                    </div>
+                                  </div>
+                                );
+                              })}
+                            </div>
+                          </div>
+                        )}
                       </div>
                     ))}
                   </div>

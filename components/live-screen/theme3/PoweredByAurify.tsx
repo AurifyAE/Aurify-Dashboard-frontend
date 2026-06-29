@@ -2,7 +2,7 @@ import React from 'react';
 import { Box, Typography } from '@mui/material';
 const AurifyLogo = '/images/aurify-logo.svg';
 
-const PoweredByAurify = () => {
+const PoweredByAurify = ({ colors }: { colors?: any }) => {
   return (
     <Box
       sx={{
@@ -25,7 +25,7 @@ const PoweredByAurify = () => {
           fontSize: { xs: '15px', md: '1.2vw' },
 
           fontWeight: 500,
-          color: '#FFC983',
+          color: colors?.clockText || '#FFC983',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',

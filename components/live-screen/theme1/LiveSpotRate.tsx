@@ -67,7 +67,7 @@ const LiveSpotRate = ({ goldData, silverData, colors = {} }: LiveSpotRateProps) 
     }
   }, [silverData?.ask]);
 
-  const getColors = (dir: string) => {
+  const getColors = (dir: string, isBuy: boolean) => {
     if (dir === 'rise')
       return {
         bgColor: '#4dbf00',
@@ -80,19 +80,19 @@ const LiveSpotRate = ({ goldData, silverData, colors = {} }: LiveSpotRateProps) 
         border: '1px solid #FF0040',
         color: 'white',
       };
-    return { bgColor: '#F0F8FF00', border: '1px solid #FFFFFF', color: '#fff' };
+    return {
+      bgColor: isBuy ? (colors?.buyBg || '#F0F8FF00') : (colors?.sellBg || '#F0F8FF00'),
+      border: '1px solid #FFFFFF',
+      color: isBuy ? (colors?.buyText || '#fff') : (colors?.sellText || '#fff'),
+    };
   };
 
   const PricePulse = ({ label, value, dir }: { label: string; value: any; dir: string }) => {
-    const { bgColor, border, color } = getColors(dir);
+    const { bgColor, border, color } = getColors(dir, label === 'BID');
     const hasPulse = dir !== 'neutral';
 
     const type = label;
     const isBuy = type === 'BID';
-    const bgFallback = isBuy
-      ? 'linear-gradient(180deg, rgba(20,8,2,0.8) 0%, rgba(40,15,5,0.9) 100%)'
-      : 'linear-gradient(180deg, rgba(40,15,5,0.8) 0%, rgba(20,8,2,0.9) 100%)';
-    const textFallback = isBuy ? '#fff' : '#fff';
 
     return (
       <Box
@@ -132,7 +132,7 @@ const LiveSpotRate = ({ goldData, silverData, colors = {} }: LiveSpotRateProps) 
             letterSpacing: '0.18vw',
             textAlign: 'center',
             bgcolor: bgColor,
-            color: '#fff',
+            color: color,
             border: border,
             borderRadius: '1vw',
             fontVariantNumeric: 'tabular-nums',

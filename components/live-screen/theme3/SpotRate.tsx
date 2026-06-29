@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Box, Typography } from '@mui/material';
-const SpotRate = ({ goldData, silverData }: { goldData: any; silverData: any }) => {
+const SpotRate = ({ goldData, silverData, colors }: { goldData: any; silverData: any; colors?: any }) => {
   const [goldBidDir, setGoldBidDir] = useState('neutral');
   const [goldAskDir, setGoldAskDir] = useState('neutral');
   const [silverBidDir, setSilverBidDir] = useState('neutral');
@@ -57,7 +57,7 @@ const SpotRate = ({ goldData, silverData }: { goldData: any; silverData: any }) 
     prev.current.silverAsk = detectChange(prev.current.silverAsk, silverData.ask, setSilverAskDir);
   }, [silverData.ask]);
 
-  const getColors = (dir: any) => {
+  const getColors = (dir: any, isBid: boolean) => {
     if (dir === 'rise')
       return {
         bgColor: '#55d500',
@@ -71,14 +71,14 @@ const SpotRate = ({ goldData, silverData }: { goldData: any; silverData: any }) 
         color: 'white',
       };
     return {
-      bgColor: '#F0F8FF00',
+      bgColor: isBid ? (colors?.buyBg || '#F0F8FF00') : (colors?.sellBg || '#F0F8FF00'),
       border: ' 1px solid #FFFFFF',
-      color: '#fff',
+      color: isBid ? (colors?.buyText || '#fff') : (colors?.sellText || '#fff'),
     };
   };
 
   const PricePulse = ({ label, value, dir }: any) => {
-    const { bgColor, border, color } = getColors(dir);
+    const { bgColor, border, color } = getColors(dir, label === 'BID');
     const hasPulse = dir !== 'neutral';
 
     return (

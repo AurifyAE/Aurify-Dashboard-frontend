@@ -12,9 +12,10 @@ interface SpotData {
 interface SpotRateProps {
   goldData: SpotData;
   silverData: SpotData;
+  colors?: any;
 }
 
-const SpotRate = ({ goldData, silverData }: SpotRateProps) => {
+const SpotRate = ({ goldData, silverData, colors }: SpotRateProps) => {
   const [goldBidDir, setGoldBidDir] = useState('neutral');
   const [goldAskDir, setGoldAskDir] = useState('neutral');
   const [silverBidDir, setSilverBidDir] = useState('neutral');
@@ -86,7 +87,7 @@ const SpotRate = ({ goldData, silverData }: SpotRateProps) => {
     prev.current.silverAsk = detectChange(prev.current.silverAsk, silverData.ask, setSilverAskDir);
   }, [silverData.ask]);
 
-  const getColors = (dir: string) => {
+  const getColors = (dir: string, isBid: boolean) => {
     if (dir === 'rise')
       return {
         bgColor: '#4dbf00',
@@ -100,9 +101,9 @@ const SpotRate = ({ goldData, silverData }: SpotRateProps) => {
         color: 'white',
       };
     return {
-      bgColor: '#F0F8FF00',
+      bgColor: isBid ? (colors?.buyBg || '#F0F8FF00') : (colors?.sellBg || '#F0F8FF00'),
       border: '1px solid #FFFFFF',
-      color: '#fff',
+      color: isBid ? (colors?.buyText || '#fff') : (colors?.sellText || '#fff'),
     };
   };
 
@@ -113,7 +114,7 @@ const SpotRate = ({ goldData, silverData }: SpotRateProps) => {
   }
 
   const PricePulse: React.FC<PricePulseProps> = ({ label, value, dir }) => {
-    const { bgColor, border, color } = getColors(dir);
+    const { bgColor, border, color } = getColors(dir, label === 'BID');
     const hasPulse = dir !== 'neutral';
 
     return (
