@@ -12,6 +12,8 @@ interface LiveClockProps {
   variant?: 'time' | 'date' | 'datetime';
 }
 
+
+
 const PLACEHOLDER = '--:--';
 
 function formatClock(
