@@ -404,7 +404,7 @@ export default function ScreenBuilderTab({
       setNews(newsItems);
 
       const currentThemeId = installed[0]?.themeId || '';
-      
+
       let localDraft: DraftState | null = null;
       try {
         const stored = localStorage.getItem('aurify-builder-draft');

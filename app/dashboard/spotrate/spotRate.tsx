@@ -622,7 +622,7 @@ const SpotRate: React.FC = () => {
 
       setServerURL(serverUrlResult);
       setAdminId(adminDataResponse.data.data._id);
-      
+
       if (merchantInfo && merchantInfo.allowedCommodities?.length > 0) {
         setVisibleMetals(merchantInfo.allowedCommodities);
       } else {
