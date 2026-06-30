@@ -28,6 +28,7 @@ import io from 'socket.io-client';
 import axiosInstance from '../../axios/axiosInstance';
 import { useCurrency } from '@/context/CurrencyContext';
 import { useAuth } from '@/context/AuthContext';
+import { marketplaceApi } from '@/lib/api/marketplace';
 import DashboardShell from '@/components/dashboard/DashboardShell';
 import AddCommodityModal from './AddCommodityModal';
 import { API_URL, API_KEY, SOCKET_SECRET } from '@/lib/env';
@@ -561,12 +562,6 @@ const SpotRate: React.FC = () => {
   const availableMetals = useMemo(() => ['Gold', 'Silver', 'Platinum', 'Copper'], []);
   const [visibleMetals, setVisibleMetals] = useState<string[]>(['Gold', 'Silver']);
 
-  const handleToggleMetal = useCallback((metal: string) => {
-    setVisibleMetals((prev) =>
-      prev.includes(metal) ? prev.filter((m) => m !== metal) : [...prev, metal]
-    );
-  }, []);
-
   const getSpreadOrMarginFromDB = useCallback(
     (metal: string, type: string) => {
       const lowerMetal = metal.toLowerCase();
@@ -606,12 +601,13 @@ const SpotRate: React.FC = () => {
         return; // Don't fetch if no userName is present
       }
 
-      const [serverURLResponse, adminDataResponse] = await Promise.all([
+      const [serverURLResponse, adminDataResponse, merchantInfo] = await Promise.all([
         fetch(`${API_URL}/get-server`, {
           headers: { 'Content-Type': 'application/json', 'X-Secret-Key': API_KEY },
           credentials: 'include',
         }).then((res) => res.json()),
         axiosInstance.get(`/data/${userName}`),
+        marketplaceApi.myMerchant().catch(() => null),
       ]);
       const serverUrlResult =
         serverURLResponse?.data?.info?.serverURL ||
@@ -626,6 +622,12 @@ const SpotRate: React.FC = () => {
 
       setServerURL(serverUrlResult);
       setAdminId(adminDataResponse.data.data._id);
+      
+      if (merchantInfo && merchantInfo.allowedCommodities?.length > 0) {
+        setVisibleMetals(merchantInfo.allowedCommodities);
+      } else {
+        setVisibleMetals(['Gold', 'Silver']);
+      }
 
       const uniqueSymbols = [
         ...new Set<string>(
@@ -1101,7 +1103,7 @@ const SpotRate: React.FC = () => {
       </div>
 
       {/* Spreads & Charts Section */}
-      <div className="flex items-center gap-2 mt-4 px-1">
+      {/* <div className="flex items-center gap-2 mt-4 px-1">
         <span className="text-sm font-semibold text-slate-600 mr-2">Visible Spot Rates:</span>
         {availableMetals.map((m) => {
           const isActive = visibleMetals.includes(m);
@@ -1119,7 +1121,7 @@ const SpotRate: React.FC = () => {
             </button>
           );
         })}
-      </div>
+      </div> */}
 
       {isLoading ? (
         renderLoadingSkeleton()
