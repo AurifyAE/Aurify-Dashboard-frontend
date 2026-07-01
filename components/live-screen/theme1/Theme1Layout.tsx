@@ -195,7 +195,7 @@ export default function Theme1Layout({
       >
         <Box
           component="img"
-          src={theme?.customizations?.backgroundUrl || '/images/theme1-bg.png'}
+          src={layout?.styles?.backgroundUrl || theme?.customizations?.backgroundUrl || '/images/theme1-bg.png'}
           alt="background"
           onError={(e) => {
             e.currentTarget.style.display = 'none';
@@ -240,7 +240,7 @@ export default function Theme1Layout({
           >
             {showLogo ? (
               <img
-                src={merchant?.logo || '/images/logo-placeholder.svg'}
+                src={layout?.styles?.logoUrl || merchant?.logo || '/images/logo-placeholder.svg'}
                 alt={merchant?.companyName}
                 style={{ width: '100%', height: 'auto', objectFit: 'contain' }}
               />

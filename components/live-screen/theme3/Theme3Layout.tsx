@@ -177,7 +177,7 @@ export default function Theme3Layout({
       >
         <Box
           component="img"
-          src={theme?.customizations?.backgroundUrl || '/images/theme3-bg.png'}
+          src={layout?.styles?.backgroundUrl || theme?.customizations?.backgroundUrl || '/images/theme3-bg.png'}
           alt="background"
           onError={(e: any) => {
             e.currentTarget.style.display = 'none';
@@ -235,7 +235,7 @@ export default function Theme3Layout({
           >
             {(layout?.styles?.showLogo ?? true) ? (
               <img
-                src={merchant?.logo || '/images/logo-placeholder.svg'}
+                src={layout?.styles?.logoUrl || merchant?.logo || '/images/logo-placeholder.svg'}
                 alt=""
                 style={{ objectFit: 'contain', width: '100%', height: '100%' }}
               />
