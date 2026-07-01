@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import { Grid, Box, Typography } from '@mui/material';
 import SpotRate from './SpotRate';
-import CommodityTable from './CommodityTable';
+import CommodityTable from '../shared/CommodityTable';
 import NewsTicker from '../shared/NewsTicker';
 import WorldClockHorizontal from './WorldClock';
 import SystemClock from './SystemClock';
@@ -232,22 +232,13 @@ export default function Theme2Layout({
           {widgets.includes('Date') && <SystemClock colors={colors} />}
 
           {widgets.includes('Commodity Table') && (
-            <>
-              <CommodityTable
-                commodities={displayCommodities}
-                isCommodity={true}
-                goldData={goldData}
-                silverData={silverData}
-                colors={colors}
-              />
-              <CommodityTable
-                commodities={displayCommodities}
-                isMintedBar={true}
-                goldData={goldData}
-                silverData={silverData}
-                colors={colors}
-              />
-            </>
+            <CommodityTable
+              theme="theme2"
+              items={displayCommodities}
+              goldData={goldData}
+              silverData={silverData}
+              colors={colors}
+            />
           )}
           {widgets.includes('Clock') && <WorldClockHorizontal colors={colors} />}
         </Grid>

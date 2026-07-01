@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import { Grid, Box } from '@mui/material';
 import SpotRate from './SpotRate';
-import CommodityTable from './CommodityTable';
+import CommodityTable from '../shared/CommodityTable';
 import NewsTicker from '../shared/NewsTicker';
 import WorldClockHorizontal from './WorldClock';
 import SystemClock from './SystemClock';
@@ -251,6 +251,7 @@ export default function Theme3Layout({
           </Box>
           {widgets.includes('Commodity Table') && (
             <CommodityTable
+              theme="theme3"
               items={displayCommodities}
               goldData={goldData}
               silverData={silverData}
