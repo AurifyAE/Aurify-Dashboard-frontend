@@ -45,7 +45,20 @@ export default function MyScreensTab({ onEditLayout, onCreateNew }: MyScreensTab
 
   const copyUrl = async (url: string, id: string) => {
     try {
-      await navigator.clipboard.writeText(url);
+      if (navigator.clipboard && window.isSecureContext) {
+        await navigator.clipboard.writeText(url);
+      } else {
+        // Fallback for non-HTTPS local network IPs
+        const textArea = document.createElement('textarea');
+        textArea.value = url;
+        // Move outside of screen to make it invisible
+        textArea.style.position = 'absolute';
+        textArea.style.left = '-999999px';
+        document.body.appendChild(textArea);
+        textArea.select();
+        document.execCommand('copy');
+        textArea.remove();
+      }
       setCopiedId(id);
       setTimeout(() => setCopiedId(null), 2000);
     } catch (err) {
