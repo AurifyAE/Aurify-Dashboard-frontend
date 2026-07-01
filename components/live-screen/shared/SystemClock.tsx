@@ -1,41 +1,45 @@
 'use client';
-
 import React, { useEffect, useState } from 'react';
 import { Box, Typography } from '@mui/material';
 
-const SystemClock = ({ colors = {} }: { colors?: any }) => {
-  const [timeData, setTimeData] = useState({ day: '', date: '', time: '' });
+interface SystemClockProps {
+  theme: 'theme1' | 'theme2' | 'theme3';
+  colors?: any;
+}
+
+const SystemClock = ({ theme, colors = {} }: SystemClockProps) => {
+  const [timeData, setTimeData] = useState({
+    day: '',
+    date: '',
+    time: '',
+  });
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
     setMounted(true);
     const updateTime = () => {
       const now = new Date();
-      const DAYS = ['SUNDAY', 'MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY'];
-      const MONTHS = [
-        'JAN',
-        'FEB',
-        'MAR',
-        'APR',
-        'MAY',
-        'JUN',
-        'JUL',
-        'AUG',
-        'SEP',
-        'OCT',
-        'NOV',
-        'DEC',
-      ];
 
-      const dayStr = DAYS[now.getDay()];
-      const dateStr = `${String(now.getDate()).padStart(2, '0')} ${MONTHS[now.getMonth()]} ${now.getFullYear()}`;
+      const dayStr = now.toLocaleDateString('en-GB', { weekday: 'long' }).toUpperCase();
+      const dateStr = now
+        .toLocaleDateString('en-GB', {
+          day: '2-digit',
+          month: 'short',
+          year: 'numeric',
+        })
+        .toUpperCase();
+
       const timeStr = now.toLocaleTimeString('en-US', {
         hour: '2-digit',
         minute: '2-digit',
         hour12: true,
       });
 
-      setTimeData({ day: dayStr, date: dateStr, time: timeStr });
+      setTimeData({
+        day: dayStr,
+        date: dateStr,
+        time: timeStr,
+      });
     };
 
     updateTime();
@@ -45,8 +49,20 @@ const SystemClock = ({ colors = {} }: { colors?: any }) => {
 
   if (!mounted) return null;
 
+  const isTheme1 = theme === 'theme1';
+  const isTheme3 = theme === 'theme3';
+  const defaultColor = isTheme1 ? '#000000' : isTheme3 ? '#FFC983' : '#FFFFFF';
+  const textColor = colors?.clockText || defaultColor;
+
   return (
-    <Box sx={{ width: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+    <Box
+      sx={{
+        width: '100%',
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+      }}
+    >
       <Box
         sx={{
           display: 'flex',
@@ -63,7 +79,7 @@ const SystemClock = ({ colors = {} }: { colors?: any }) => {
             fontSize: { xs: '12px', sm: '2vw' },
             fontWeight: 400,
             letterSpacing: '2px',
-            color: colors.clockText || '#000000',
+            color: textColor,
           }}
         >
           {timeData.date || '-- --- ----'}
@@ -71,7 +87,7 @@ const SystemClock = ({ colors = {} }: { colors?: any }) => {
         <Typography
           sx={{
             fontSize: { xs: '12px', sm: '1vw' },
-            color: colors.clockText || '#000000',
+            color: textColor,
             letterSpacing: '2px',
           }}
         >

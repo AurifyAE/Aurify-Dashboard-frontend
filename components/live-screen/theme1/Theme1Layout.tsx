@@ -6,8 +6,8 @@ import io from 'socket.io-client';
 import CommodityTable from '../shared/CommodityTable';
 import LiveSpotRate from './LiveSpotRate';
 import NewsTicker from '../shared/NewsTicker';
-import WorldClockHorizontal from './WorldClock';
-import SystemClock from './SystemClock';
+import WorldClockHorizontal from '../shared/WorldClock';
+import SystemClock from '../shared/SystemClock';
 import PoweredByAurify from '../shared/PoweredByAurify';
 import { API_URL, API_KEY, SOCKET_SECRET } from '@/lib/env';
 
@@ -269,8 +269,12 @@ export default function Theme1Layout({
         </Grid>
 
         <Grid size={{ xs: 12, md: 6 }} sx={{ gap: '1vw', display: 'grid' }}>
-          {widgets.includes('Clock') && <WorldClockHorizontal colors={colors} />}
-          {widgets.includes('Date') && <SystemClock colors={colors} />}
+          {widgets.includes('Date') && <SystemClock theme="theme1" colors={colors} />}
+
+          {widgets.includes('Clock') && (
+            <WorldClockHorizontal theme="theme1" colors={colors} />
+          )}
+
           {widgets.includes('Spot Rates') && (
             <LiveSpotRate goldData={goldData} silverData={silverData} colors={colors} />
           )}

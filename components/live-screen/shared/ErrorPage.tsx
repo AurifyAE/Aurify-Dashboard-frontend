@@ -1,21 +1,28 @@
 'use client';
 import React, { useEffect, useState } from 'react';
 
-const ErrorPage = () => {
+interface ErrorPageProps {
+  theme?: 'theme1' | 'theme2' | 'theme3';
+}
+
+const ErrorPage = ({ theme = 'theme1' }: ErrorPageProps) => {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
     setMounted(true);
   }, []);
 
+  // Set background color based on theme
+  let bgColor = '#0f172a'; // Default / Theme 1
+  if (theme === 'theme2') bgColor = '#0b1628';
+  if (theme === 'theme3') bgColor = '#280b0b';
+
   return (
     <>
       <style>{`
-
-
         .ep-root {
           min-height: 100dvh;
-          background: #0b1628;
+          background: ${bgColor};
           display: flex;
           flex-direction: column;
           align-items: center;
@@ -235,7 +242,7 @@ const ErrorPage = () => {
         }
       `}</style>
 
-      <div className={`ep-root${mounted ? ' ep-mounted' : ''}`}>
+      <div className={`ep-root\${mounted ? ' ep-mounted' : ''}`}>
         {/* Background layers */}
         <div className="ep-grid" />
         <div className="ep-blob ep-blob--1" />

@@ -4,8 +4,8 @@ import { Grid, Box } from '@mui/material';
 import SpotRate from './SpotRate';
 import CommodityTable from '../shared/CommodityTable';
 import NewsTicker from '../shared/NewsTicker';
-import WorldClockHorizontal from './WorldClock';
-import SystemClock from './SystemClock';
+import WorldClockHorizontal from '../shared/WorldClock';
+import SystemClock from '../shared/SystemClock';
 import PoweredByAurify from '../shared/PoweredByAurify';
 import io from 'socket.io-client';
 import { API_URL, API_KEY, SOCKET_SECRET } from '@/lib/env';
@@ -212,8 +212,8 @@ export default function Theme3Layout({
       >
         {/* Side: SpotRate & Date Time */}
         <Grid size={{ xs: 12, md: 6 }} sx={{ padding: '1vw', gap: '1vw', display: 'grid' }}>
-          {widgets.includes('Date') && <SystemClock colors={colors} />}
-          {widgets.includes('Clock') && <WorldClockHorizontal colors={colors} />}
+          {widgets.includes('Date') && <SystemClock theme="theme3" colors={colors} />}
+          {widgets.includes('Clock') && <WorldClockHorizontal theme="theme3" colors={colors} />}
           {widgets.includes('Spot Rates') && (
             <SpotRate goldData={goldData} silverData={silverData} colors={colors} />
           )}

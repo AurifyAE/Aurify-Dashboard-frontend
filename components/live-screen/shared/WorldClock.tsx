@@ -10,7 +10,12 @@ const clockConfig = [
   { key: 'usa', label: 'USA', timeZone: 'America/New_York', flag: '/images/usa.png' },
 ];
 
-const WorldClockHorizontal = ({ colors = {} }: { colors?: any }) => {
+interface WorldClockProps {
+  theme: 'theme1' | 'theme2' | 'theme3';
+  colors?: any;
+}
+
+const WorldClockHorizontal = ({ theme, colors = {} }: WorldClockProps) => {
   const [times, setTimes] = useState<Record<string, string>>({});
   const [mounted, setMounted] = useState(false);
 
@@ -45,20 +50,37 @@ const WorldClockHorizontal = ({ colors = {} }: { colors?: any }) => {
 
   if (!mounted) return null;
 
+  const isTheme1 = theme === 'theme1';
+  const isTheme2 = theme === 'theme2';
+  const isTheme3 = theme === 'theme3';
+
+  // Theme 2 only shows 3 clocks (removes USA)
+  const displayClocks = isTheme2 ? clockConfig.filter(c => c.key !== 'usa') : clockConfig;
+
+  // Colors
+  const defaultColor = isTheme1 ? '#000000' : isTheme3 ? '#FFC983' : '#fff';
+  const textColor = colors?.clockText || defaultColor;
+
   return (
     <Box
       sx={{
-        display: 'flex',
+        display: isTheme2 ? 'grid' : 'flex',
         alignItems: 'center',
-        justifyContent: 'space-around',
+        gridTemplateColumns: isTheme2 ? 'repeat(3, 1fr)' : undefined,
+        justifyContent: isTheme2 ? undefined : 'space-around',
         gap: '1vw',
         width: '100%',
       }}
     >
-      {clockConfig.map((clock) => (
+      {displayClocks.map((clock) => (
         <Box
           key={clock.key}
-          sx={{ display: 'flex', alignItems: 'center', gap: { xs: '10px', lg: '1vw' } }}
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: isTheme2 ? 'center' : undefined,
+            gap: { xs: '10px', lg: '1vw' },
+          }}
         >
           <Box sx={{ width: { xs: '30px', lg: '3vw' } }}>
             <img
@@ -73,16 +95,19 @@ const WorldClockHorizontal = ({ colors = {} }: { colors?: any }) => {
           <Box sx={{ display: 'flex', alignItems: 'start', flexDirection: 'column' }}>
             <Typography
               sx={{
-                color: colors.clockText || '#000000',
-                fontSize: { xs: '8px', lg: '0.6vw' },
-                fontWeight: '600',
-                textTransform: 'uppercase',
+                color: textColor,
+                fontSize: isTheme1 ? { xs: '8px', lg: '0.6vw' } : { xs: '14px', lg: '1vw' },
+                fontWeight: isTheme1 ? '600' : '500',
+                textTransform: isTheme1 ? 'uppercase' : undefined,
               }}
             >
               {clock.label}
             </Typography>
             <Typography
-              sx={{ fontSize: { xs: '14px', lg: '1vw' }, color: colors.clockText || '#000000' }}
+              sx={{
+                fontSize: { xs: '14px', lg: '1vw' },
+                color: textColor,
+              }}
             >
               {times[clock.key] || '--:--'}
             </Typography>

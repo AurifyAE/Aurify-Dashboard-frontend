@@ -4,8 +4,8 @@ import { Grid, Box, Typography } from '@mui/material';
 import SpotRate from './SpotRate';
 import CommodityTable from '../shared/CommodityTable';
 import NewsTicker from '../shared/NewsTicker';
-import WorldClockHorizontal from './WorldClock';
-import SystemClock from './SystemClock';
+import WorldClockHorizontal from '../shared/WorldClock';
+import SystemClock from '../shared/SystemClock';
 import PoweredByAurify from '../shared/PoweredByAurify';
 import io from 'socket.io-client';
 import { API_URL, API_KEY, SOCKET_SECRET } from '@/lib/env';
@@ -229,7 +229,7 @@ export default function Theme2Layout({
             gap: '1vw',
           }}
         >
-          {widgets.includes('Date') && <SystemClock colors={colors} />}
+          {widgets.includes('Date') && <SystemClock theme="theme2" colors={colors} />}
 
           {widgets.includes('Commodity Table') && (
             <CommodityTable
@@ -240,7 +240,7 @@ export default function Theme2Layout({
               colors={colors}
             />
           )}
-          {widgets.includes('Clock') && <WorldClockHorizontal colors={colors} />}
+          {widgets.includes('Clock') && <WorldClockHorizontal theme="theme2" colors={colors} />}
         </Grid>
 
         <Grid size={{ xs: 12, md: 6 }} sx={{ display: 'grid', padding: '1vw', gap: '1vw' }}>
