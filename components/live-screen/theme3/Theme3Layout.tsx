@@ -8,6 +8,7 @@ import WorldClockHorizontal from '../shared/WorldClock';
 import SystemClock from '../shared/SystemClock';
 import PoweredByAurify from '../shared/PoweredByAurify';
 import MerchantLogo from '../shared/MerchantLogo';
+import theme3Bg from '../images/theme3-bg.png';
 import io from 'socket.io-client';
 import { API_URL, API_KEY, SOCKET_SECRET } from '@/lib/env';
 
@@ -181,7 +182,7 @@ export default function Theme3Layout({
           src={
             layout?.styles?.backgroundUrl ||
             theme?.customizations?.backgroundUrl ||
-            '/images/theme3-bg.png'
+            theme3Bg.src
           }
           alt="background"
           onError={(e: any) => {

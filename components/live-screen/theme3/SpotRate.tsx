@@ -1,5 +1,9 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Box, Typography } from '@mui/material';
+
+import goldBar from '../images/gold-bar.png';
+import silverBar from '../images/silver-bar.png';
+
 const SpotRate = ({
   goldData,
   silverData,
@@ -232,7 +236,7 @@ const SpotRate = ({
               objectFit: 'contain',
             }}
             component="img"
-            src={isSilver ? '/images/silver-bar.png' : '/images/gold-bar.png'}
+            src={isSilver ? silverBar.src : goldBar.src}
             alt={title}
           />
 

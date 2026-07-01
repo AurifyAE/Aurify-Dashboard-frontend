@@ -3,11 +3,16 @@
 import React, { useEffect, useState } from 'react';
 import { Box, Typography } from '@mui/material';
 
+import indiaFlag from '../images/india.png';
+import uaeFlag from '../images/uae.png';
+import ukFlag from '../images/uk.png';
+import usaFlag from '../images/usa.png';
+
 export const clockConfig = [
-  { key: 'india', label: 'INDIA', timeZone: 'Asia/Kolkata', flag: '/images/india.png' },
-  { key: 'uae', label: 'UAE', timeZone: 'Asia/Dubai', flag: '/images/uae.png' },
-  { key: 'london', label: 'LONDON', timeZone: 'Europe/London', flag: '/images/uk.png' },
-  { key: 'usa', label: 'USA', timeZone: 'America/New_York', flag: '/images/usa.png' },
+  { key: 'india', label: 'INDIA', timeZone: 'Asia/Kolkata', flag: indiaFlag.src },
+  { key: 'uae', label: 'UAE', timeZone: 'Asia/Dubai', flag: uaeFlag.src },
+  { key: 'london', label: 'LONDON', timeZone: 'Europe/London', flag: ukFlag.src },
+  { key: 'usa', label: 'USA', timeZone: 'America/New_York', flag: usaFlag.src },
   {
     key: 'singapore',
     label: 'SINGAPORE',

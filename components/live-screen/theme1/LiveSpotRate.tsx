@@ -2,6 +2,8 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 import { Box, Typography } from '@mui/material';
+import goldBar from '../images/gold-bar.png';
+import silverBar from '../images/silver-bar.png';
 
 interface LiveSpotRateProps {
   goldData: any;
@@ -201,7 +203,7 @@ const LiveSpotRate = ({ goldData, silverData, colors = {} }: LiveSpotRateProps) 
           <Box
             sx={{ width: '4.5vw', height: '4.5vw', objectFit: 'contain' }}
             component="img"
-            src={isSilver ? '/images/silver-bar.png' : '/images/gold-bar.png'}
+            src={isSilver ? silverBar.src : goldBar.src}
             alt={title}
             onError={(e) => {
               e.currentTarget.style.display = 'none';

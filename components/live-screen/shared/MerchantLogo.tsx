@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { Box, Typography } from '@mui/material';
+import logoPlaceholder from '../images/logo-placeholder.svg';
 
 interface MerchantLogoProps {
   theme: 'theme1' | 'theme2' | 'theme3';
@@ -14,7 +15,7 @@ const MerchantLogo = ({ theme, merchant, layout, colors = {} }: MerchantLogoProp
   // Common properties
   const showLogo = layout?.styles?.showLogo ?? true;
   const showName = layout?.styles?.showName ?? true;
-  const logoUrl = layout?.styles?.logoUrl || merchant?.logo || '/images/logo-placeholder.svg';
+  const logoUrl = layout?.styles?.logoUrl || merchant?.logo || logoPlaceholder.src;
   const companyName = merchant?.companyName || 'Merchant';
 
   const isTheme1 = theme === 'theme1';

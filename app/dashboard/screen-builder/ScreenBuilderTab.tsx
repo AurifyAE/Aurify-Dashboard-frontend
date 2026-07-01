@@ -3,7 +3,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
-import LiveClock from '@/components/LiveClock';
+
 import Theme1Layout from '@/components/live-screen/theme1/Theme1Layout';
 import Theme2Layout from '@/components/live-screen/theme2/Theme2Layout';
 import Theme3Layout from '@/components/live-screen/theme3/Theme3Layout';

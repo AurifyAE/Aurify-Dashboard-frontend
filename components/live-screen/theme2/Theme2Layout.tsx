@@ -8,6 +8,7 @@ import WorldClockHorizontal from '../shared/WorldClock';
 import SystemClock from '../shared/SystemClock';
 import PoweredByAurify from '../shared/PoweredByAurify';
 import MerchantLogo from '../shared/MerchantLogo';
+import theme2Bg from '../images/theme2-bg.png';
 import io from 'socket.io-client';
 import { API_URL, API_KEY, SOCKET_SECRET } from '@/lib/env';
 
@@ -194,7 +195,7 @@ export default function Theme2Layout({
           src={
             layout?.styles?.backgroundUrl ||
             theme?.customizations?.backgroundUrl ||
-            '/images/theme2-bg.png'
+            theme2Bg.src
           }
           alt="background"
           onError={(e) => {

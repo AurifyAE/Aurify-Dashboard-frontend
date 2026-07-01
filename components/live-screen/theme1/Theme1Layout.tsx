@@ -10,6 +10,7 @@ import WorldClockHorizontal from '../shared/WorldClock';
 import SystemClock from '../shared/SystemClock';
 import PoweredByAurify from '../shared/PoweredByAurify';
 import MerchantLogo from '../shared/MerchantLogo';
+import theme1Bg from '../images/theme1-bg.png';
 import { API_URL, API_KEY, SOCKET_SECRET } from '@/lib/env';
 
 export default function Theme1Layout({
@@ -199,7 +200,7 @@ export default function Theme1Layout({
           src={
             layout?.styles?.backgroundUrl ||
             theme?.customizations?.backgroundUrl ||
-            '/images/theme1-bg.png'
+            theme1Bg.src
           }
           alt="background"
           onError={(e) => {

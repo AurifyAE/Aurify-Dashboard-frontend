@@ -235,6 +235,8 @@ const CommodityTable = ({
               rowBorder = '0.05vw solid rgba(255,255,255,0.05)';
             }
 
+            if (!row) return null;
+
             return (
               <SwiperSlide key={index}>
                 <Box

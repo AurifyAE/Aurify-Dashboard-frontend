@@ -1,6 +1,8 @@
 'use client';
 import React from 'react';
 import { Box, Typography } from '@mui/material';
+import aurifyLogoBlack from '../images/aurify-logo-black.svg';
+import aurifyLogo from '../images/aurify-logo.svg';
 
 interface PoweredByAurifyProps {
   colors?: any;
@@ -49,9 +51,9 @@ const PoweredByAurify = ({
         <Box
           component="img"
           src={
-            colors?.useBlackLogo === 'true'
-              ? '/images/aurify-logo-black.svg'
-              : '/images/aurify-logo.svg'
+            String(colors?.useBlackLogo) === 'true'
+              ? aurifyLogoBlack.src
+              : aurifyLogo.src
           }
           alt="Aurify"
           sx={{
