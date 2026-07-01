@@ -34,6 +34,9 @@ import {
   Pie,
   Cell,
 } from 'recharts';
+import { Swiper, SwiperSlide } from 'swiper/react';
+import { Autoplay } from 'swiper/modules';
+import 'swiper/css';
 
 interface HistoryPoint {
   time: string;
@@ -200,14 +203,11 @@ const DashboardData = () => {
   const goldPriceNum = goldData?.bid ? parseFloat(goldData.bid.toString()) : 2350;
   const silverPriceNum = silverData?.bid ? parseFloat(silverData.bid.toString()) : 29;
 
-  // Selected chart dataset
-  const chartData = useMemo(() => {
-    const isGold = activeMetal === 'gold';
-    const base = isGold ? goldPriceNum : silverPriceNum;
-    const ticks = isGold ? goldTicks : silverTicks;
+  const goldChartData = useMemo(() => {
+    const base = goldPriceNum;
+    const ticks = goldTicks;
 
     if (activeInterval === 'Live') {
-      // Fallback placeholder during initial connection buffer
       if (ticks.length === 0) {
         return Array.from({ length: 12 }).map((_, i) => ({
           time: `${i * 3}s`,
@@ -217,7 +217,23 @@ const DashboardData = () => {
       return ticks;
     }
     return getHistoricalData(base, activeInterval);
-  }, [activeMetal, activeInterval, goldTicks, silverTicks, goldPriceNum, silverPriceNum]);
+  }, [activeInterval, goldTicks, goldPriceNum]);
+
+  const silverChartData = useMemo(() => {
+    const base = silverPriceNum;
+    const ticks = silverTicks;
+
+    if (activeInterval === 'Live') {
+      if (ticks.length === 0) {
+        return Array.from({ length: 12 }).map((_, i) => ({
+          time: `${i * 3}s`,
+          price: base + Math.sin(i * 0.8) * (base * 0.0003),
+        }));
+      }
+      return ticks;
+    }
+    return getHistoricalData(base, activeInterval);
+  }, [activeInterval, silverTicks, silverPriceNum]);
 
   // Calculate live percentage differences
   const goldPct = useMemo(() => {
@@ -240,27 +256,67 @@ const DashboardData = () => {
 
   // Country rate calculator
   const countryRates = useMemo(() => {
-    const uae = (goldPriceNum / 31.1035) * 3.674;
-    const india = (goldPriceNum / 31.1035) * 83.95;
-    const saudi = (goldPriceNum / 31.1035) * 3.75;
+    const gramPriceUsd = goldPriceNum / 31.1035;
     return [
       {
         name: 'India',
-        display: `${india.toLocaleString(undefined, { maximumFractionDigits: 0 })} INR`,
+        display: `${(gramPriceUsd * 83.95).toLocaleString(undefined, { maximumFractionDigits: 0 })} INR`,
         pct: 100,
         flag: '🇮🇳',
       },
       {
         name: 'UAE',
-        display: `${uae.toLocaleString(undefined, { maximumFractionDigits: 1 })} AED`,
+        display: `${(gramPriceUsd * 3.674).toLocaleString(undefined, { maximumFractionDigits: 1 })} AED`,
         pct: 85,
         flag: '🇦🇪',
       },
       {
         name: 'Saudi Arabia',
-        display: `${saudi.toLocaleString(undefined, { maximumFractionDigits: 1 })} SAR`,
+        display: `${(gramPriceUsd * 3.75).toLocaleString(undefined, { maximumFractionDigits: 1 })} SAR`,
         pct: 80,
         flag: '🇸🇦',
+      },
+      {
+        name: 'Qatar',
+        display: `${(gramPriceUsd * 3.64).toLocaleString(undefined, { maximumFractionDigits: 1 })} QAR`,
+        pct: 78,
+        flag: '🇶🇦',
+      },
+      {
+        name: 'Oman',
+        display: `${(gramPriceUsd * 0.385).toLocaleString(undefined, { maximumFractionDigits: 2 })} OMR`,
+        pct: 75,
+        flag: '🇴🇲',
+      },
+      {
+        name: 'Kuwait',
+        display: `${(gramPriceUsd * 0.308).toLocaleString(undefined, { maximumFractionDigits: 2 })} KWD`,
+        pct: 70,
+        flag: '🇰🇼',
+      },
+      {
+        name: 'Bahrain',
+        display: `${(gramPriceUsd * 0.377).toLocaleString(undefined, { maximumFractionDigits: 2 })} BHD`,
+        pct: 68,
+        flag: '🇧🇭',
+      },
+      {
+        name: 'Singapore',
+        display: `${(gramPriceUsd * 1.35).toLocaleString(undefined, { maximumFractionDigits: 1 })} SGD`,
+        pct: 65,
+        flag: '🇸🇬',
+      },
+      {
+        name: 'UK',
+        display: `${(gramPriceUsd * 0.79).toLocaleString(undefined, { maximumFractionDigits: 1 })} GBP`,
+        pct: 60,
+        flag: '🇬🇧',
+      },
+      {
+        name: 'Europe',
+        display: `${(gramPriceUsd * 0.92).toLocaleString(undefined, { maximumFractionDigits: 1 })} EUR`,
+        pct: 55,
+        flag: '🇪🇺',
       },
     ];
   }, [goldPriceNum]);
@@ -428,28 +484,12 @@ const DashboardData = () => {
       </div>
 
       {/* Elegant Main Graph Card */}
-      <Card className="border border-slate-100 shadow-sm bg-white rounded-2xl overflow-hidden transition-all duration-300 hover:shadow-md">
+      <Card className="border border-slate-100 shadow-sm bg-white rounded-2xl overflow-hidden transition-all duration-300 hover:shadow-md mb-6">
         <div className="px-6 py-4.5 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 bg-slate-50/40">
           <div>
             <div className="flex items-center gap-2">
               <TrendingUp className="text-[#4067B1] h-4.5 w-4.5" />
               <h3 className="font-bold text-slate-800 text-[14px]">Spot Rate Analytics</h3>
-              <span
-                className={cn(
-                  'text-[9px] font-bold px-2 py-0.5 rounded-full border flex items-center gap-1',
-                  isConnected
-                    ? 'bg-emerald-50 text-emerald-600 border-emerald-100'
-                    : 'bg-rose-50 text-rose-600 border-rose-100'
-                )}
-              >
-                <span
-                  className={cn(
-                    'w-1 h-1 rounded-full',
-                    isConnected ? 'bg-emerald-500 animate-ping' : 'bg-rose-500'
-                  )}
-                />
-                {isConnected ? 'LIVE FEED' : 'DISCONNECTED'}
-              </span>
             </div>
             <p className="text-[10px] text-slate-400 mt-0.5">
               Real-time dynamic exchange rate updates
@@ -457,31 +497,6 @@ const DashboardData = () => {
           </div>
 
           <div className="flex items-center gap-3">
-            {/* Metal toggle */}
-            <div className="flex bg-slate-200/50 p-0.5 rounded-xl text-xs font-bold border border-slate-200/30">
-              <button
-                onClick={() => setActiveMetal('gold')}
-                className={cn(
-                  'px-3.5 py-1.5 rounded-lg transition-all cursor-pointer',
-                  activeMetal === 'gold'
-                    ? 'bg-white text-slate-800 shadow-sm'
-                    : 'text-slate-500 hover:text-slate-700'
-                )}
-              >
-                Gold
-              </button>
-              <button
-                onClick={() => setActiveMetal('silver')}
-                className={cn(
-                  'px-3.5 py-1.5 rounded-lg transition-all cursor-pointer',
-                  activeMetal === 'silver'
-                    ? 'bg-white text-slate-800 shadow-sm'
-                    : 'text-slate-500 hover:text-slate-700'
-                )}
-              >
-                Silver
-              </button>
-            </div>
             {/* Interval Filter */}
             <div className="flex bg-slate-200/50 p-0.5 rounded-xl text-xs font-bold border border-slate-200/30">
               {(['Live', '1H', '24H', '7D'] as const).map((v) => (
@@ -502,96 +517,169 @@ const DashboardData = () => {
           </div>
         </div>
 
-        <CardContent className="p-6 bg-gradient-to-b from-white to-slate-50/30">
-          <div className="mb-4.5 flex justify-between items-baseline">
-            <div>
-              <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest block">
-                Bullion Value
-              </span>
-              <div className="flex items-baseline gap-2 mt-0.5">
-                <span className="text-3xl font-black text-slate-800 tracking-tight">
-                  {activeMetal === 'gold' ? goldPrice : silverPrice}
+        <CardContent className="p-0 bg-gradient-to-b from-white to-slate-50/30 grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-slate-100">
+          {/* Gold Graph */}
+          <div className="p-6">
+            <div className="mb-4.5 flex justify-between items-baseline">
+              <div>
+                <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest block">
+                  Gold Bullion Value
                 </span>
-                <span className="text-xs font-bold text-slate-400">USD / oz</span>
-                <span
-                  className={cn(
-                    'text-xs font-black px-1.5 py-0.5 rounded-md flex items-center ml-1.5',
-                    (activeMetal === 'gold' ? goldPct : silverPct) >= 0
-                      ? 'text-emerald-600 bg-emerald-50'
-                      : 'text-rose-600 bg-rose-50'
-                  )}
-                >
-                  {(activeMetal === 'gold' ? goldPct : silverPct) >= 0 ? '+' : ''}
-                  {activeMetal === 'gold' ? goldPct : silverPct}%
-                </span>
+                <div className="flex items-baseline gap-2 mt-0.5">
+                  <span className="text-3xl font-black text-slate-800 tracking-tight">
+                    {goldPrice}
+                  </span>
+                  <span className="text-xs font-bold text-slate-400">USD / oz</span>
+                  <span
+                    className={cn(
+                      'text-xs font-black px-1.5 py-0.5 rounded-md flex items-center ml-1.5',
+                      goldPct >= 0
+                        ? 'text-emerald-600 bg-emerald-50'
+                        : 'text-rose-600 bg-rose-50'
+                    )}
+                  >
+                    {goldPct >= 0 ? '+' : ''}
+                    {goldPct}%
+                  </span>
+                </div>
               </div>
+            </div>
+
+            <div className="h-[250px] w-full">
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={goldChartData} margin={{ left: -15, right: 5, top: 10, bottom: 0 }}>
+                  <defs>
+                    <linearGradient id="glowGradientGold" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#d4a017" stopOpacity={0.2} />
+                      <stop offset="95%" stopColor="#d4a017" stopOpacity={0.0} />
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="4 4" vertical={false} stroke="#E2E8F0" />
+                  <XAxis
+                    dataKey="time"
+                    tickLine={false}
+                    axisLine={false}
+                    tick={{ fill: '#94A3B8', fontSize: 10, fontWeight: 'bold' }}
+                  />
+                  <YAxis
+                    domain={['auto', 'auto']}
+                    tickLine={false}
+                    axisLine={false}
+                    tick={{ fill: '#94A3B8', fontSize: 10, fontWeight: 'bold' }}
+                  />
+                  <Tooltip
+                    content={({ active, payload }) => {
+                      if (active && payload && payload.length) {
+                        return (
+                          <div className="bg-white/90 backdrop-blur-sm border border-slate-200 p-2.5 rounded-xl shadow-lg">
+                            <div className="text-[10px] font-bold text-slate-400 mb-1">
+                              {payload[0].payload.time}
+                            </div>
+                            <div className="text-sm font-black text-slate-800">
+                              {payload[0].value}{' '}
+                              <span className="text-[10px] text-slate-500 font-bold">USD</span>
+                            </div>
+                          </div>
+                        );
+                      }
+                      return null;
+                    }}
+                  />
+                  <Area
+                    type="monotone"
+                    dataKey="price"
+                    stroke="#d4a017"
+                    strokeWidth={2.5}
+                    fillOpacity={1}
+                    fill="url(#glowGradientGold)"
+                    animationDuration={1500}
+                    isAnimationActive={true}
+                  />
+                </AreaChart>
+              </ResponsiveContainer>
             </div>
           </div>
 
-          {/* Glowing dynamic Area Chart */}
-          <div className="h-68 w-full">
-            <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={chartData} margin={{ left: -15, right: 5, top: 10, bottom: 0 }}>
-                <defs>
-                  <linearGradient id="glowGradient" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor={chartColor} stopOpacity={0.2} />
-                    <stop offset="95%" stopColor={chartColor} stopOpacity={0.0} />
-                  </linearGradient>
-                </defs>
-                <CartesianGrid strokeDasharray="4 4" vertical={false} stroke="#E2E8F0" />
-                <XAxis
-                  dataKey="time"
-                  tickLine={false}
-                  axisLine={false}
-                  tick={{ fill: '#94A3B8', fontSize: 10, fontWeight: 'bold' }}
-                />
-                <YAxis
-                  domain={['auto', 'auto']}
-                  tickLine={false}
-                  axisLine={false}
-                  tick={{ fill: '#94A3B8', fontSize: 10, fontWeight: 'bold' }}
-                />
+          {/* Silver Graph */}
+          <div className="p-6">
+            <div className="mb-4.5 flex justify-between items-baseline">
+              <div>
+                <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest block">
+                  Silver Bullion Value
+                </span>
+                <div className="flex items-baseline gap-2 mt-0.5">
+                  <span className="text-3xl font-black text-slate-800 tracking-tight">
+                    {silverPrice}
+                  </span>
+                  <span className="text-xs font-bold text-slate-400">USD / oz</span>
+                  <span
+                    className={cn(
+                      'text-xs font-black px-1.5 py-0.5 rounded-md flex items-center ml-1.5',
+                      silverPct >= 0
+                        ? 'text-emerald-600 bg-emerald-50'
+                        : 'text-rose-600 bg-rose-50'
+                    )}
+                  >
+                    {silverPct >= 0 ? '+' : ''}
+                    {silverPct}%
+                  </span>
+                </div>
+              </div>
+            </div>
 
-                {/* Custom Glassmorphism Tooltip */}
-                <Tooltip
-                  content={({ active, payload }) => {
-                    if (active && payload && payload.length) {
-                      return (
-                        <div className="bg-white/90 backdrop-blur-md px-3.5 py-2.5 border border-white/20 rounded-xl shadow-lg shadow-slate-100 flex flex-col gap-0.5">
-                          <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider">
-                            {payload[0].payload.time}
-                          </span>
-                          <div className="flex items-baseline gap-1 mt-0.5">
-                            <span className="text-sm font-black text-slate-800">
-                              ${payload[0].value}
-                            </span>
-                            <span className="text-[9px] font-bold text-slate-400">USD</span>
+            <div className="h-[250px] w-full">
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={silverChartData} margin={{ left: -15, right: 5, top: 10, bottom: 0 }}>
+                  <defs>
+                    <linearGradient id="glowGradientSilver" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#94A3B8" stopOpacity={0.2} />
+                      <stop offset="95%" stopColor="#94A3B8" stopOpacity={0.0} />
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="4 4" vertical={false} stroke="#E2E8F0" />
+                  <XAxis
+                    dataKey="time"
+                    tickLine={false}
+                    axisLine={false}
+                    tick={{ fill: '#94A3B8', fontSize: 10, fontWeight: 'bold' }}
+                  />
+                  <YAxis
+                    domain={['auto', 'auto']}
+                    tickLine={false}
+                    axisLine={false}
+                    tick={{ fill: '#94A3B8', fontSize: 10, fontWeight: 'bold' }}
+                  />
+                  <Tooltip
+                    content={({ active, payload }) => {
+                      if (active && payload && payload.length) {
+                        return (
+                          <div className="bg-white/90 backdrop-blur-sm border border-slate-200 p-2.5 rounded-xl shadow-lg">
+                            <div className="text-[10px] font-bold text-slate-400 mb-1">
+                              {payload[0].payload.time}
+                            </div>
+                            <div className="text-sm font-black text-slate-800">
+                              {payload[0].value}{' '}
+                              <span className="text-[10px] text-slate-500 font-bold">USD</span>
+                            </div>
                           </div>
-                        </div>
-                      );
-                    }
-                    return null;
-                  }}
-                />
-
-                <Area
-                  type="monotone"
-                  dataKey="price"
-                  stroke={chartColor}
-                  strokeWidth={2.5}
-                  fillOpacity={1}
-                  fill="url(#glowGradient)"
-                  isAnimationActive={true}
-                  animationDuration={600}
-                  activeDot={{
-                    r: 5,
-                    stroke: 'white',
-                    strokeWidth: 2,
-                    fill: chartColor,
-                  }}
-                />
-              </AreaChart>
-            </ResponsiveContainer>
+                        );
+                      }
+                      return null;
+                    }}
+                  />
+                  <Area
+                    type="monotone"
+                    dataKey="price"
+                    stroke="#94A3B8"
+                    strokeWidth={2.5}
+                    fillOpacity={1}
+                    fill="url(#glowGradientSilver)"
+                    animationDuration={1500}
+                    isAnimationActive={true}
+                  />
+                </AreaChart>
+              </ResponsiveContainer>
+            </div>
           </div>
         </CardContent>
       </Card>
@@ -603,25 +691,42 @@ const DashboardData = () => {
           <div className="flex items-center gap-1.5 text-slate-800">
             <Globe className="text-[#4067B1] h-4 w-4" />
             <span className="text-xs font-bold uppercase tracking-wider">Country Rates</span>
+            <span className="text-[10px] text-slate-400 font-medium ml-auto">(per 1g Gold)</span>
           </div>
-          <div className="space-y-3">
-            {countryRates.map((c, i) => (
-              <div key={i} className="space-y-1">
-                <div className="flex justify-between text-xs font-semibold text-slate-600">
-                  <span className="flex items-center gap-1">
-                    <span>{c.flag}</span>
-                    {c.name}
-                  </span>
-                  <span className="font-extrabold text-slate-800">{c.display}</span>
-                </div>
-                <div className="w-full h-1.5 rounded-full bg-slate-100 overflow-hidden">
-                  <div
-                    className="h-full bg-gradient-to-r from-sky-400 to-[#4067B1] transition-all"
-                    style={{ width: `${c.pct}%` }}
-                  />
-                </div>
-              </div>
-            ))}
+          <div className="h-[140px] overflow-hidden">
+            <Swiper
+              direction="vertical"
+              slidesPerView={3}
+              spaceBetween={12}
+              loop={true}
+              autoplay={{
+                delay: 2000,
+                disableOnInteraction: false,
+              }}
+              speed={2000}
+              modules={[Autoplay]}
+              className="h-full w-full"
+            >
+              {countryRates.map((c, i) => (
+                <SwiperSlide key={i}>
+                  <div className="space-y-1 py-1">
+                    <div className="flex justify-between text-xs font-semibold text-slate-600">
+                      <span className="flex items-center gap-1">
+                        <span>{c.flag}</span>
+                        {c.name}
+                      </span>
+                      <span className="font-extrabold text-slate-800">{c.display}</span>
+                    </div>
+                    <div className="w-full h-1.5 rounded-full bg-slate-100 overflow-hidden">
+                      <div
+                        className="h-full bg-gradient-to-r from-sky-400 to-[#4067B1]"
+                        style={{ width: `${c.pct}%` }}
+                      />
+                    </div>
+                  </div>
+                </SwiperSlide>
+              ))}
+            </Swiper>
           </div>
         </Card>
 

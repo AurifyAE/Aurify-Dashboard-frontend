@@ -238,7 +238,6 @@ export default function Theme1Layout({
         >
           <MerchantLogo theme="theme1" merchant={merchant} layout={layout} colors={colors} />
 
-          
           {widgets.includes('Commodity Table') && (
             <CommodityTable
               theme="theme1"
