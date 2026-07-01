@@ -55,7 +55,7 @@ const WorldClockHorizontal = ({ theme, colors = {} }: WorldClockProps) => {
   const isTheme3 = theme === 'theme3';
 
   // Theme 2 only shows 3 clocks (removes USA)
-  const displayClocks = isTheme2 ? clockConfig.filter(c => c.key !== 'usa') : clockConfig;
+  const displayClocks = isTheme2 ? clockConfig.filter((c) => c.key !== 'usa') : clockConfig;
 
   // Colors
   const defaultColor = isTheme1 ? '#000000' : isTheme3 ? '#FFC983' : '#fff';

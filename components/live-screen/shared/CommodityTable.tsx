@@ -160,17 +160,17 @@ const CommodityTable = ({
         sx={{
           display: 'grid',
           gridTemplateColumns: gridColumns,
-          gap: isTheme1 ? '0.2vw' : '0',
-          py: isTheme1 ? '1vw' : '0.9vw',
+          gap: '0',
+          py: '0.9vw',
           px: '1.5vw',
           alignItems: isTheme1 ? 'center' : 'end',
           background: headerBg,
-          borderRadius: isTheme1 ? '0.8vw' : '1vw',
+          borderRadius: '1vw',
           border: headerBorder,
           boxShadow: headerShadow,
-          mb: isTheme1 ? '0.8vw' : '0.4vw',
-          margin: !isTheme1 ? '.4vw' : undefined,
-          backdropFilter: isTheme1 ? 'none' : 'blur(0.35vw)',
+          mb: '0.4vw',
+          margin: '.4vw',
+          backdropFilter: 'blur(0.35vw)',
         }}
       >
         {headerTitles.map((title, i) => (
@@ -193,7 +193,7 @@ const CommodityTable = ({
       <Box
         sx={{
           maxHeight: tableHeight,
-          mt: isTheme3 ? '1vw' : '0',
+          mt: '1vw',
         }}
       >
         <Swiper
@@ -205,7 +205,7 @@ const CommodityTable = ({
           speed={3000}
           style={{
             height: tableHeight,
-            backdropFilter: isTheme1 ? 'blur(5px)' : 'blur(0.4vw)',
+            backdropFilter: 'blur(0.4vw)',
             borderRadius: '1vw',
             background: isTheme1
               ? 'transparent'
@@ -241,13 +241,13 @@ const CommodityTable = ({
                   sx={{
                     display: 'grid',
                     gridTemplateColumns: gridColumns,
-                    gap: isTheme1 ? '0.2vw' : '0',
+                    gap: '0',
                     alignItems: 'center',
                     background: rowBg,
-                    py: isTheme1 ? '1vw' : '.7vw',
+                    py: '.7vw',
                     px: '1.5vw',
                     border: rowBorder,
-                    height: isTheme1 ? 'auto' : '100%',
+                    height: '100%',
                   }}
                 >
                   <Typography
