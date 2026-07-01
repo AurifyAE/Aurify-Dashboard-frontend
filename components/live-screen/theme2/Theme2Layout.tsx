@@ -7,6 +7,7 @@ import NewsTicker from '../shared/NewsTicker';
 import WorldClockHorizontal from '../shared/WorldClock';
 import SystemClock from '../shared/SystemClock';
 import PoweredByAurify from '../shared/PoweredByAurify';
+import MerchantLogo from '../shared/MerchantLogo';
 import io from 'socket.io-client';
 import { API_URL, API_KEY, SOCKET_SECRET } from '@/lib/env';
 
@@ -244,31 +245,7 @@ export default function Theme2Layout({
         </Grid>
 
         <Grid size={{ xs: 12, md: 6 }} sx={{ display: 'grid', padding: '1vw', gap: '1vw' }}>
-          <Box
-            sx={{
-              height: 'auto',
-              width: { xs: '40vw', sm: '20vw' },
-              marginBottom: { xs: '20px', sm: '0vw' },
-              mx: 'auto',
-            }}
-          >
-            {(layout?.styles?.showLogo ?? true) ? (
-              <img
-                src={layout?.styles?.logoUrl || merchant?.logo || '/images/logo-placeholder.svg'}
-                alt={merchant?.companyName}
-                style={{
-                  width: '100%',
-                  height: 'auto',
-                  objectFit: 'contain',
-                  maxHeight: '15vw',
-                }}
-              />
-            ) : showName ? (
-              <Typography variant="h4" sx={{ color: '#d4a017', fontWeight: 'bold' }}>
-                {merchant?.companyName || 'Merchant'}
-              </Typography>
-            ) : null}
-          </Box>
+          <MerchantLogo theme="theme2" merchant={merchant} layout={layout} colors={colors} />
 
           {widgets.includes('Spot Rates') && (
             <SpotRate goldData={goldData} silverData={silverData} colors={colors} />

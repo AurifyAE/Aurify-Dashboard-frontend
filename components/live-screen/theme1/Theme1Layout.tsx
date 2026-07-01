@@ -9,6 +9,7 @@ import NewsTicker from '../shared/NewsTicker';
 import WorldClockHorizontal from '../shared/WorldClock';
 import SystemClock from '../shared/SystemClock';
 import PoweredByAurify from '../shared/PoweredByAurify';
+import MerchantLogo from '../shared/MerchantLogo';
 import { API_URL, API_KEY, SOCKET_SECRET } from '@/lib/env';
 
 export default function Theme1Layout({
@@ -235,28 +236,9 @@ export default function Theme1Layout({
             gap: '1vw',
           }}
         >
-          <Box
-            sx={{
-              height: 'auto',
-              width: { xs: '40vw', sm: '18vw' },
-              marginBottom: { xs: '20px', sm: '0vw' },
-            }}
-          >
-            {showLogo ? (
-              <img
-                src={layout?.styles?.logoUrl || merchant?.logo || '/images/logo-placeholder.svg'}
-                alt={merchant?.companyName}
-                style={{ width: '100%', height: 'auto', objectFit: 'contain' }}
-              />
-            ) : showName ? (
-              <Typography
-                variant="h4"
-                sx={{ color: colors.primary || '#d4a017', fontWeight: 'bold' }}
-              >
-                {merchant?.companyName || 'Merchant'}
-              </Typography>
-            ) : null}
-          </Box>
+          <MerchantLogo theme="theme1" merchant={merchant} layout={layout} colors={colors} />
+
+          
           {widgets.includes('Commodity Table') && (
             <CommodityTable
               theme="theme1"

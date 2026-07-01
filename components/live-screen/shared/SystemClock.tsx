@@ -69,9 +69,9 @@ const SystemClock = ({ theme, colors = {} }: SystemClockProps) => {
           alignItems: 'center',
           justifyContent: 'center',
           gap: '1vw',
+          mb: '1vw',
           width: '100%',
           padding: '0vw 2.5vw',
-          borderRadius: '20px',
         }}
       >
         <Typography
@@ -80,6 +80,7 @@ const SystemClock = ({ theme, colors = {} }: SystemClockProps) => {
             fontWeight: 400,
             letterSpacing: '2px',
             color: textColor,
+            lineHeight: '1',
           }}
         >
           {timeData.date || '-- --- ----'}
@@ -89,6 +90,7 @@ const SystemClock = ({ theme, colors = {} }: SystemClockProps) => {
             fontSize: { xs: '12px', sm: '1vw' },
             color: textColor,
             letterSpacing: '2px',
+            lineHeight: '1',
           }}
         >
           {timeData.day || '-----'}
