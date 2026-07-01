@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, FormEvent, useEffect } from 'react';
+import React, { useState, FormEvent, useEffect, Suspense } from 'react';
 import Image from 'next/image';
 import { Eye, EyeOff } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
@@ -12,7 +12,7 @@ interface FieldErrors {
   password?: string;
 }
 
-export default function LoginPage() {
+function LoginContent() {
   const { login } = useAuth();
   const searchParams = useSearchParams();
 
@@ -280,5 +280,13 @@ export default function LoginPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <LoginContent />
+    </Suspense>
   );
 }
