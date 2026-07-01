@@ -142,7 +142,7 @@ const SpotRate = ({ goldData, silverData, colors }: SpotRateProps) => {
               md: '1.5vw', // laptops
             },
             letterSpacing: '0.25vw',
-            color: '#fff',
+            color: colors?.panelText || '#fff',
             mb: '0.5vw',
           }}
         >
@@ -202,12 +202,7 @@ const SpotRate = ({ goldData, silverData, colors }: SpotRateProps) => {
           border: '0.1vw solid #eee2d73d',
           borderRadius: '1vw',
           backdropFilter: 'blur(0.2vw)',
-          background:
-            theme === 'gold' && colors?.buyBg
-              ? colors.buyBg
-              : theme === 'silver' && colors?.sellBg
-                ? colors.sellBg
-                : '#aa8a4b11',
+          background: colors?.panelBg || '#aa8a4b11',
           padding: { xs: ' 2vw 3vw', sm: ' 0.5vw 2vw', md: '1vw 1vw' },
           position: 'relative',
           boxShadow: '0px 0px 25px  rgba(69, 79, 170, 0.25)  inset',
@@ -223,7 +218,7 @@ const SpotRate = ({ goldData, silverData, colors }: SpotRateProps) => {
           sx={{
             fontSize: { xs: '14px', md: '1.8vw' },
             fontWeight: 700,
-            color: '#fff',
+            color: colors?.panelText || '#fff',
             letterSpacing: '0.1em',
             textAlign: 'center',
           }}
@@ -240,7 +235,7 @@ const SpotRate = ({ goldData, silverData, colors }: SpotRateProps) => {
               lg: '1.5vw', // desktop
               xl: '1.2vw', // large screens
             },
-            color: '#fff',
+            color: colors?.panelText || '#fff',
             textAlign: 'center',
             fontWeight: '700',
           }}
@@ -266,7 +261,7 @@ const SpotRate = ({ goldData, silverData, colors }: SpotRateProps) => {
               lg: '1.5vw', // desktop
               xl: '1.2vw', // large screens
             },
-            color: '#fff',
+            color: colors?.panelText || '#fff',
             textAlign: 'center',
             fontWeight: '700',
           }}

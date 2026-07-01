@@ -127,7 +127,7 @@ const CommodityTable = ({ items, goldData, silverData, colors = {} }: CommodityT
           mb: '0.8vw',
         }}
       >
-        {['ITEM', 'WT', 'BUY', 'SELL'].map((header, i) => (
+        {['ITEM', 'UNIT', 'BUY', 'SELL'].map((header, i) => (
           <Typography
             key={header}
             sx={{

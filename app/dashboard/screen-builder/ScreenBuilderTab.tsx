@@ -254,8 +254,8 @@ const COLOR_CATEGORIES = [
   {
     title: 'Spot Rate Settings',
     colors: [
-      { key: 'buyBg', label: 'Gold Panel Bg' },
-      { key: 'sellBg', label: 'Silver Panel Bg' },
+      { key: 'panelBg', label: 'Panel Bg' },
+      { key: 'panelText', label: 'Text Color' },
     ],
   },
   {
@@ -992,6 +992,9 @@ export default function ScreenBuilderTab({
                 {[
                   { label: 'Screen name set', done: Boolean(draft.name.trim()) },
                   { label: 'Theme selected', done: Boolean(draft.selectedLayout) },
+                  { label: 'Custom logo selected', done: Boolean(draft.logoUrl) },
+                  { label: 'Custom background selected', done: Boolean(draft.backgroundUrl) },
+                  { label: 'Custom news added', done: Boolean(news && news.length > 0) },
                   { label: 'Merchant approved', done: merchant?.status === 'Active' },
                 ].map((item) => (
                   <div key={item.label} className="flex items-center gap-2 text-sm">

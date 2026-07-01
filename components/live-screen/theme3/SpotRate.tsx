@@ -115,7 +115,7 @@ const SpotRate = ({
               md: '1.5vw', // laptops
             },
             letterSpacing: '0.25vw',
-            color: '#fff',
+            color: colors?.panelText || '#fff',
           }}
         >
           {label}
@@ -172,11 +172,8 @@ const SpotRate = ({
           backdropFilter: 'blur(0.8vw)',
 
           background:
-            theme === 'gold' && colors?.buyBg
-              ? colors.buyBg
-              : theme === 'silver' && colors?.sellBg
-                ? colors.sellBg
-                : `linear-gradient(135deg,  rgba(46, 1, 17, 0.52) 0%,  rgba(88, 35, 35, 0.72), rgba(72, 7, 7, 0.52) 100%)`,
+            colors?.panelBg ||
+            `linear-gradient(135deg,  rgba(46, 1, 17, 0.52) 0%,  rgba(88, 35, 35, 0.72), rgba(72, 7, 7, 0.52) 100%)`,
           border: '0.18vw solid rgba(255, 225, 190, 0.28)',
           padding: {
             xs: '2vw 3vw',
@@ -245,11 +242,14 @@ const SpotRate = ({
               fontWeight: 700,
 
               letterSpacing: '0.1em',
-              background: isSilver
-                ? 'linear-gradient(90deg, #CCFBFF,#9AC6FF)'
-                : 'linear-gradient(90deg, #FFF7CC,#FFCD9A)',
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent',
+              color: colors?.panelText || undefined,
+              background: colors?.panelText
+                ? undefined
+                : isSilver
+                  ? 'linear-gradient(90deg, #CCFBFF,#9AC6FF)'
+                  : 'linear-gradient(90deg, #FFF7CC,#FFCD9A)',
+              WebkitBackgroundClip: colors?.panelText ? undefined : 'text',
+              WebkitTextFillColor: colors?.panelText ? undefined : 'transparent',
               lineHeight: '1',
             }}
           >
@@ -266,7 +266,7 @@ const SpotRate = ({
               lg: '1.5vw', // desktop
               xl: '1.2vw', // large screens
             },
-            color: '#fff',
+            color: colors?.panelText || '#fff',
             textAlign: 'center',
 
             fontWeight: '700',
@@ -287,7 +287,7 @@ const SpotRate = ({
               xl: '1.2vw', // large screens
             },
             textAlign: 'center',
-            color: '#fff',
+            color: colors?.panelText || '#fff',
             fontWeight: '700',
           }}
         >

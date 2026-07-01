@@ -113,7 +113,7 @@ const LiveSpotRate = ({ goldData, silverData, colors = {} }: LiveSpotRateProps) 
           sx={{
             fontSize: { xs: '15px', sm: '2.5vw', md: '1.5vw' },
             letterSpacing: '0.25vw',
-            color: '#fff',
+            color: colors?.panelText || '#fff',
             pl: '1vw',
           }}
         >
@@ -132,6 +132,8 @@ const LiveSpotRate = ({ goldData, silverData, colors = {} }: LiveSpotRateProps) 
             letterSpacing: '0.18vw',
             textAlign: 'center',
             color: '#fff',
+            bgcolor: bgColor,
+
             border: border,
             borderRadius: '1vw',
             fontVariantNumeric: 'tabular-nums',
@@ -166,11 +168,8 @@ const LiveSpotRate = ({ goldData, silverData, colors = {} }: LiveSpotRateProps) 
           borderRadius: '1.8vw',
           backdropFilter: 'blur(0.8vw)',
           background:
-            theme === 'gold' && colors?.buyBg
-              ? colors.buyBg
-              : theme === 'silver' && colors?.sellBg
-                ? colors.sellBg
-                : `linear-gradient(135deg,  rgba(46, 16, 1, 0.52) 0%,  rgba(88, 53, 35, 0.72), rgba(72, 29, 7, 0.52) 100%)`,
+            colors?.panelBg ||
+            `linear-gradient(135deg,  rgba(46, 16, 1, 0.52) 0%,  rgba(88, 53, 35, 0.72), rgba(72, 29, 7, 0.52) 100%)`,
           border: '0.18vw solid rgba(255, 225, 190, 0.28)',
           padding: { xs: '2vw 3vw', sm: '0.5vw 2vw', md: '1.5vw 1vw' },
           display: 'grid',
@@ -213,11 +212,14 @@ const LiveSpotRate = ({ goldData, silverData, colors = {} }: LiveSpotRateProps) 
               fontSize: { xs: '14px', md: '1.7vw' },
               fontWeight: 700,
               letterSpacing: '0.1em',
-              background: isSilver
-                ? 'linear-gradient(90deg, #CCFBFF,#9AC6FF)'
-                : 'linear-gradient(90deg, #FFF7CC,#FFCD9A)',
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent',
+              color: colors?.panelText || undefined,
+              background: colors?.panelText
+                ? undefined
+                : isSilver
+                  ? 'linear-gradient(90deg, #CCFBFF,#9AC6FF)'
+                  : 'linear-gradient(90deg, #FFF7CC,#FFCD9A)',
+              WebkitBackgroundClip: colors?.panelText ? undefined : 'text',
+              WebkitTextFillColor: colors?.panelText ? undefined : 'transparent',
               lineHeight: '1',
             }}
           >
@@ -234,7 +236,7 @@ const LiveSpotRate = ({ goldData, silverData, colors = {} }: LiveSpotRateProps) 
               lg: '1.5vw',
               xl: '1.2vw',
             },
-            color: '#fff',
+            color: colors?.panelText || '#fff',
             fontWeight: '700',
             textAlign: 'center',
           }}
@@ -252,7 +254,7 @@ const LiveSpotRate = ({ goldData, silverData, colors = {} }: LiveSpotRateProps) 
               lg: '1.5vw',
               xl: '1.2vw',
             },
-            color: '#fff',
+            color: colors?.panelText || '#fff',
             fontWeight: '700',
             textAlign: 'center',
           }}

@@ -253,9 +253,10 @@ export default function NewsManagementTab({
                     }`}
                   >
                     {/* Priority indicator removed since it's no longer used */}
-                    <div className="pl-3">
+                    <div>
                       <div className="mb-2 flex items-start justify-between gap-3">
-                        <div className="flex items-center gap-1.5 ml-auto flex-shrink-0">
+                        <h3 className="font-semibold text-slate-900 pr-2">{item.title}</h3>
+                        <div className="flex items-center gap-1.5 flex-shrink-0">
                           <button
                             type="button"
                             onClick={() => {
@@ -283,7 +284,6 @@ export default function NewsManagementTab({
                           </button>
                         </div>
                       </div>
-                      <h3 className="font-semibold text-slate-900">{item.title}</h3>
                       {item.content && (
                         <p className="mt-1 text-sm text-slate-500 line-clamp-2">{item.content}</p>
                       )}
