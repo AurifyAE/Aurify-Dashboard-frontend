@@ -190,7 +190,11 @@ export default function Theme2Layout({
       >
         <Box
           component="img"
-          src={layout?.styles?.backgroundUrl || theme?.customizations?.backgroundUrl || '/images/theme2-bg.png'}
+          src={
+            layout?.styles?.backgroundUrl ||
+            theme?.customizations?.backgroundUrl ||
+            '/images/theme2-bg.png'
+          }
           alt="background"
           onError={(e) => {
             e.currentTarget.style.display = 'none';
@@ -257,7 +261,7 @@ export default function Theme2Layout({
               mx: 'auto',
             }}
           >
-            {layout?.styles?.showLogo ?? true ? (
+            {(layout?.styles?.showLogo ?? true) ? (
               <img
                 src={layout?.styles?.logoUrl || merchant?.logo || '/images/logo-placeholder.svg'}
                 alt={merchant?.companyName}

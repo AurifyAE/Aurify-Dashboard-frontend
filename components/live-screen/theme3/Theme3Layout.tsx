@@ -177,7 +177,11 @@ export default function Theme3Layout({
       >
         <Box
           component="img"
-          src={layout?.styles?.backgroundUrl || theme?.customizations?.backgroundUrl || '/images/theme3-bg.png'}
+          src={
+            layout?.styles?.backgroundUrl ||
+            theme?.customizations?.backgroundUrl ||
+            '/images/theme3-bg.png'
+          }
           alt="background"
           onError={(e: any) => {
             e.currentTarget.style.display = 'none';

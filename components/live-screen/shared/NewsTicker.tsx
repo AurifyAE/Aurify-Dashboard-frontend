@@ -53,8 +53,8 @@ const NewsTicker = ({
       {/* LEFT BRAND */}
       <Typography
         sx={{
-          color: brandColor || colors?.newsText || '#fff',
-          background: brandBg || colors?.newsBg || '#202020',
+          color: colors?.newsTitleText || brandColor || colors?.newsText || '#fff',
+          background: colors?.newsTitleBg || brandBg || colors?.newsBg || '#202020',
           fontSize: {
             xs: '12px',
             lg: '1.2vw',

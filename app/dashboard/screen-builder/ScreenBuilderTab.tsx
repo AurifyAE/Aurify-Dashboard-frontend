@@ -254,17 +254,17 @@ const COLOR_CATEGORIES = [
   {
     title: 'Spot Rate Settings',
     colors: [
-      { key: 'buyBg', label: 'Buy Box Bg' },
-      { key: 'buyText', label: 'Buy Text' },
-      { key: 'sellBg', label: 'Sell Box Bg' },
-      { key: 'sellText', label: 'Sell Text' },
+      { key: 'buyBg', label: 'Gold Panel Bg' },
+      { key: 'sellBg', label: 'Silver Panel Bg' },
     ],
   },
   {
     title: 'News Settings',
     colors: [
-      { key: 'newsBg', label: 'News Bg' },
-      { key: 'newsText', label: 'News Text' },
+      { key: 'newsBg', label: 'Background' },
+      { key: 'newsText', label: 'Text' },
+      { key: 'newsTitleText', label: 'Title Text' },
+      { key: 'newsTitleBg', label: 'Title Bg' },
     ],
   },
   {
@@ -658,7 +658,7 @@ export default function ScreenBuilderTab({
       </div>
 
       <div className="grid gap-6 xl:grid-cols-[380px_1fr]">
-        <aside className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sticky top-6 h-fit max-h-[70dvh] overflow-y-auto">
+        <aside className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sticky top-6 h-fit max-h-[80dvh] overflow-y-auto">
           {/* STEP 1 */}
           {step === 1 && (
             <div className="space-y-4">
@@ -751,6 +751,16 @@ export default function ScreenBuilderTab({
                       onChange={(e) => handleImageUpload(e, 'logoUrl')}
                       className="block w-full text-xs text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer"
                     />
+                    {draft.logoUrl && (
+                      <div className="mt-2 flex items-center gap-2 text-xs text-slate-500">
+                        <span className="font-semibold">Current:</span>
+                        <img
+                          src={draft.logoUrl}
+                          alt="logo"
+                          className="h-8 w-auto rounded border border-slate-200 bg-slate-50 object-contain p-0.5"
+                        />
+                      </div>
+                    )}
                   </div>
                   <div>
                     <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-500">
@@ -762,6 +772,16 @@ export default function ScreenBuilderTab({
                       onChange={(e) => handleImageUpload(e, 'backgroundUrl')}
                       className="block w-full text-xs text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer"
                     />
+                    {draft.backgroundUrl && (
+                      <div className="mt-2 flex items-center gap-2 text-xs text-slate-500">
+                        <span className="font-semibold">Current:</span>
+                        <img
+                          src={draft.backgroundUrl}
+                          alt="background"
+                          className="h-8 w-12 rounded border border-slate-200 bg-slate-50 object-cover p-0.5"
+                        />
+                      </div>
+                    )}
                   </div>
                 </div>
 

@@ -195,7 +195,11 @@ export default function Theme1Layout({
       >
         <Box
           component="img"
-          src={layout?.styles?.backgroundUrl || theme?.customizations?.backgroundUrl || '/images/theme1-bg.png'}
+          src={
+            layout?.styles?.backgroundUrl ||
+            theme?.customizations?.backgroundUrl ||
+            '/images/theme1-bg.png'
+          }
           alt="background"
           onError={(e) => {
             e.currentTarget.style.display = 'none';

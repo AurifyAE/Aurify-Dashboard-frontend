@@ -131,7 +131,6 @@ const LiveSpotRate = ({ goldData, silverData, colors = {} }: LiveSpotRateProps) 
             fontWeight: 800,
             letterSpacing: '0.18vw',
             textAlign: 'center',
-            bgcolor: bgColor,
             color: '#fff',
             border: border,
             borderRadius: '1vw',
@@ -166,7 +165,12 @@ const LiveSpotRate = ({ goldData, silverData, colors = {} }: LiveSpotRateProps) 
           overflow: 'hidden',
           borderRadius: '1.8vw',
           backdropFilter: 'blur(0.8vw)',
-          background: `linear-gradient(135deg,  rgba(46, 16, 1, 0.52) 0%,  rgba(88, 53, 35, 0.72), rgba(72, 29, 7, 0.52) 100%)`,
+          background:
+            theme === 'gold' && colors?.buyBg
+              ? colors.buyBg
+              : theme === 'silver' && colors?.sellBg
+                ? colors.sellBg
+                : `linear-gradient(135deg,  rgba(46, 16, 1, 0.52) 0%,  rgba(88, 53, 35, 0.72), rgba(72, 29, 7, 0.52) 100%)`,
           border: '0.18vw solid rgba(255, 225, 190, 0.28)',
           padding: { xs: '2vw 3vw', sm: '0.5vw 2vw', md: '1.5vw 1vw' },
           display: 'grid',

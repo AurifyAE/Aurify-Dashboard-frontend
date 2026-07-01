@@ -202,7 +202,12 @@ const SpotRate = ({ goldData, silverData, colors }: SpotRateProps) => {
           border: '0.1vw solid #eee2d73d',
           borderRadius: '1vw',
           backdropFilter: 'blur(0.2vw)',
-          background: '#aa8a4b11',
+          background:
+            theme === 'gold' && colors?.buyBg
+              ? colors.buyBg
+              : theme === 'silver' && colors?.sellBg
+                ? colors.sellBg
+                : '#aa8a4b11',
           padding: { xs: ' 2vw 3vw', sm: ' 0.5vw 2vw', md: '1vw 1vw' },
           position: 'relative',
           boxShadow: '0px 0px 25px  rgba(69, 79, 170, 0.25)  inset',

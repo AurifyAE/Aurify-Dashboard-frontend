@@ -79,9 +79,9 @@ const SpotRate = ({
         color: 'white',
       };
     return {
-      bgColor: isBid ? colors?.buyBg || '#F0F8FF00' : colors?.sellBg || '#F0F8FF00',
+      bgColor: '#000',
       border: ' 1px solid #FFFFFF',
-      color: isBid ? colors?.buyText || '#fff' : colors?.sellText || '#fff',
+      color: '#fff',
     };
   };
 
@@ -171,7 +171,12 @@ const SpotRate = ({
 
           backdropFilter: 'blur(0.8vw)',
 
-          background: `linear-gradient(135deg,  rgba(46, 1, 17, 0.52) 0%,  rgba(88, 35, 35, 0.72), rgba(72, 7, 7, 0.52) 100%)`,
+          background:
+            theme === 'gold' && colors?.buyBg
+              ? colors.buyBg
+              : theme === 'silver' && colors?.sellBg
+                ? colors.sellBg
+                : `linear-gradient(135deg,  rgba(46, 1, 17, 0.52) 0%,  rgba(88, 35, 35, 0.72), rgba(72, 7, 7, 0.52) 100%)`,
           border: '0.18vw solid rgba(255, 225, 190, 0.28)',
           padding: {
             xs: '2vw 3vw',
