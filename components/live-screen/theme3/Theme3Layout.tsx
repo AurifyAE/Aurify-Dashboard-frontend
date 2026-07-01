@@ -214,7 +214,13 @@ export default function Theme3Layout({
         {/* Side: SpotRate & Date Time */}
         <Grid size={{ xs: 12, md: 6 }} sx={{ padding: '1vw', gap: '1vw', display: 'grid' }}>
           {widgets.includes('Date') && <SystemClock theme="theme3" colors={colors} />}
-          {widgets.includes('Clock') && <WorldClockHorizontal theme="theme3" colors={colors} />}
+          {widgets.includes('Clock') && (
+            <WorldClockHorizontal
+              theme="theme3"
+              colors={colors}
+              selectedClocks={layout?.styles?.selectedClocks}
+            />
+          )}
           {widgets.includes('Spot Rates') && (
             <SpotRate goldData={goldData} silverData={silverData} colors={colors} />
           )}

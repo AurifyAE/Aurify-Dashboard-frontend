@@ -58,6 +58,24 @@ const DashboardData = () => {
   const [goldBaseline, setGoldBaseline] = useState<number | null>(null);
   const [silverBaseline, setSilverBaseline] = useState<number | null>(null);
 
+  // Live news state
+  const [newsItems, setNewsItems] = useState<{title: string, pubDate: string, link: string}[]>([
+    { title: 'Fetching live news...', pubDate: '', link: '#' },
+    { title: 'Fetching live news...', pubDate: '', link: '#' },
+    { title: 'Fetching live news...', pubDate: '', link: '#' },
+  ]);
+
+  useEffect(() => {
+    fetch('/api/news')
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.success && data.data && data.data.length > 0) {
+          setNewsItems(data.data.slice(0, 3));
+        }
+      })
+      .catch((err) => console.error('Failed to fetch news', err));
+  }, []);
+
   useEffect(() => {
     setMounted(true);
   }, []);
@@ -789,26 +807,39 @@ const DashboardData = () => {
           Latest News
         </h3>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {[
-            'Gold trends upward as global central banks signal interest rate relief',
-            'Silver experiences massive retail demand in Asian physical markets',
-            'Precious metals surge amidst new clean energy manufacturing quotas',
-          ].map((title, i) => (
-            <Card
-              key={i}
-              className="border border-slate-100 shadow-sm bg-white rounded-2xl hover:border-[#4067B1] transition-all p-4.5 group cursor-pointer"
-            >
-              <CardContent className="p-0 flex flex-col justify-between h-20 text-xs">
-                <p className="font-bold text-slate-700 leading-relaxed group-hover:text-[#4067B1] transition-colors line-clamp-3">
-                  {title}
-                </p>
-                <div className="flex justify-between text-[10px] text-slate-400 font-medium pt-2 border-t border-slate-50 mt-1">
-                  <span>Bulletin Feed</span>
-                  <span>10m ago</span>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
+          {newsItems.map((news, i) => {
+            const isFetching = news.title === 'Fetching live news...';
+            const dateObj = new Date(news.pubDate);
+            const timeStr = isNaN(dateObj.getTime())
+              ? 'Just now'
+              : dateObj.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+            return (
+              <Card
+                key={i}
+                className="border border-slate-100 shadow-sm bg-white rounded-2xl hover:border-[#4067B1] transition-all p-4.5 group cursor-pointer flex flex-col"
+                onClick={() => {
+                  if (news.link !== '#') window.open(news.link, '_blank');
+                }}
+              >
+                <CardContent className="p-0 flex flex-col justify-between h-20 text-xs">
+                  <p
+                    className={cn(
+                      'font-bold text-slate-700 leading-relaxed transition-colors line-clamp-3',
+                      !isFetching && 'group-hover:text-[#4067B1]',
+                      isFetching && 'animate-pulse text-slate-400'
+                    )}
+                  >
+                    {news.title}
+                  </p>
+                  <div className="flex justify-between text-[10px] text-slate-400 font-medium pt-2 border-t border-slate-50 mt-1">
+                    <span>{isFetching ? '...' : 'WSJ Markets'}</span>
+                    <span>{isFetching ? '...' : timeStr}</span>
+                  </div>
+                </CardContent>
+              </Card>
+            );
+          })}
         </div>
       </div>
     </div>

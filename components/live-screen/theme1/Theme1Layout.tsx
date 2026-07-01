@@ -252,7 +252,13 @@ export default function Theme1Layout({
         <Grid size={{ xs: 12, md: 6 }} sx={{ gap: '1vw', display: 'grid' }}>
           {widgets.includes('Date') && <SystemClock theme="theme1" colors={colors} />}
 
-          {widgets.includes('Clock') && <WorldClockHorizontal theme="theme1" colors={colors} />}
+          {widgets.includes('Clock') && (
+            <WorldClockHorizontal
+              theme="theme1"
+              colors={colors}
+              selectedClocks={layout?.styles?.selectedClocks}
+            />
+          )}
 
           {widgets.includes('Spot Rates') && (
             <LiveSpotRate goldData={goldData} silverData={silverData} colors={colors} />

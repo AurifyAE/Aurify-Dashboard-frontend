@@ -241,7 +241,13 @@ export default function Theme2Layout({
               colors={colors}
             />
           )}
-          {widgets.includes('Clock') && <WorldClockHorizontal theme="theme2" colors={colors} />}
+          {widgets.includes('Clock') && (
+            <WorldClockHorizontal
+              theme="theme2"
+              colors={colors}
+              selectedClocks={layout?.styles?.selectedClocks}
+            />
+          )}
         </Grid>
 
         <Grid size={{ xs: 12, md: 6 }} sx={{ display: 'grid', padding: '1vw', gap: '1vw' }}>

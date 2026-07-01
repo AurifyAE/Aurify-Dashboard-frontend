@@ -115,6 +115,7 @@ type DraftState = {
   logoUrl?: string;
   backgroundUrl?: string;
   newsHeading?: string;
+  selectedClocks: string[];
 };
 
 const defaultDraft: DraftState = {
@@ -148,6 +149,7 @@ const defaultDraft: DraftState = {
   showName: true,
   logoUrl: '',
   backgroundUrl: '',
+  selectedClocks: ['india', 'uae', 'london'],
 };
 
 interface ScreenBuilderTabProps {
@@ -182,6 +184,7 @@ const TVPreviewRenderer = ({ data }: { data: any }) => {
         colorOverride: data.layout?.colorOverride || data.layout?.styles?.colorOverride,
         showLogo: data.layout?.showLogo,
         showName: data.layout?.showName,
+        selectedClocks: data.layout?.selectedClocks || data.layout?.styles?.selectedClocks,
       },
     },
     merchant: {
@@ -415,7 +418,11 @@ export default function ScreenBuilderTab({
         const target = savedLayouts.find((l) => l.layoutId === editingLayoutId);
         if (target) {
           if (localDraft && localDraft.layoutId === editingLayoutId) {
-            setDraft(localDraft);
+            setDraft({
+              ...defaultDraft,
+              ...localDraft,
+              selectedClocks: localDraft.selectedClocks?.length ? localDraft.selectedClocks : defaultDraft.selectedClocks,
+            });
           } else {
             setDraft({
               layoutId: target.layoutId,
@@ -432,12 +439,19 @@ export default function ScreenBuilderTab({
               colorOverride: (target.styles as any)?.colorOverride || defaultDraft.colorOverride,
               showLogo: (target.styles as any)?.showLogo ?? true,
               showName: (target.styles as any)?.showName ?? true,
+              logoUrl: (target.styles as any)?.logoUrl || '',
+              backgroundUrl: (target.styles as any)?.backgroundUrl || '',
+              selectedClocks: (target.styles as any)?.selectedClocks?.length ? (target.styles as any).selectedClocks : defaultDraft.selectedClocks,
             });
           }
         }
       } else {
         if (localDraft && !localDraft.layoutId) {
-          setDraft(localDraft);
+          setDraft({
+            ...defaultDraft,
+            ...localDraft,
+            selectedClocks: localDraft.selectedClocks?.length ? localDraft.selectedClocks : defaultDraft.selectedClocks,
+          });
         } else {
           setDraft({
             ...defaultDraft,
@@ -508,6 +522,7 @@ export default function ScreenBuilderTab({
       showName: draft.showName,
       logoUrl: draft.logoUrl,
       backgroundUrl: draft.backgroundUrl,
+      selectedClocks: draft.selectedClocks,
     },
   });
 
@@ -907,6 +922,52 @@ export default function ScreenBuilderTab({
                   ))}
                 </div>
               </div>
+
+              {/* Clocks Section */}
+              {draft.widgets.includes('Clock') && (
+                <div className="pt-4 border-t border-slate-100">
+                  <h3 className="font-bold text-slate-800 text-sm mb-3">World Clocks</h3>
+                  <div className="grid grid-cols-2 gap-3">
+                    {[
+                      { id: 'india', label: 'India' },
+                      { id: 'uae', label: 'UAE' },
+                      { id: 'london', label: 'London' },
+                      { id: 'usa', label: 'USA (New York)' },
+                      { id: 'singapore', label: 'Singapore' },
+                      { id: 'saudi', label: 'Saudi Arabia' },
+                      { id: 'qatar', label: 'Qatar' },
+                      { id: 'bahrain', label: 'Bahrain' },
+                      { id: 'kuwait', label: 'Kuwait' },
+                      { id: 'oman', label: 'Oman' },
+                    ].map((clock) => {
+                      const activeClocks = draft.selectedClocks || ['india', 'uae', 'london'];
+                      return (
+                      <label
+                        key={clock.id}
+                        className="flex items-center gap-2 text-sm text-slate-700 cursor-pointer"
+                      >
+                        <input
+                          type="checkbox"
+                          checked={activeClocks.includes(clock.id)}
+                          onChange={(e) => {
+                            const current = draft.selectedClocks || ['india', 'uae', 'london'];
+                            if (e.target.checked) {
+                              setDraft({ ...draft, selectedClocks: [...current, clock.id] });
+                            } else {
+                              setDraft({
+                                ...draft,
+                                selectedClocks: current.filter((c) => c !== clock.id),
+                              });
+                            }
+                          }}
+                          className="rounded border-slate-300 text-blue-600 focus:ring-blue-600 h-4 w-4 cursor-pointer"
+                        />
+                        {clock.label}
+                      </label>
+                    )})}
+                  </div>
+                </div>
+              )}
 
               <div className="flex gap-2 pt-2">
                 <button type="button" onClick={() => setStep(1)} className="btn-secondary">

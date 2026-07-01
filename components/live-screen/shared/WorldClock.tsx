@@ -3,19 +3,31 @@
 import React, { useEffect, useState } from 'react';
 import { Box, Typography } from '@mui/material';
 
-const clockConfig = [
+export const clockConfig = [
   { key: 'india', label: 'INDIA', timeZone: 'Asia/Kolkata', flag: '/images/india.png' },
   { key: 'uae', label: 'UAE', timeZone: 'Asia/Dubai', flag: '/images/uae.png' },
   { key: 'london', label: 'LONDON', timeZone: 'Europe/London', flag: '/images/uk.png' },
   { key: 'usa', label: 'USA', timeZone: 'America/New_York', flag: '/images/usa.png' },
+  {
+    key: 'singapore',
+    label: 'SINGAPORE',
+    timeZone: 'Asia/Singapore',
+    flag: '/images/singapore.png',
+  },
+  { key: 'saudi', label: 'SAUDI', timeZone: 'Asia/Riyadh', flag: '/images/saudi.png' },
+  { key: 'qatar', label: 'QATAR', timeZone: 'Asia/Qatar', flag: '/images/qatar.png' },
+  { key: 'bahrain', label: 'BAHRAIN', timeZone: 'Asia/Bahrain', flag: '/images/bahrain.png' },
+  { key: 'kuwait', label: 'KUWAIT', timeZone: 'Asia/Kuwait', flag: '/images/kuwait.png' },
+  { key: 'oman', label: 'OMAN', timeZone: 'Asia/Muscat', flag: '/images/oman.png' },
 ];
 
 interface WorldClockProps {
   theme: 'theme1' | 'theme2' | 'theme3';
   colors?: any;
+  selectedClocks?: string[];
 }
 
-const WorldClockHorizontal = ({ theme, colors = {} }: WorldClockProps) => {
+const WorldClockHorizontal = ({ theme, colors = {}, selectedClocks }: WorldClockProps) => {
   const [times, setTimes] = useState<Record<string, string>>({});
   const [mounted, setMounted] = useState(false);
 
@@ -54,8 +66,17 @@ const WorldClockHorizontal = ({ theme, colors = {} }: WorldClockProps) => {
   const isTheme2 = theme === 'theme2';
   const isTheme3 = theme === 'theme3';
 
-  // Theme 2 only shows 3 clocks (removes USA)
-  const displayClocks = isTheme2 ? clockConfig.filter((c) => c.key !== 'usa') : clockConfig;
+  // Use selected clocks if provided, otherwise fallback to theme defaults
+  let displayClocks = clockConfig;
+
+  if (selectedClocks && selectedClocks.length > 0) {
+    displayClocks = selectedClocks
+      .map((key) => clockConfig.find((c) => c.key === key))
+      .filter((c): c is (typeof clockConfig)[0] => c !== undefined);
+  } else {
+    // By default, initially show only 3 clocks (India, UAE, London)
+    displayClocks = clockConfig.slice(0, 3);
+  }
 
   // Colors
   const defaultColor = isTheme1 ? '#000000' : isTheme3 ? '#FFC983' : '#fff';
@@ -64,10 +85,10 @@ const WorldClockHorizontal = ({ theme, colors = {} }: WorldClockProps) => {
   return (
     <Box
       sx={{
-        display: isTheme2 ? 'grid' : 'flex',
+        display: 'grid',
         alignItems: 'center',
-        gridTemplateColumns: isTheme2 ? 'repeat(3, 1fr)' : undefined,
-        justifyContent: isTheme2 ? undefined : 'space-around',
+        gridTemplateColumns: 'repeat(3, 1fr)',
+        justifyContent: 'space-around',
         gap: '1vw',
         width: '100%',
       }}
@@ -78,7 +99,7 @@ const WorldClockHorizontal = ({ theme, colors = {} }: WorldClockProps) => {
           sx={{
             display: 'flex',
             alignItems: 'center',
-            justifyContent: isTheme2 ? 'center' : undefined,
+            justifyContent: 'center',
             gap: { xs: '10px', lg: '1vw' },
           }}
         >
@@ -96,9 +117,9 @@ const WorldClockHorizontal = ({ theme, colors = {} }: WorldClockProps) => {
             <Typography
               sx={{
                 color: textColor,
-                fontSize: isTheme1 ? { xs: '8px', lg: '0.6vw' } : { xs: '14px', lg: '1vw' },
-                fontWeight: isTheme1 ? '600' : '500',
-                textTransform: isTheme1 ? 'uppercase' : undefined,
+                fontSize: { xs: '8px', lg: '0.6vw' },
+                fontWeight: '600',
+                textTransform: 'uppercase',
               }}
             >
               {clock.label}
