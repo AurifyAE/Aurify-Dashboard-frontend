@@ -59,7 +59,7 @@ const DashboardData = () => {
   const [silverBaseline, setSilverBaseline] = useState<number | null>(null);
 
   // Live news state
-  const [newsItems, setNewsItems] = useState<{title: string, pubDate: string, link: string}[]>([
+  const [newsItems, setNewsItems] = useState<{ title: string; pubDate: string; link: string }[]>([
     { title: 'Fetching live news...', pubDate: '', link: '#' },
     { title: 'Fetching live news...', pubDate: '', link: '#' },
     { title: 'Fetching live news...', pubDate: '', link: '#' },
@@ -551,9 +551,7 @@ const DashboardData = () => {
                   <span
                     className={cn(
                       'text-xs font-black px-1.5 py-0.5 rounded-md flex items-center ml-1.5',
-                      goldPct >= 0
-                        ? 'text-emerald-600 bg-emerald-50'
-                        : 'text-rose-600 bg-rose-50'
+                      goldPct >= 0 ? 'text-emerald-600 bg-emerald-50' : 'text-rose-600 bg-rose-50'
                     )}
                   >
                     {goldPct >= 0 ? '+' : ''}
@@ -565,7 +563,10 @@ const DashboardData = () => {
 
             <div className="h-[250px] w-full">
               <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={goldChartData} margin={{ left: -15, right: 5, top: 10, bottom: 0 }}>
+                <AreaChart
+                  data={goldChartData}
+                  margin={{ left: -15, right: 5, top: 10, bottom: 0 }}
+                >
                   <defs>
                     <linearGradient id="glowGradientGold" x1="0" y1="0" x2="0" y2="1">
                       <stop offset="5%" stopColor="#d4a017" stopOpacity={0.2} />
@@ -633,9 +634,7 @@ const DashboardData = () => {
                   <span
                     className={cn(
                       'text-xs font-black px-1.5 py-0.5 rounded-md flex items-center ml-1.5',
-                      silverPct >= 0
-                        ? 'text-emerald-600 bg-emerald-50'
-                        : 'text-rose-600 bg-rose-50'
+                      silverPct >= 0 ? 'text-emerald-600 bg-emerald-50' : 'text-rose-600 bg-rose-50'
                     )}
                   >
                     {silverPct >= 0 ? '+' : ''}
@@ -647,7 +646,10 @@ const DashboardData = () => {
 
             <div className="h-[250px] w-full">
               <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={silverChartData} margin={{ left: -15, right: 5, top: 10, bottom: 0 }}>
+                <AreaChart
+                  data={silverChartData}
+                  margin={{ left: -15, right: 5, top: 10, bottom: 0 }}
+                >
                   <defs>
                     <linearGradient id="glowGradientSilver" x1="0" y1="0" x2="0" y2="1">
                       <stop offset="5%" stopColor="#94A3B8" stopOpacity={0.2} />

@@ -50,11 +50,7 @@ const PoweredByAurify = ({
         Powered by
         <Box
           component="img"
-          src={
-            String(colors?.useBlackLogo) === 'true'
-              ? aurifyLogoBlack.src
-              : aurifyLogo.src
-          }
+          src={String(colors?.useBlackLogo) === 'true' ? aurifyLogoBlack.src : aurifyLogo.src}
           alt="Aurify"
           sx={{
             height: { xs: '5vw', md: '1.5vw' },

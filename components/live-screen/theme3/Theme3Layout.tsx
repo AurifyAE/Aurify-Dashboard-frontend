@@ -180,9 +180,7 @@ export default function Theme3Layout({
         <Box
           component="img"
           src={
-            layout?.styles?.backgroundUrl ||
-            theme?.customizations?.backgroundUrl ||
-            theme3Bg.src
+            layout?.styles?.backgroundUrl || theme?.customizations?.backgroundUrl || theme3Bg.src
           }
           alt="background"
           onError={(e: any) => {
@@ -225,9 +223,7 @@ export default function Theme3Layout({
           {widgets.includes('Spot Rates') && (
             <SpotRate goldData={goldData} silverData={silverData} colors={colors} />
           )}
-          {widgets.includes('Footer') && (
-            <PoweredByAurify colors={colors} defaultColor="#FFC983" />
-          )}
+          {widgets.includes('Footer') && <PoweredByAurify colors={colors} defaultColor="#FFC983" />}
         </Grid>
         <Grid
           size={{ xs: 12, md: 6 }}

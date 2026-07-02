@@ -42,10 +42,10 @@ const WIDGETS = ['Spot Rates', 'Commodity Table', 'News', 'Clock', 'Date', 'Foot
 const WIDGET_LABELS: Record<string, string> = {
   'Commodity Table': 'Commodity Table',
   'Spot Rates': 'Spot Rates',
-  'Date': 'System Clock',
-  'Clock': 'World Clocks',
-  'Footer': 'Powered By (Footer)',
-  'News': 'News',
+  Date: 'System Clock',
+  Clock: 'World Clocks',
+  Footer: 'Powered By (Footer)',
+  News: 'News',
 };
 
 const LAYOUTS = [
@@ -133,7 +133,7 @@ const defaultDraft: DraftState = {
   screenSlug: 'main',
   selectedLayout: 'theme1',
   themeId: '',
-  widgets: ['Spot Rates', 'Commodity Table', 'News', 'Clock', 'Date'],
+  widgets: ['Spot Rates', 'Commodity Table', 'News', 'Clock', 'Date', 'Footer'],
   sectionOrder: ['header', 'spotRates', 'commodities', 'news'],
   assignedDevices: 'TV 1, TV 2',
   colorOverride: {
@@ -583,6 +583,18 @@ export default function ScreenBuilderTab({
       );
       return;
     }
+
+    const isDuplicateSlug = layouts.some(
+      (l) => l.screenSlug === draft.screenSlug && l.layoutId !== draft.layoutId
+    );
+    if (isDuplicateSlug) {
+      showMessage(
+        'This URL slug is already in use by another screen. Please enter a unique URL Slug.',
+        'error'
+      );
+      return;
+    }
+
     setSaving(true);
     try {
       // Always save the latest draft state before publishing
@@ -645,11 +657,6 @@ export default function ScreenBuilderTab({
             <Monitor className="h-4 w-4" />
             My Screens
           </button>
-          {draft.layoutId && (
-            <button type="button" onClick={resetForm} className="btn-secondary">
-              Start New Screen
-            </button>
-          )}
           <button type="button" onClick={save} disabled={saving} className="btn-secondary">
             {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
             Save Draft
@@ -711,7 +718,29 @@ export default function ScreenBuilderTab({
                   className={inputClass}
                   placeholder="e.g. Main Showroom"
                   value={draft.name}
-                  onChange={(e) => setDraft({ ...draft, name: e.target.value })}
+                  onChange={(e) => {
+                    const newName = e.target.value;
+                    setDraft((prev) => {
+                      const oldGeneratedSlug = prev.name
+                        .toLowerCase()
+                        .replace(/[^a-z0-9]+/g, '-')
+                        .replace(/(^-|-$)+/g, '');
+                      const isDefaultOrGenerated =
+                        prev.screenSlug === 'main' ||
+                        prev.screenSlug === oldGeneratedSlug ||
+                        !prev.screenSlug;
+
+                      if (!prev.layoutId && isDefaultOrGenerated) {
+                        const newSlug =
+                          newName
+                            .toLowerCase()
+                            .replace(/[^a-z0-9]+/g, '-')
+                            .replace(/(^-|-$)+/g, '') || 'main';
+                        return { ...prev, name: newName, screenSlug: newSlug };
+                      }
+                      return { ...prev, name: newName };
+                    });
+                  }}
                 />
               </div>
 
@@ -902,127 +931,131 @@ export default function ScreenBuilderTab({
                               <div className="p-4 border-t border-slate-100 bg-white">
                                 {widget === 'Clock' && (
                                   <div className="mb-5">
-                                  <h4 className="text-[10px] font-bold uppercase tracking-wide text-slate-500 mb-3">
-                                    World Clocks
-                                  </h4>
-                                  <div className="grid grid-cols-2 gap-3">
-                                    {[
-                                      { id: 'india', label: 'India' },
-                                      { id: 'uae', label: 'UAE' },
-                                      { id: 'london', label: 'London' },
-                                      { id: 'usa', label: 'USA (New York)' },
-                                      { id: 'singapore', label: 'Singapore' },
-                                      { id: 'saudi', label: 'Saudi Arabia' },
-                                      { id: 'qatar', label: 'Qatar' },
-                                      { id: 'bahrain', label: 'Bahrain' },
-                                      { id: 'kuwait', label: 'Kuwait' },
-                                      { id: 'oman', label: 'Oman' },
-                                    ].map((clock) => {
-                                      const activeClocks = draft.selectedClocks || [
-                                        'india',
-                                        'uae',
-                                        'london',
-                                      ];
-                                      return (
-                                        <label
-                                          key={clock.id}
-                                          className="flex items-center gap-2 text-xs text-slate-600 cursor-pointer"
-                                        >
-                                          <input
-                                            type="checkbox"
-                                            checked={activeClocks.includes(clock.id)}
-                                            onChange={(e) => {
-                                              const current = draft.selectedClocks || [
-                                                'india',
-                                                'uae',
-                                                'london',
-                                              ];
-                                              if (e.target.checked) {
-                                                setDraft({
-                                                  ...draft,
-                                                  selectedClocks: [...current, clock.id],
-                                                });
-                                              } else {
-                                                setDraft({
-                                                  ...draft,
-                                                  selectedClocks: current.filter(
-                                                    (c) => c !== clock.id
-                                                  ),
-                                                });
-                                              }
-                                            }}
-                                            className="rounded border-slate-300 text-blue-600 focus:ring-blue-600 h-3 w-3 cursor-pointer"
-                                          />
-                                          {clock.label}
-                                        </label>
-                                      );
-                                    })}
-                                  </div>
-                                </div>
-                              )}
-
-                              <h4 className="text-[10px] font-bold uppercase tracking-wide text-slate-500 mb-3">
-                                {category.title}
-                              </h4>
-                              <div className="flex gap-3 flex-wrap">
-                                {category.colors.map((color) => {
-                                  const activeDefault =
-                                    THEME_DEFAULTS[draft.selectedLayout]?.[color.key] ||
-                                    THEME_DEFAULTS.theme1[color.key];
-                                  return (
-                                    <div
-                                      key={color.key}
-                                      className="bg-slate-50 rounded-xl p-2 border border-slate-100 flex flex-col gap-1 w-[120px]"
-                                    >
-                                      <label className="text-[10px] font-bold uppercase tracking-wide text-slate-500 truncate">
-                                        {color.label}
-                                      </label>
-                                      <div className="flex items-center gap-2">
-                                        {color.type === 'checkbox' ? (
-                                          <input
-                                            type="checkbox"
-                                            className="h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-600"
-                                            checked={draft.colorOverride[color.key] === 'true'}
-                                            onChange={(e) =>
-                                              setDraft({
-                                                ...draft,
-                                                colorOverride: {
-                                                  ...draft.colorOverride,
-                                                  [color.key]: e.target.checked ? 'true' : 'false',
-                                                },
-                                              })
-                                            }
-                                          />
-                                        ) : (
-                                          <>
+                                    <h4 className="text-[10px] font-bold uppercase tracking-wide text-slate-500 mb-3">
+                                      World Clocks
+                                    </h4>
+                                    <div className="grid grid-cols-2 gap-3">
+                                      {[
+                                        { id: 'india', label: 'India' },
+                                        { id: 'uae', label: 'UAE' },
+                                        { id: 'london', label: 'London' },
+                                        { id: 'usa', label: 'USA (New York)' },
+                                        { id: 'singapore', label: 'Singapore' },
+                                        { id: 'saudi', label: 'Saudi Arabia' },
+                                        { id: 'qatar', label: 'Qatar' },
+                                        { id: 'bahrain', label: 'Bahrain' },
+                                        { id: 'kuwait', label: 'Kuwait' },
+                                        { id: 'oman', label: 'Oman' },
+                                      ].map((clock) => {
+                                        const activeClocks = draft.selectedClocks || [
+                                          'india',
+                                          'uae',
+                                          'london',
+                                        ];
+                                        return (
+                                          <label
+                                            key={clock.id}
+                                            className="flex items-center gap-2 text-xs text-slate-600 cursor-pointer"
+                                          >
                                             <input
-                                              type="color"
-                                              className="h-8 w-8 cursor-pointer rounded bg-transparent border-0 p-0"
-                                              value={
-                                                draft.colorOverride[color.key] || activeDefault || '#000000'
-                                              }
+                                              type="checkbox"
+                                              checked={activeClocks.includes(clock.id)}
+                                              onChange={(e) => {
+                                                const current = draft.selectedClocks || [
+                                                  'india',
+                                                  'uae',
+                                                  'london',
+                                                ];
+                                                if (e.target.checked) {
+                                                  setDraft({
+                                                    ...draft,
+                                                    selectedClocks: [...current, clock.id],
+                                                  });
+                                                } else {
+                                                  setDraft({
+                                                    ...draft,
+                                                    selectedClocks: current.filter(
+                                                      (c) => c !== clock.id
+                                                    ),
+                                                  });
+                                                }
+                                              }}
+                                              className="rounded border-slate-300 text-blue-600 focus:ring-blue-600 h-3 w-3 cursor-pointer"
+                                            />
+                                            {clock.label}
+                                          </label>
+                                        );
+                                      })}
+                                    </div>
+                                  </div>
+                                )}
+
+                                <h4 className="text-[10px] font-bold uppercase tracking-wide text-slate-500 mb-3">
+                                  {category.title}
+                                </h4>
+                                <div className="flex gap-3 flex-wrap">
+                                  {category.colors.map((color) => {
+                                    const activeDefault =
+                                      THEME_DEFAULTS[draft.selectedLayout]?.[color.key] ||
+                                      THEME_DEFAULTS.theme1[color.key];
+                                    return (
+                                      <div
+                                        key={color.key}
+                                        className="bg-slate-50 rounded-xl p-2 border border-slate-100 flex flex-col gap-1 w-[120px]"
+                                      >
+                                        <label className="text-[10px] font-bold uppercase tracking-wide text-slate-500 truncate">
+                                          {color.label}
+                                        </label>
+                                        <div className="flex items-center gap-2">
+                                          {color.type === 'checkbox' ? (
+                                            <input
+                                              type="checkbox"
+                                              className="h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-600"
+                                              checked={draft.colorOverride[color.key] === 'true'}
                                               onChange={(e) =>
                                                 setDraft({
                                                   ...draft,
                                                   colorOverride: {
                                                     ...draft.colorOverride,
-                                                    [color.key]: e.target.value,
+                                                    [color.key]: e.target.checked
+                                                      ? 'true'
+                                                      : 'false',
                                                   },
                                                 })
                                               }
                                             />
-                                            <span className="text-xs font-mono text-slate-600">
-                                              {draft.colorOverride[color.key] || activeDefault}
-                                            </span>
-                                          </>
-                                        )}
+                                          ) : (
+                                            <>
+                                              <input
+                                                type="color"
+                                                className="h-8 w-8 cursor-pointer rounded bg-transparent border-0 p-0"
+                                                value={
+                                                  draft.colorOverride[color.key] ||
+                                                  activeDefault ||
+                                                  '#000000'
+                                                }
+                                                onChange={(e) =>
+                                                  setDraft({
+                                                    ...draft,
+                                                    colorOverride: {
+                                                      ...draft.colorOverride,
+                                                      [color.key]: e.target.value,
+                                                    },
+                                                  })
+                                                }
+                                              />
+                                              <span className="text-xs font-mono text-slate-600">
+                                                {draft.colorOverride[color.key] || activeDefault}
+                                              </span>
+                                            </>
+                                          )}
+                                        </div>
                                       </div>
-                                    </div>
-                                  );
-                                })}
+                                    );
+                                  })}
+                                </div>
                               </div>
                             </div>
-                           </div>
                           </div>
                         </div>
                       );

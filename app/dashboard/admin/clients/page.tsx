@@ -158,7 +158,6 @@ export default function AdminClientsPage() {
                     <th className="px-6 py-4 font-semibold">Status</th>
                     <th className="px-6 py-4 font-semibold">Service End Date</th>
                     <th className="px-6 py-4 font-semibold">Screens Limit</th>
-                    <th className="px-6 py-4 font-semibold">TV Limit</th>
                     <th className="px-6 py-4 font-semibold text-right">Actions</th>
                   </tr>
                 </thead>
@@ -202,12 +201,6 @@ export default function AdminClientsPage() {
                           <div className="flex items-center gap-1.5 text-slate-600 font-medium">
                             <Monitor className="w-3.5 h-3.5" />
                             {merchant.maxScreens || 1}
-                          </div>
-                        </td>
-                        <td className="px-6 py-4">
-                          <div className="flex items-center gap-1.5 text-slate-600 font-medium">
-                            <Tv className="w-3.5 h-3.5" />
-                            {merchant.maxDevices || 1}
                           </div>
                         </td>
                         <td className="px-6 py-4 text-right flex items-center justify-end gap-2">
@@ -359,10 +352,10 @@ export default function AdminClientsPage() {
                         required
                       />
                     </div>
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 gap-4">
                       <div>
                         <label className="block text-sm font-semibold text-slate-700 mb-1.5">
-                          Max Layouts
+                          Max Screens Allowed
                         </label>
                         <input
                           type="number"
@@ -372,23 +365,6 @@ export default function AdminClientsPage() {
                             setEditingMerchant({
                               ...editingMerchant,
                               maxScreens: parseInt(e.target.value),
-                            })
-                          }
-                          className="w-full rounded-xl border border-slate-200 px-4 py-2.5 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-semibold text-slate-700 mb-1.5">
-                          Max TVs
-                        </label>
-                        <input
-                          type="number"
-                          min="1"
-                          value={editingMerchant.maxDevices || 1}
-                          onChange={(e) =>
-                            setEditingMerchant({
-                              ...editingMerchant,
-                              maxDevices: parseInt(e.target.value),
                             })
                           }
                           className="w-full rounded-xl border border-slate-200 px-4 py-2.5 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none"

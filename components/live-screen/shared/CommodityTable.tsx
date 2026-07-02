@@ -229,7 +229,8 @@ const CommodityTable = ({
             let rowBorder = 'none';
 
             if (isTheme1) {
-              rowBg = colors.tableRowBg ||
+              rowBg =
+                colors.tableRowBg ||
                 'linear-gradient(90deg, rgba(20,10,5,0.85) 0%, rgba(35,15,8,0.9) 50%, rgba(20,10,5,0.85) 100%)';
               rowBorder = '0.05vw solid rgba(255,255,255,0.05)';
             }

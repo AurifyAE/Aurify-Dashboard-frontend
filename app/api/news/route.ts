@@ -8,13 +8,13 @@ export async function GET() {
     const res = await fetch('https://feeds.a.dj.com/rss/RSSMarketsMain.xml', {
       next: { revalidate: 600 },
     });
-    
+
     if (!res.ok) {
       throw new Error('Failed to fetch RSS feed');
     }
 
     const xml = await res.text();
-    
+
     // Quick regex parsing for the XML items
     const items: any[] = [];
     const itemRegex = /<item>([\s\S]*?)<\/item>/g;
@@ -25,13 +25,13 @@ export async function GET() {
     let match;
     while ((match = itemRegex.exec(xml)) !== null && items.length < 6) {
       const itemXml = match[1];
-      
+
       const titleMatch = itemXml.match(titleRegex);
       const title = titleMatch ? (titleMatch[1] || titleMatch[2]).trim() : 'Market Update';
-      
+
       const pubDateMatch = itemXml.match(pubDateRegex);
       const pubDateStr = pubDateMatch ? pubDateMatch[1].trim() : new Date().toISOString();
-      
+
       const linkMatch = itemXml.match(linkRegex);
       const link = linkMatch ? linkMatch[1].trim() : '#';
 
@@ -49,10 +49,22 @@ export async function GET() {
     return NextResponse.json({
       success: true,
       data: [
-        { title: 'Gold trends upward as global central banks signal interest rate relief', pubDate: new Date().toISOString(), link: '#' },
-        { title: 'Silver experiences massive retail demand in Asian physical markets', pubDate: new Date().toISOString(), link: '#' },
-        { title: 'Precious metals surge amidst new clean energy manufacturing quotas', pubDate: new Date().toISOString(), link: '#' },
-      ]
+        {
+          title: 'Gold trends upward as global central banks signal interest rate relief',
+          pubDate: new Date().toISOString(),
+          link: '#',
+        },
+        {
+          title: 'Silver experiences massive retail demand in Asian physical markets',
+          pubDate: new Date().toISOString(),
+          link: '#',
+        },
+        {
+          title: 'Precious metals surge amidst new clean energy manufacturing quotas',
+          pubDate: new Date().toISOString(),
+          link: '#',
+        },
+      ],
     });
   }
 }

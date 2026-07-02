@@ -193,9 +193,7 @@ export default function Theme2Layout({
         <Box
           component="img"
           src={
-            layout?.styles?.backgroundUrl ||
-            theme?.customizations?.backgroundUrl ||
-            theme2Bg.src
+            layout?.styles?.backgroundUrl || theme?.customizations?.backgroundUrl || theme2Bg.src
           }
           alt="background"
           onError={(e) => {

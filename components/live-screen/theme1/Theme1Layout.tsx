@@ -198,9 +198,7 @@ export default function Theme1Layout({
         <Box
           component="img"
           src={
-            layout?.styles?.backgroundUrl ||
-            theme?.customizations?.backgroundUrl ||
-            theme1Bg.src
+            layout?.styles?.backgroundUrl || theme?.customizations?.backgroundUrl || theme1Bg.src
           }
           alt="background"
           onError={(e) => {
@@ -264,9 +262,7 @@ export default function Theme1Layout({
           {widgets.includes('Spot Rates') && (
             <LiveSpotRate goldData={goldData} silverData={silverData} colors={colors} />
           )}
-          {widgets.includes('Footer') && (
-            <PoweredByAurify colors={colors} defaultColor="#000000" />
-          )}
+          {widgets.includes('Footer') && <PoweredByAurify colors={colors} defaultColor="#000000" />}
         </Grid>
 
         {widgets.includes('News') && (
