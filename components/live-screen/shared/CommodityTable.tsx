@@ -210,9 +210,8 @@ const CommodityTable = ({
             background: isTheme1
               ? 'transparent'
               : isTheme2
-                ? colors.tableRowBg || '#aa8a4b11'
-                : colors.tableRowBg ||
-                  'linear-gradient(180deg, rgba(30,10,3,0.3) 0%, rgba(20,8,2,0.6) 100%)',
+                ? '#aa8a4b11'
+                : 'linear-gradient(180deg, rgba(30,10,3,0.3) 0%, rgba(20,8,2,0.6) 100%)',
             ...(isTheme2 && {
               border: '0.1vw solid #eee2d73d',
               boxShadow: '0px 0px 25px rgba(69, 79, 170, 0.25) inset',
@@ -226,11 +225,11 @@ const CommodityTable = ({
           }}
         >
           {rows.map((row, index) => {
-            let rowBg = 'transparent';
+            let rowBg = colors.tableRowBg || 'transparent';
             let rowBorder = 'none';
 
             if (isTheme1) {
-              rowBg =
+              rowBg = colors.tableRowBg ||
                 'linear-gradient(90deg, rgba(20,10,5,0.85) 0%, rgba(35,15,8,0.9) 50%, rgba(20,10,5,0.85) 100%)';
               rowBorder = '0.05vw solid rgba(255,255,255,0.05)';
             }

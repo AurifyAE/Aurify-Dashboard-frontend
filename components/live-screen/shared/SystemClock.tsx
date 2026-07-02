@@ -52,7 +52,7 @@ const SystemClock = ({ theme, colors = {} }: SystemClockProps) => {
   const isTheme1 = theme === 'theme1';
   const isTheme3 = theme === 'theme3';
   const defaultColor = isTheme1 ? '#000000' : isTheme3 ? '#FFC983' : '#FFFFFF';
-  const textColor = colors?.clockText || defaultColor;
+  const textColor = colors?.dateText || defaultColor;
 
   return (
     <Box

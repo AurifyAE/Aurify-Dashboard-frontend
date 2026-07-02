@@ -257,7 +257,9 @@ export default function Theme2Layout({
           {widgets.includes('Spot Rates') && (
             <SpotRate goldData={goldData} silverData={silverData} colors={colors} />
           )}
-          <PoweredByAurify colors={colors} fontSize={{ xs: '15px', md: '1vw' }} mt="auto" />
+          {widgets.includes('Footer') && (
+            <PoweredByAurify colors={colors} fontSize={{ xs: '15px', md: '1vw' }} mt="auto" />
+          )}
         </Grid>
 
         {widgets.includes('News') && (

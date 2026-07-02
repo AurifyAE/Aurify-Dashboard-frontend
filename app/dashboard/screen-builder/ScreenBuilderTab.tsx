@@ -37,7 +37,16 @@ import {
 import toast from 'react-hot-toast';
 import Loader from '@/components/loader/loader';
 
-const WIDGETS = ['Spot Rates', 'Commodity Table', 'News', 'Clock', 'Date'];
+const WIDGETS = ['Spot Rates', 'Commodity Table', 'News', 'Clock', 'Date', 'Footer'];
+
+const WIDGET_LABELS: Record<string, string> = {
+  'Commodity Table': 'Commodity Table',
+  'Spot Rates': 'Spot Rates',
+  'Date': 'System Clock',
+  'Clock': 'World Clocks',
+  'Footer': 'Powered By (Footer)',
+  'News': 'News',
+};
 
 const LAYOUTS = [
   {
@@ -49,13 +58,13 @@ const LAYOUTS = [
       { key: 'accent', label: 'Accent', default: '#38bdf8' },
       { key: 'backgroundColor', label: 'Background', default: '#140b10' },
       { key: 'tableHeaderBg', label: 'Table Header Bg', default: '#280f05' },
-      { key: 'tableRowBg', label: 'Table Row Bg', default: '#140802' },
       { key: 'tableText', label: 'Table Text', default: '#ffffff' },
       { key: 'buyBg', label: 'Buy Box Bg', default: '#280f05' },
       { key: 'buyText', label: 'Buy Text', default: '#20c997' },
       { key: 'sellBg', label: 'Sell Box Bg', default: '#280f05' },
       { key: 'sellText', label: 'Sell Text', default: '#ff4d4d' },
       { key: 'clockText', label: 'Clock Text', default: '#000000' },
+      { key: 'dateText', label: 'Date Text', default: '#000000' },
       { key: 'newsBg', label: 'News Bg', default: '#111827' },
       { key: 'newsText', label: 'News Text', default: '#ffffff' },
       { key: 'poweredByText', label: 'Powered By Text', default: '#000000' },
@@ -248,6 +257,7 @@ const TVPreviewRenderer = ({ data }: { data: any }) => {
 const COLOR_CATEGORIES = [
   {
     title: 'Table Settings',
+    requiredWidget: 'Commodity Table',
     colors: [
       { key: 'tableHeaderBg', label: 'Header Bg' },
       { key: 'tableRowBg', label: 'Row Bg' },
@@ -256,29 +266,38 @@ const COLOR_CATEGORIES = [
   },
   {
     title: 'Spot Rate Settings',
+    requiredWidget: 'Spot Rates',
     colors: [
       { key: 'panelBg', label: 'Panel Bg' },
       { key: 'panelText', label: 'Text Color' },
     ],
   },
   {
+    title: 'System Clock Settings',
+    requiredWidget: 'Date',
+    colors: [{ key: 'dateText', label: 'Clock Text' }],
+  },
+  {
+    title: 'World Clocks Settings',
+    requiredWidget: 'Clock',
+    colors: [{ key: 'clockText', label: 'Clock Text' }],
+  },
+  {
+    title: 'Footer Settings',
+    requiredWidget: 'Footer',
+    colors: [
+      { key: 'poweredByText', label: 'Powered By Text' },
+      { key: 'useBlackLogo', label: 'Black Logo', type: 'checkbox' },
+    ],
+  },
+  {
     title: 'News Settings',
+    requiredWidget: 'News',
     colors: [
       { key: 'newsBg', label: 'Background' },
       { key: 'newsText', label: 'Text' },
       { key: 'newsTitleText', label: 'Title Text' },
       { key: 'newsTitleBg', label: 'Title Bg' },
-    ],
-  },
-  {
-    title: 'Clock Settings',
-    colors: [{ key: 'clockText', label: 'Clock Text' }],
-  },
-  {
-    title: 'Footer Settings',
-    colors: [
-      { key: 'poweredByText', label: 'Powered By Text' },
-      { key: 'useBlackLogo', label: 'Black Logo', type: 'checkbox' },
     ],
   },
 ];
@@ -421,7 +440,9 @@ export default function ScreenBuilderTab({
             setDraft({
               ...defaultDraft,
               ...localDraft,
-              selectedClocks: localDraft.selectedClocks?.length ? localDraft.selectedClocks : defaultDraft.selectedClocks,
+              selectedClocks: localDraft.selectedClocks?.length
+                ? localDraft.selectedClocks
+                : defaultDraft.selectedClocks,
             });
           } else {
             setDraft({
@@ -441,7 +462,9 @@ export default function ScreenBuilderTab({
               showName: (target.styles as any)?.showName ?? true,
               logoUrl: (target.styles as any)?.logoUrl || '',
               backgroundUrl: (target.styles as any)?.backgroundUrl || '',
-              selectedClocks: (target.styles as any)?.selectedClocks?.length ? (target.styles as any).selectedClocks : defaultDraft.selectedClocks,
+              selectedClocks: (target.styles as any)?.selectedClocks?.length
+                ? (target.styles as any).selectedClocks
+                : defaultDraft.selectedClocks,
             });
           }
         }
@@ -450,7 +473,9 @@ export default function ScreenBuilderTab({
           setDraft({
             ...defaultDraft,
             ...localDraft,
-            selectedClocks: localDraft.selectedClocks?.length ? localDraft.selectedClocks : defaultDraft.selectedClocks,
+            selectedClocks: localDraft.selectedClocks?.length
+              ? localDraft.selectedClocks
+              : defaultDraft.selectedClocks,
           });
         } else {
           setDraft({
@@ -802,180 +827,217 @@ export default function ScreenBuilderTab({
 
                 <div className="pt-2">
                   <label className="mb-2 block text-xs font-semibold uppercase tracking-wide text-slate-500">
-                    Advanced Colors
+                    Visible Elements & Colors
                   </label>
-                  <div className="flex flex-col gap-2">
-                    {COLOR_CATEGORIES.map((category) => (
-                      <div
-                        key={category.title}
-                        className="border border-slate-200 rounded-xl bg-white overflow-hidden"
-                      >
-                        <button
-                          type="button"
-                          onClick={() =>
-                            setOpenAccordion(
-                              openAccordion === category.title ? null : category.title
-                            )
-                          }
-                          className="w-full flex items-center justify-between px-4 py-3 bg-slate-50 hover:bg-slate-100 transition-colors"
-                        >
-                          <span className="text-sm font-semibold text-slate-700">
-                            {category.title}
-                          </span>
-                          {openAccordion === category.title ? (
-                            <ChevronDown className="h-4 w-4 text-slate-500" />
-                          ) : (
-                            <ChevronRight className="h-4 w-4 text-slate-500" />
-                          )}
-                        </button>
+                  <div className="flex flex-col gap-3">
+                    {COLOR_CATEGORIES.map((category) => {
+                      const widget = category.requiredWidget;
+                      const hasWidget = !!widget;
+                      const isChecked = hasWidget ? draft.widgets.includes(widget) : true;
 
-                        {openAccordion === category.title && (
-                          <div className="p-4 border-t border-slate-100 bg-white">
-                            <div className="flex gap-3 flex-wrap">
-                              {category.colors.map((color) => {
-                                const activeDefault =
-                                  THEME_DEFAULTS[draft.selectedLayout]?.[color.key] ||
-                                  THEME_DEFAULTS.theme1[color.key];
-                                return (
-                                  <div
-                                    key={color.key}
-                                    className="bg-slate-50 rounded-xl p-2 border border-slate-100 flex flex-col gap-1 w-[120px]"
-                                  >
-                                    <label className="text-[10px] font-bold uppercase tracking-wide text-slate-500 truncate">
-                                      {color.label}
-                                    </label>
-                                    <div className="flex items-center gap-2">
-                                      {color.type === 'checkbox' ? (
-                                        <input
-                                          type="checkbox"
-                                          className="h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-600"
-                                          checked={draft.colorOverride[color.key] === 'true'}
-                                          onChange={(e) =>
-                                            setDraft({
-                                              ...draft,
-                                              colorOverride: {
-                                                ...draft.colorOverride,
-                                                [color.key]: e.target.checked ? 'true' : 'false',
-                                              },
-                                            })
-                                          }
-                                        />
-                                      ) : (
-                                        <>
+                      return (
+                        <div
+                          key={category.title}
+                          className={`border rounded-xl bg-white overflow-hidden ${
+                            isChecked ? 'border-slate-200' : 'border-slate-100 opacity-75'
+                          }`}
+                        >
+                          <div className="w-full flex items-center justify-between px-4 py-3 bg-slate-50 hover:bg-slate-100 transition-colors">
+                            {hasWidget ? (
+                              <label className="flex items-center gap-2 text-sm font-semibold text-slate-700 cursor-pointer flex-1">
+                                <input
+                                  type="checkbox"
+                                  checked={isChecked}
+                                  onChange={(e) => {
+                                    if (e.target.checked) {
+                                      setDraft({ ...draft, widgets: [...draft.widgets, widget] });
+                                      setOpenAccordion(category.title);
+                                    } else {
+                                      setDraft({
+                                        ...draft,
+                                        widgets: draft.widgets.filter((w) => w !== widget),
+                                      });
+                                      if (openAccordion === category.title) {
+                                        setOpenAccordion(null);
+                                      }
+                                    }
+                                  }}
+                                  className="rounded border-slate-300 text-blue-600 focus:ring-blue-600 h-4 w-4 cursor-pointer"
+                                />
+                                {WIDGET_LABELS[widget] || widget}
+                              </label>
+                            ) : (
+                              <div className="text-sm font-semibold text-slate-700 flex-1 cursor-default">
+                                {category.title}
+                              </div>
+                            )}
+
+                            {isChecked && (
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  setOpenAccordion(
+                                    openAccordion === category.title ? null : category.title
+                                  )
+                                }
+                                className="p-1 hover:bg-slate-200 rounded-md transition-colors"
+                              >
+                                {openAccordion === category.title ? (
+                                  <ChevronDown className="h-4 w-4 text-slate-500" />
+                                ) : (
+                                  <ChevronRight className="h-4 w-4 text-slate-500" />
+                                )}
+                              </button>
+                            )}
+                          </div>
+
+                          <div
+                            className={`grid transition-[grid-template-rows,opacity] duration-300 ease-in-out ${
+                              isChecked && openAccordion === category.title
+                                ? 'grid-rows-[1fr] opacity-100'
+                                : 'grid-rows-[0fr] opacity-0'
+                            }`}
+                          >
+                            <div className="overflow-hidden">
+                              <div className="p-4 border-t border-slate-100 bg-white">
+                                {widget === 'Clock' && (
+                                  <div className="mb-5">
+                                  <h4 className="text-[10px] font-bold uppercase tracking-wide text-slate-500 mb-3">
+                                    World Clocks
+                                  </h4>
+                                  <div className="grid grid-cols-2 gap-3">
+                                    {[
+                                      { id: 'india', label: 'India' },
+                                      { id: 'uae', label: 'UAE' },
+                                      { id: 'london', label: 'London' },
+                                      { id: 'usa', label: 'USA (New York)' },
+                                      { id: 'singapore', label: 'Singapore' },
+                                      { id: 'saudi', label: 'Saudi Arabia' },
+                                      { id: 'qatar', label: 'Qatar' },
+                                      { id: 'bahrain', label: 'Bahrain' },
+                                      { id: 'kuwait', label: 'Kuwait' },
+                                      { id: 'oman', label: 'Oman' },
+                                    ].map((clock) => {
+                                      const activeClocks = draft.selectedClocks || [
+                                        'india',
+                                        'uae',
+                                        'london',
+                                      ];
+                                      return (
+                                        <label
+                                          key={clock.id}
+                                          className="flex items-center gap-2 text-xs text-slate-600 cursor-pointer"
+                                        >
                                           <input
-                                            type="color"
-                                            className="h-8 w-8 cursor-pointer rounded bg-transparent border-0 p-0"
-                                            value={draft.colorOverride[color.key] || activeDefault}
+                                            type="checkbox"
+                                            checked={activeClocks.includes(clock.id)}
+                                            onChange={(e) => {
+                                              const current = draft.selectedClocks || [
+                                                'india',
+                                                'uae',
+                                                'london',
+                                              ];
+                                              if (e.target.checked) {
+                                                setDraft({
+                                                  ...draft,
+                                                  selectedClocks: [...current, clock.id],
+                                                });
+                                              } else {
+                                                setDraft({
+                                                  ...draft,
+                                                  selectedClocks: current.filter(
+                                                    (c) => c !== clock.id
+                                                  ),
+                                                });
+                                              }
+                                            }}
+                                            className="rounded border-slate-300 text-blue-600 focus:ring-blue-600 h-3 w-3 cursor-pointer"
+                                          />
+                                          {clock.label}
+                                        </label>
+                                      );
+                                    })}
+                                  </div>
+                                </div>
+                              )}
+
+                              <h4 className="text-[10px] font-bold uppercase tracking-wide text-slate-500 mb-3">
+                                {category.title}
+                              </h4>
+                              <div className="flex gap-3 flex-wrap">
+                                {category.colors.map((color) => {
+                                  const activeDefault =
+                                    THEME_DEFAULTS[draft.selectedLayout]?.[color.key] ||
+                                    THEME_DEFAULTS.theme1[color.key];
+                                  return (
+                                    <div
+                                      key={color.key}
+                                      className="bg-slate-50 rounded-xl p-2 border border-slate-100 flex flex-col gap-1 w-[120px]"
+                                    >
+                                      <label className="text-[10px] font-bold uppercase tracking-wide text-slate-500 truncate">
+                                        {color.label}
+                                      </label>
+                                      <div className="flex items-center gap-2">
+                                        {color.type === 'checkbox' ? (
+                                          <input
+                                            type="checkbox"
+                                            className="h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-600"
+                                            checked={draft.colorOverride[color.key] === 'true'}
                                             onChange={(e) =>
                                               setDraft({
                                                 ...draft,
                                                 colorOverride: {
                                                   ...draft.colorOverride,
-                                                  [color.key]: e.target.value,
+                                                  [color.key]: e.target.checked ? 'true' : 'false',
                                                 },
                                               })
                                             }
                                           />
-                                          <span className="text-xs font-mono text-slate-600">
-                                            {draft.colorOverride[color.key] || activeDefault}
-                                          </span>
-                                        </>
-                                      )}
+                                        ) : (
+                                          <>
+                                            <input
+                                              type="color"
+                                              className="h-8 w-8 cursor-pointer rounded bg-transparent border-0 p-0"
+                                              value={
+                                                draft.colorOverride[color.key] || activeDefault || '#000000'
+                                              }
+                                              onChange={(e) =>
+                                                setDraft({
+                                                  ...draft,
+                                                  colorOverride: {
+                                                    ...draft.colorOverride,
+                                                    [color.key]: e.target.value,
+                                                  },
+                                                })
+                                              }
+                                            />
+                                            <span className="text-xs font-mono text-slate-600">
+                                              {draft.colorOverride[color.key] || activeDefault}
+                                            </span>
+                                          </>
+                                        )}
+                                      </div>
                                     </div>
-                                  </div>
-                                );
-                              })}
+                                  );
+                                })}
+                              </div>
                             </div>
+                           </div>
                           </div>
-                        )}
-                      </div>
-                    ))}
+                        </div>
+                      );
+                    })}
                   </div>
                 </div>
-              </div>
 
-              {/* Elements Section */}
-              <div className="pt-4 border-t border-slate-100">
-                <h3 className="font-bold text-slate-800 text-sm mb-3">Visible Elements</h3>
-                <div className="grid grid-cols-2 gap-3">
-                  {WIDGETS.map((widget) => (
-                    <label
-                      key={widget}
-                      className="flex items-center gap-2 text-sm text-slate-700 cursor-pointer"
-                    >
-                      <input
-                        type="checkbox"
-                        checked={draft.widgets.includes(widget)}
-                        onChange={(e) => {
-                          if (e.target.checked)
-                            setDraft({ ...draft, widgets: [...draft.widgets, widget] });
-                          else
-                            setDraft({
-                              ...draft,
-                              widgets: draft.widgets.filter((w) => w !== widget),
-                            });
-                        }}
-                        className="rounded border-slate-300 text-blue-600 focus:ring-blue-600 h-4 w-4 cursor-pointer"
-                      />
-                      {widget}
-                    </label>
-                  ))}
+                <div className="flex gap-2 pt-2">
+                  <button type="button" onClick={() => setStep(1)} className="btn-secondary">
+                    <ArrowLeft className="h-4 w-4" /> Back
+                  </button>
+                  <button type="button" onClick={() => setStep(3)} className="btn-primary flex-1">
+                    Next: News & Content <ArrowRight className="h-4 w-4" />
+                  </button>
                 </div>
-              </div>
-
-              {/* Clocks Section */}
-              {draft.widgets.includes('Clock') && (
-                <div className="pt-4 border-t border-slate-100">
-                  <h3 className="font-bold text-slate-800 text-sm mb-3">World Clocks</h3>
-                  <div className="grid grid-cols-2 gap-3">
-                    {[
-                      { id: 'india', label: 'India' },
-                      { id: 'uae', label: 'UAE' },
-                      { id: 'london', label: 'London' },
-                      { id: 'usa', label: 'USA (New York)' },
-                      { id: 'singapore', label: 'Singapore' },
-                      { id: 'saudi', label: 'Saudi Arabia' },
-                      { id: 'qatar', label: 'Qatar' },
-                      { id: 'bahrain', label: 'Bahrain' },
-                      { id: 'kuwait', label: 'Kuwait' },
-                      { id: 'oman', label: 'Oman' },
-                    ].map((clock) => {
-                      const activeClocks = draft.selectedClocks || ['india', 'uae', 'london'];
-                      return (
-                      <label
-                        key={clock.id}
-                        className="flex items-center gap-2 text-sm text-slate-700 cursor-pointer"
-                      >
-                        <input
-                          type="checkbox"
-                          checked={activeClocks.includes(clock.id)}
-                          onChange={(e) => {
-                            const current = draft.selectedClocks || ['india', 'uae', 'london'];
-                            if (e.target.checked) {
-                              setDraft({ ...draft, selectedClocks: [...current, clock.id] });
-                            } else {
-                              setDraft({
-                                ...draft,
-                                selectedClocks: current.filter((c) => c !== clock.id),
-                              });
-                            }
-                          }}
-                          className="rounded border-slate-300 text-blue-600 focus:ring-blue-600 h-4 w-4 cursor-pointer"
-                        />
-                        {clock.label}
-                      </label>
-                    )})}
-                  </div>
-                </div>
-              )}
-
-              <div className="flex gap-2 pt-2">
-                <button type="button" onClick={() => setStep(1)} className="btn-secondary">
-                  <ArrowLeft className="h-4 w-4" /> Back
-                </button>
-                <button type="button" onClick={() => setStep(3)} className="btn-primary flex-1">
-                  Next: News & Content <ArrowRight className="h-4 w-4" />
-                </button>
               </div>
             </div>
           )}

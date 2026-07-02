@@ -264,7 +264,9 @@ export default function Theme1Layout({
           {widgets.includes('Spot Rates') && (
             <LiveSpotRate goldData={goldData} silverData={silverData} colors={colors} />
           )}
-          <PoweredByAurify colors={colors} defaultColor="#000000" />
+          {widgets.includes('Footer') && (
+            <PoweredByAurify colors={colors} defaultColor="#000000" />
+          )}
         </Grid>
 
         {widgets.includes('News') && (

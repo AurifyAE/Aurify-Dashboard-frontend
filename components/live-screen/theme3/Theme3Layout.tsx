@@ -225,7 +225,9 @@ export default function Theme3Layout({
           {widgets.includes('Spot Rates') && (
             <SpotRate goldData={goldData} silverData={silverData} colors={colors} />
           )}
-          <PoweredByAurify colors={colors} defaultColor="#FFC983" />
+          {widgets.includes('Footer') && (
+            <PoweredByAurify colors={colors} defaultColor="#FFC983" />
+          )}
         </Grid>
         <Grid
           size={{ xs: 12, md: 6 }}
