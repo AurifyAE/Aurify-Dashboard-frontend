@@ -86,29 +86,6 @@ export default function AdminClientsPage() {
     }
   };
 
-  const handleDelete = async (id: string, companyName: string) => {
-    const result = await Swal.fire({
-      title: 'Are you sure?',
-      text: `You are about to permanently delete ${companyName} and their user account. This cannot be undone!`,
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonColor: '#ef4444',
-      cancelButtonColor: '#64748b',
-      confirmButtonText: 'Yes, delete user!',
-    });
-
-    if (result.isConfirmed) {
-      try {
-        await adminApi.deleteMerchant(id);
-        Swal.fire('Deleted!', 'The user has been deleted.', 'success');
-        fetchMerchants();
-      } catch (err) {
-        console.error(err);
-        Swal.fire('Error', 'Failed to delete user', 'error');
-      }
-    }
-  };
-
   const filteredMerchants = merchants.filter(
     (m) =>
       m.companyName?.toLowerCase().includes(search.toLowerCase()) ||
@@ -156,6 +133,7 @@ export default function AdminClientsPage() {
                   <tr>
                     <th className="px-6 py-4 font-semibold">Company / Email</th>
                     <th className="px-6 py-4 font-semibold">Status</th>
+                    <th className="px-6 py-4 font-semibold">Service Start Date</th>
                     <th className="px-6 py-4 font-semibold">Service End Date</th>
                     <th className="px-6 py-4 font-semibold">Screens Limit</th>
                     <th className="px-6 py-4 font-semibold text-right">Actions</th>
@@ -192,6 +170,14 @@ export default function AdminClientsPage() {
                         <td className="px-6 py-4 text-slate-600">
                           <div className="flex items-center gap-1.5">
                             <Calendar className="w-3.5 h-3.5" />
+                            {merchant.createdAt
+                              ? new Date(merchant.createdAt).toLocaleDateString()
+                              : 'N/A'}
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 text-slate-600">
+                          <div className="flex items-center gap-1.5">
+                            <Calendar className="w-3.5 h-3.5" />
                             {merchant.serviceEndDate
                               ? new Date(merchant.serviceEndDate).toLocaleDateString()
                               : 'N/A'}
@@ -210,13 +196,6 @@ export default function AdminClientsPage() {
                           >
                             <Edit2 className="w-3.5 h-3.5" />
                             Manage
-                          </button>
-                          <button
-                            onClick={() => handleDelete(merchant._id, merchant.companyName)}
-                            className="inline-flex items-center gap-1.5 text-red-500 hover:text-red-700 font-semibold px-3 py-1.5 hover:bg-red-50 rounded-lg transition-colors"
-                          >
-                            <Trash2 className="w-3.5 h-3.5" />
-                            Delete
                           </button>
                         </td>
                       </tr>
@@ -334,23 +313,40 @@ export default function AdminClientsPage() {
                         <MenuItem value="Suspended">Suspended</MenuItem>
                       </Select>
                     </div>
-                    <div>
-                      <label className="block text-sm font-semibold text-slate-700 mb-1.5">
-                        Service End Date
-                      </label>
-                      <input
-                        type="date"
-                        value={
-                          editingMerchant.serviceEndDate
-                            ? new Date(editingMerchant.serviceEndDate).toISOString().split('T')[0]
-                            : ''
-                        }
-                        onChange={(e) =>
-                          setEditingMerchant({ ...editingMerchant, serviceEndDate: e.target.value })
-                        }
-                        className="w-full rounded-xl border border-slate-200 px-4 py-2.5 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none"
-                        required
-                      />
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-semibold text-slate-700 mb-1.5">
+                          Registration Date (Start)
+                        </label>
+                        <input
+                          type="date"
+                          value={
+                            editingMerchant.createdAt
+                              ? new Date(editingMerchant.createdAt).toISOString().split('T')[0]
+                              : ''
+                          }
+                          className="w-full rounded-xl border border-slate-200 px-4 py-2.5 text-sm bg-slate-50 text-slate-500 outline-none cursor-not-allowed"
+                          disabled
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-semibold text-slate-700 mb-1.5">
+                          Service End Date
+                        </label>
+                        <input
+                          type="date"
+                          value={
+                            editingMerchant.serviceEndDate
+                              ? new Date(editingMerchant.serviceEndDate).toISOString().split('T')[0]
+                              : ''
+                          }
+                          onChange={(e) =>
+                            setEditingMerchant({ ...editingMerchant, serviceEndDate: e.target.value })
+                          }
+                          className="w-full rounded-xl border border-slate-200 px-4 py-2.5 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none"
+                          required
+                        />
+                      </div>
                     </div>
                     <div className="grid grid-cols-1 gap-4">
                       <div>

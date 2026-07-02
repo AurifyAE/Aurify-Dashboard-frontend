@@ -6,18 +6,23 @@ import {
   AlertCircle,
   ArrowLeft,
   ArrowRight,
+  Building2,
+  Calendar,
   Check,
   CheckCircle2,
   Clock,
+  Edit2,
   Globe,
   Loader2,
   Mail,
+  MapPin,
   MessageCircle,
   Monitor,
   Phone,
   Rocket,
   Smartphone,
   Store,
+  X,
   XCircle,
 } from 'lucide-react';
 import { Select, MenuItem } from '@mui/material';
@@ -203,6 +208,7 @@ export default function MerchantProfileTab() {
   const [step, setStep] = useState(1);
   const [message, setMessage] = useState('');
   const [messageType, setMessageType] = useState<'success' | 'error'>('success');
+  const [isEditing, setIsEditing] = useState(false);
 
   const [form, setForm] = useState<FormState>({
     companyName: '',
@@ -239,6 +245,9 @@ export default function MerchantProfileTab() {
             branding: { ...defaultBranding, ...(m.branding || {}) },
             services: { ...defaultServices, ...(m.services || {}) },
           }));
+          setIsEditing(false);
+        } else {
+          setIsEditing(true);
         }
       })
       .catch((err) => {
@@ -257,11 +266,16 @@ export default function MerchantProfileTab() {
       setMessage('Registration updated successfully!');
       setMessageType('success');
     } catch (err) {
-      setMessage(err instanceof Error ? err.message : 'Registration failed');
       setMessageType('error');
     } finally {
       setSaving(false);
     }
+  };
+
+  const cancelEdit = () => {
+    setIsEditing(false);
+    setStep(1);
+    setMessage('');
   };
 
   const inputClass =
@@ -335,8 +349,131 @@ export default function MerchantProfileTab() {
         </div>
       )}
 
-      {/* Main Registration Card */}
-      <div className="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden">
+      {/* Main Content Area */}
+      {!isEditing && merchant ? (
+        <div className="space-y-6">
+          {/* Quick Stats Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center gap-4">
+              <div className="w-12 h-12 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center">
+                <Monitor className="h-6 w-6" />
+              </div>
+              <div>
+                <p className="text-sm font-semibold text-slate-500">Live Screens</p>
+                <p className="text-xl font-bold text-slate-900">{merchant.maxScreens || 1} Allowed</p>
+              </div>
+            </div>
+            
+            <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center gap-4">
+              <div className="w-12 h-12 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center">
+                <Calendar className="h-6 w-6" />
+              </div>
+              <div>
+                <p className="text-sm font-semibold text-slate-500">Service Ends</p>
+                <p className="text-xl font-bold text-slate-900">
+                  {merchant.serviceEndDate
+                    ? new Date(merchant.serviceEndDate).toLocaleDateString()
+                    : 'N/A'}
+                </p>
+              </div>
+            </div>
+            
+            <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center gap-4 justify-between group cursor-pointer hover:border-blue-300 transition-colors" onClick={() => setIsEditing(true)}>
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 rounded-xl bg-slate-50 text-slate-600 flex items-center justify-center group-hover:bg-blue-600 group-hover:text-white transition-colors">
+                  <Edit2 className="h-5 w-5" />
+                </div>
+                <div>
+                  <p className="text-sm font-semibold text-slate-500">Manage Profile</p>
+                  <p className="text-lg font-bold text-slate-900">Edit Settings</p>
+                </div>
+              </div>
+              <ArrowRight className="h-5 w-5 text-slate-300 group-hover:text-blue-500 transition-colors" />
+            </div>
+          </div>
+
+          {/* Profile Overview Card */}
+          <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden flex flex-col md:flex-row">
+            {/* Identity Column */}
+            <div className="md:w-1/3 bg-slate-50 border-b md:border-b-0 md:border-r border-slate-200 p-8 flex flex-col items-center justify-center text-center">
+              <div className="w-24 h-24 rounded-2xl bg-white border border-slate-200 shadow-sm flex items-center justify-center mb-4 overflow-hidden relative">
+                {form.companyLogo ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={form.companyLogo} alt="Logo" className="w-full h-full object-contain p-2" />
+                ) : (
+                  <Building2 className="h-8 w-8 text-slate-300" />
+                )}
+              </div>
+              <h3 className="text-xl font-extrabold text-slate-900">{form.companyName || 'My Business'}</h3>
+              <p className="text-sm font-semibold text-blue-600 mt-1">{form.businessType}</p>
+              
+              <div className="flex flex-wrap justify-center gap-2 mt-4">
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-200/50 text-slate-600 text-xs font-semibold">
+                  <MapPin className="h-3 w-3" />
+                  {form.city}, {form.country}
+                </span>
+              </div>
+            </div>
+
+            {/* Contact Details Column */}
+            <div className="md:w-2/3 p-8 flex flex-col justify-center">
+              <h4 className="text-sm font-bold text-slate-400 uppercase tracking-wider mb-6">Contact Information</h4>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                <div className="flex items-start gap-3">
+                  <div className="w-8 h-8 rounded-lg bg-blue-50 text-blue-500 flex items-center justify-center flex-shrink-0">
+                    <Mail className="h-4 w-4" />
+                  </div>
+                  <div>
+                    <p className="text-xs font-semibold text-slate-500">Email Address</p>
+                    <p className="text-sm font-bold text-slate-800">{form.email || 'Not provided'}</p>
+                  </div>
+                </div>
+                
+                <div className="flex items-start gap-3">
+                  <div className="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-500 flex items-center justify-center flex-shrink-0">
+                    <Phone className="h-4 w-4" />
+                  </div>
+                  <div>
+                    <p className="text-xs font-semibold text-slate-500">Phone</p>
+                    <p className="text-sm font-bold text-slate-800">{form.phone || 'Not provided'}</p>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-3">
+                  <div className="w-8 h-8 rounded-lg bg-green-50 text-green-500 flex items-center justify-center flex-shrink-0">
+                    <Smartphone className="h-4 w-4" />
+                  </div>
+                  <div>
+                    <p className="text-xs font-semibold text-slate-500">WhatsApp</p>
+                    <p className="text-sm font-bold text-slate-800">{form.whatsapp || 'Not provided'}</p>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-3">
+                  <div className="w-8 h-8 rounded-lg bg-indigo-50 text-indigo-500 flex items-center justify-center flex-shrink-0">
+                    <Globe className="h-4 w-4" />
+                  </div>
+                  <div>
+                    <p className="text-xs font-semibold text-slate-500">Website</p>
+                    <p className="text-sm font-bold text-slate-800">{form.website || 'Not provided'}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      ) : (
+      <div className="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden relative">
+        {merchant && (
+          <button
+            onClick={cancelEdit}
+            className="absolute top-4 right-4 z-10 p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-full transition-colors"
+            title="Cancel Edit"
+          >
+            <X className="h-5 w-5" />
+          </button>
+        )}
+        
         {/* Step Tabs */}
         <div className="flex border-b border-slate-100 bg-slate-50/50">
           {STEPS.map((s) => (
@@ -791,6 +928,7 @@ export default function MerchantProfileTab() {
           )}
         </div>
       </div>
+      )}
     </div>
   );
 }
