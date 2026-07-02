@@ -3,6 +3,7 @@ import Theme1Layout from '@/components/live-screen/theme1/Theme1Layout';
 import Theme2Layout from '@/components/live-screen/theme2/Theme2Layout';
 import Theme3Layout from '@/components/live-screen/theme3/Theme3Layout';
 import DeviceTracker from '@/components/live-screen/DeviceTracker';
+import ReturnToDashboardButton from '@/components/live-screen/shared/ReturnToDashboardButton';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
@@ -50,12 +51,7 @@ export default async function LiveScreenPage({ params }: PageProps) {
             </p>
           </div>
           <div className="pt-2">
-            <a
-              href="/dashboard"
-              className="inline-block px-5 py-2.5 bg-gradient-to-r from-amber-500 to-orange-500 rounded-xl font-bold text-xs text-white shadow-sm hover:from-amber-600 hover:to-orange-600 transition-all"
-            >
-              Return to Dashboard
-            </a>
+            <ReturnToDashboardButton />
           </div>
         </div>
       </main>
