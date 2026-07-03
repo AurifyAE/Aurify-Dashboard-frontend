@@ -120,7 +120,40 @@ const CommodityTable = ({
     return () => window.removeEventListener('resize', checkWidth);
   }, []);
 
-  if (!rows.length) return null;
+  if (!rows.length)
+    return (
+      <Box
+        sx={{
+          width: '100%',
+          py: '2vw',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          gap: '0.5vw',
+          opacity: 0.5,
+        }}
+      >
+        <Typography
+          sx={{
+            fontSize: { xs: '13px', lg: '1.1vw' },
+            fontWeight: 600,
+            color: colors.tableText || '#fff',
+            letterSpacing: '0.05vw',
+          }}
+        >
+          No commodity data added yet
+        </Typography>
+        <Typography
+          sx={{
+            fontSize: { xs: '11px', lg: '0.85vw' },
+            color: colors.tableText || '#aaa',
+          }}
+        >
+          Add commodities from your dashboard to display them here.
+        </Typography>
+      </Box>
+    );
 
   // -- Theme Specific Configs --
   const isTheme1 = theme === 'theme1';

@@ -626,7 +626,7 @@ const SpotRate: React.FC = () => {
       if (merchantInfo && (merchantInfo as any).allowedCommodities?.length > 0) {
         setVisibleMetals((merchantInfo as any).allowedCommodities);
       } else {
-        setVisibleMetals(['Gold', 'Silver']);
+        setVisibleMetals([]);
       }
 
       const uniqueSymbols = [

@@ -142,31 +142,7 @@ export default function Theme1Layout({
         high: 28.6,
       };
 
-  const defaultCommodities = [
-    {
-      metal: 'GOLD',
-      metal_name: 'Gold Bar 999',
-      purity: 999,
-      unit: 1,
-      weight: 'GM',
-      buyCharge: 0,
-      buyPremium: 2,
-      sellCharge: 0,
-      sellPremium: 2,
-    },
-    {
-      metal: 'GOLD',
-      metal_name: 'Gold Coin',
-      purity: 916,
-      unit: 8,
-      weight: 'GM',
-      buyCharge: 0,
-      buyPremium: 10,
-      sellCharge: 0,
-      sellPremium: 10,
-    },
-  ];
-  const displayCommodities = commodities?.length > 0 ? commodities : defaultCommodities;
+  const displayCommodities = commodities ?? [];
 
   return (
     <Box
