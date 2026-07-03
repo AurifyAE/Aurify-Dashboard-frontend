@@ -341,7 +341,10 @@ export default function AdminClientsPage() {
                               : ''
                           }
                           onChange={(e) =>
-                            setEditingMerchant({ ...editingMerchant, serviceEndDate: e.target.value })
+                            setEditingMerchant({
+                              ...editingMerchant,
+                              serviceEndDate: e.target.value,
+                            })
                           }
                           className="w-full rounded-xl border border-slate-200 px-4 py-2.5 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none"
                           required

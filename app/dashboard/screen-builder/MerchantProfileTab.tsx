@@ -360,10 +360,12 @@ export default function MerchantProfileTab() {
               </div>
               <div>
                 <p className="text-sm font-semibold text-slate-500">Live Screens</p>
-                <p className="text-xl font-bold text-slate-900">{merchant.maxScreens || 1} Allowed</p>
+                <p className="text-xl font-bold text-slate-900">
+                  {merchant.maxScreens || 1} Allowed
+                </p>
               </div>
             </div>
-            
+
             <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center gap-4">
               <div className="w-12 h-12 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center">
                 <Calendar className="h-6 w-6" />
@@ -377,8 +379,11 @@ export default function MerchantProfileTab() {
                 </p>
               </div>
             </div>
-            
-            <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center gap-4 justify-between group cursor-pointer hover:border-blue-300 transition-colors" onClick={() => setIsEditing(true)}>
+
+            <div
+              className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center gap-4 justify-between group cursor-pointer hover:border-blue-300 transition-colors"
+              onClick={() => setIsEditing(true)}
+            >
               <div className="flex items-center gap-4">
                 <div className="w-12 h-12 rounded-xl bg-slate-50 text-slate-600 flex items-center justify-center group-hover:bg-blue-600 group-hover:text-white transition-colors">
                   <Edit2 className="h-5 w-5" />
@@ -399,14 +404,20 @@ export default function MerchantProfileTab() {
               <div className="w-24 h-24 rounded-2xl bg-white border border-slate-200 shadow-sm flex items-center justify-center mb-4 overflow-hidden relative">
                 {form.companyLogo ? (
                   // eslint-disable-next-line @next/next/no-img-element
-                  <img src={form.companyLogo} alt="Logo" className="w-full h-full object-contain p-2" />
+                  <img
+                    src={form.companyLogo}
+                    alt="Logo"
+                    className="w-full h-full object-contain p-2"
+                  />
                 ) : (
                   <Building2 className="h-8 w-8 text-slate-300" />
                 )}
               </div>
-              <h3 className="text-xl font-extrabold text-slate-900">{form.companyName || 'My Business'}</h3>
+              <h3 className="text-xl font-extrabold text-slate-900">
+                {form.companyName || 'My Business'}
+              </h3>
               <p className="text-sm font-semibold text-blue-600 mt-1">{form.businessType}</p>
-              
+
               <div className="flex flex-wrap justify-center gap-2 mt-4">
                 <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-200/50 text-slate-600 text-xs font-semibold">
                   <MapPin className="h-3 w-3" />
@@ -417,7 +428,9 @@ export default function MerchantProfileTab() {
 
             {/* Contact Details Column */}
             <div className="md:w-2/3 p-8 flex flex-col justify-center">
-              <h4 className="text-sm font-bold text-slate-400 uppercase tracking-wider mb-6">Contact Information</h4>
+              <h4 className="text-sm font-bold text-slate-400 uppercase tracking-wider mb-6">
+                Contact Information
+              </h4>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                 <div className="flex items-start gap-3">
                   <div className="w-8 h-8 rounded-lg bg-blue-50 text-blue-500 flex items-center justify-center flex-shrink-0">
@@ -425,17 +438,21 @@ export default function MerchantProfileTab() {
                   </div>
                   <div>
                     <p className="text-xs font-semibold text-slate-500">Email Address</p>
-                    <p className="text-sm font-bold text-slate-800">{form.email || 'Not provided'}</p>
+                    <p className="text-sm font-bold text-slate-800">
+                      {form.email || 'Not provided'}
+                    </p>
                   </div>
                 </div>
-                
+
                 <div className="flex items-start gap-3">
                   <div className="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-500 flex items-center justify-center flex-shrink-0">
                     <Phone className="h-4 w-4" />
                   </div>
                   <div>
                     <p className="text-xs font-semibold text-slate-500">Phone</p>
-                    <p className="text-sm font-bold text-slate-800">{form.phone || 'Not provided'}</p>
+                    <p className="text-sm font-bold text-slate-800">
+                      {form.phone || 'Not provided'}
+                    </p>
                   </div>
                 </div>
 
@@ -445,7 +462,9 @@ export default function MerchantProfileTab() {
                   </div>
                   <div>
                     <p className="text-xs font-semibold text-slate-500">WhatsApp</p>
-                    <p className="text-sm font-bold text-slate-800">{form.whatsapp || 'Not provided'}</p>
+                    <p className="text-sm font-bold text-slate-800">
+                      {form.whatsapp || 'Not provided'}
+                    </p>
                   </div>
                 </div>
 
@@ -455,7 +474,9 @@ export default function MerchantProfileTab() {
                   </div>
                   <div>
                     <p className="text-xs font-semibold text-slate-500">Website</p>
-                    <p className="text-sm font-bold text-slate-800">{form.website || 'Not provided'}</p>
+                    <p className="text-sm font-bold text-slate-800">
+                      {form.website || 'Not provided'}
+                    </p>
                   </div>
                 </div>
               </div>
@@ -463,409 +484,73 @@ export default function MerchantProfileTab() {
           </div>
         </div>
       ) : (
-      <div className="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden relative">
-        {merchant && (
-          <button
-            onClick={cancelEdit}
-            className="absolute top-4 right-4 z-10 p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-full transition-colors"
-            title="Cancel Edit"
-          >
-            <X className="h-5 w-5" />
-          </button>
-        )}
-        
-        {/* Step Tabs */}
-        <div className="flex border-b border-slate-100 bg-slate-50/50">
-          {STEPS.map((s) => (
+        <div className="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden relative">
+          {merchant && (
             <button
-              key={s.id}
-              type="button"
-              onClick={() => setStep(s.id)}
-              className={`flex flex-1 items-center justify-center gap-2 px-4 py-4 text-sm font-semibold transition-all cursor-pointer ${
-                step === s.id
-                  ? 'border-b-2 border-blue-600 bg-white text-blue-700'
-                  : step > s.id
-                    ? 'text-emerald-600'
-                    : 'text-slate-400 hover:text-slate-700'
-              }`}
+              onClick={cancelEdit}
+              className="absolute top-4 right-4 z-10 p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-full transition-colors"
+              title="Cancel Edit"
             >
-              <span
-                className={`flex h-6 w-6 items-center justify-center rounded-full text-xs font-bold ${
+              <X className="h-5 w-5" />
+            </button>
+          )}
+
+          {/* Step Tabs */}
+          <div className="flex border-b border-slate-100 bg-slate-50/50">
+            {STEPS.map((s) => (
+              <button
+                key={s.id}
+                type="button"
+                onClick={() => setStep(s.id)}
+                className={`flex flex-1 items-center justify-center gap-2 px-4 py-4 text-sm font-semibold transition-all cursor-pointer ${
                   step === s.id
-                    ? 'bg-blue-600 text-white'
+                    ? 'border-b-2 border-blue-600 bg-white text-blue-700'
                     : step > s.id
-                      ? 'bg-emerald-500 text-white'
-                      : 'bg-slate-200 text-slate-500'
+                      ? 'text-emerald-600'
+                      : 'text-slate-400 hover:text-slate-700'
                 }`}
               >
-                {step > s.id ? <Check className="h-3 w-3" /> : s.id}
-              </span>
-              <span className="hidden sm:block">{s.label}</span>
-            </button>
-          ))}
-        </div>
-
-        <div className="p-6 lg:p-8">
-          {/* STEP 1 — Company Info */}
-          {step === 1 && (
-            <div className="space-y-6">
-              <div>
-                <h3 className="text-lg font-bold text-slate-900">Company Information</h3>
-                <p className="mt-1 text-sm text-slate-500">
-                  Business info displayed across showroom screens.
-                </p>
-              </div>
-              <div className="grid gap-4 sm:grid-cols-2">
-                <div className="sm:col-span-2">
-                  <label className={labelClass}>Company Name *</label>
-                  <input
-                    className={inputClass}
-                    placeholder="e.g. Al Fardan Jewellery"
-                    value={form.companyName}
-                    onChange={(e) => setForm({ ...form, companyName: e.target.value })}
-                  />
-                </div>
-                <div>
-                  <label className={labelClass}>Business Type</label>
-                  <Select
-                    value={form.businessType}
-                    onChange={(e) => setForm({ ...form, businessType: e.target.value as string })}
-                    displayEmpty
-                    fullWidth
-                    size="small"
-                    sx={{
-                      borderRadius: '0.75rem',
-                      height: '42px',
-                      fontSize: '0.875rem',
-                      backgroundColor: '#fff',
-                      '& .MuiOutlinedInput-notchedOutline': { borderColor: '#e2e8f0' },
-                      '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: '#cbd5e1' },
-                      '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                        borderColor: '#3b82f6',
-                        borderWidth: '1px',
-                      },
-                    }}
-                  >
-                    <MenuItem value="" disabled>
-                      Select type
-                    </MenuItem>
-                    {BUSINESS_TYPES.map((t) => (
-                      <MenuItem key={t} value={t}>
-                        {t}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </div>
-                <div>
-                  <label className={labelClass}>Logo URL</label>
-                  <input
-                    className={inputClass}
-                    placeholder="https://..."
-                    value={form.companyLogo}
-                    onChange={(e) => setForm({ ...form, companyLogo: e.target.value })}
-                  />
-                </div>
-                <div>
-                  <label className={labelClass}>Country</label>
-                  <input
-                    className={inputClass}
-                    value={form.country}
-                    onChange={(e) => setForm({ ...form, country: e.target.value })}
-                  />
-                </div>
-                <div>
-                  <label className={labelClass}>City</label>
-                  <input
-                    className={inputClass}
-                    placeholder="Dubai"
-                    value={form.city}
-                    onChange={(e) => setForm({ ...form, city: e.target.value })}
-                  />
-                </div>
-                <div className="sm:col-span-2">
-                  <label className={labelClass}>Address</label>
-                  <input
-                    className={inputClass}
-                    placeholder="Street, Building, Area"
-                    value={form.address}
-                    onChange={(e) => setForm({ ...form, address: e.target.value })}
-                  />
-                </div>
-                <div>
-                  <label className={labelClass}>
-                    <Mail className="inline h-3 w-3 mr-1" />
-                    Email
-                  </label>
-                  <input
-                    type="email"
-                    className={inputClass}
-                    placeholder="info@company.com"
-                    value={form.email}
-                    onChange={(e) => setForm({ ...form, email: e.target.value })}
-                  />
-                </div>
-                <div>
-                  <label className={labelClass}>
-                    <Globe className="inline h-3 w-3 mr-1" />
-                    Website
-                  </label>
-                  <input
-                    className={inputClass}
-                    placeholder="https://company.com"
-                    value={form.website}
-                    onChange={(e) => setForm({ ...form, website: e.target.value })}
-                  />
-                </div>
-                <div>
-                  <label className={labelClass}>
-                    <Phone className="inline h-3 w-3 mr-1" />
-                    Phone
-                  </label>
-                  <input
-                    className={inputClass}
-                    placeholder="+971 ..."
-                    value={form.phone}
-                    onChange={(e) => setForm({ ...form, phone: e.target.value })}
-                  />
-                </div>
-                <div>
-                  <label className={labelClass}>
-                    <MessageCircle className="inline h-3 w-3 mr-1" />
-                    WhatsApp
-                  </label>
-                  <input
-                    className={inputClass}
-                    placeholder="+971 ..."
-                    value={form.whatsapp}
-                    onChange={(e) => setForm({ ...form, whatsapp: e.target.value })}
-                  />
-                </div>
-              </div>
-              <div className="flex justify-end">
-                <button
-                  type="button"
-                  onClick={() => setStep(2)}
-                  className="btn-primary cursor-pointer"
+                <span
+                  className={`flex h-6 w-6 items-center justify-center rounded-full text-xs font-bold ${
+                    step === s.id
+                      ? 'bg-blue-600 text-white'
+                      : step > s.id
+                        ? 'bg-emerald-500 text-white'
+                        : 'bg-slate-200 text-slate-500'
+                  }`}
                 >
-                  Next: Choose Services
-                  <ArrowRight className="h-4 w-4" />
-                </button>
-              </div>
-            </div>
-          )}
+                  {step > s.id ? <Check className="h-3 w-3" /> : s.id}
+                </span>
+                <span className="hidden sm:block">{s.label}</span>
+              </button>
+            ))}
+          </div>
 
-          {/* STEP 2 — Services */}
-          {step === 2 && (
-            <div className="space-y-6">
-              <div>
-                <h3 className="text-lg font-bold text-slate-900">Select Services</h3>
-                <p className="mt-1 text-sm text-slate-500">
-                  Choose the services your business requires.
-                </p>
-              </div>
-              <div className="grid gap-4 sm:grid-cols-3">
-                {SERVICE_CARDS.map((svc) => {
-                  const selected = form.services[svc.key];
-                  return (
-                    <button
-                      key={svc.key}
-                      type="button"
-                      onClick={() =>
-                        setForm((prev) => ({
-                          ...prev,
-                          services: {
-                            ...prev.services,
-                            [svc.key]: !prev.services[svc.key],
-                          },
-                        }))
-                      }
-                      className={`relative flex flex-col items-start gap-3 rounded-2xl border-2 p-5 text-left transition-all cursor-pointer ${
-                        selected
-                          ? 'border-blue-400 bg-blue-50/50 shadow-sm'
-                          : 'border-slate-200 bg-white hover:border-slate-300'
-                      }`}
-                    >
-                      {selected && (
-                        <span className="absolute right-3 top-3 flex h-6 w-6 items-center justify-center rounded-full bg-blue-600">
-                          <Check className="h-3.5 w-3.5 text-white" />
-                        </span>
-                      )}
-                      <div
-                        className={`flex h-10 w-10 items-center justify-center rounded-xl transition-all shadow-sm ${
-                          selected ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-600'
-                        }`}
-                      >
-                        <svc.icon className="h-5 w-5" />
-                      </div>
-                      <div>
-                        <p className="font-semibold text-slate-900">{svc.title}</p>
-                        <p className="mt-0.5 text-xs text-slate-500">{svc.description}</p>
-                      </div>
-                    </button>
-                  );
-                })}
-              </div>
-              <div className="flex justify-between">
-                <button
-                  type="button"
-                  onClick={() => setStep(1)}
-                  className="btn-secondary cursor-pointer"
-                >
-                  <ArrowLeft className="h-4 w-4" />
-                  Back
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setStep(3)}
-                  className="btn-primary cursor-pointer"
-                >
-                  Next: Branding
-                  <ArrowRight className="h-4 w-4" />
-                </button>
-              </div>
-            </div>
-          )}
-
-          {/* STEP 3 — Branding */}
-          {step === 3 && (
-            <div className="space-y-6">
-              <div>
-                <h3 className="text-lg font-bold text-slate-900">Brand Identity</h3>
-                <p className="mt-1 text-sm text-slate-500">
-                  Define showroom TV screen branding colors.
-                </p>
-              </div>
-
-              <div className="grid gap-6 lg:grid-cols-2">
-                {/* Color Pickers */}
-                <div className="space-y-4">
-                  <h4 className="text-sm font-semibold text-slate-700">Color Palette</h4>
-                  {[
-                    {
-                      key: 'primaryColor',
-                      label: 'Primary Color',
-                      hint: 'Main brand color, used for headings & accents',
-                    },
-                    {
-                      key: 'secondaryColor',
-                      label: 'Secondary Color',
-                      hint: 'Background or supporting color',
-                    },
-                    {
-                      key: 'accentColor',
-                      label: 'Accent Color',
-                      hint: 'Highlight color for prices & badges',
-                    },
-                  ].map((field) => (
-                    <div key={field.key} className="flex items-center gap-4">
-                      <div className="relative">
-                        <input
-                          type="color"
-                          value={(form.branding as any)[field.key]}
-                          onChange={(e) =>
-                            setForm((prev) => ({
-                              ...prev,
-                              branding: {
-                                ...prev.branding,
-                                [field.key]: e.target.value,
-                              },
-                            }))
-                          }
-                          className="h-12 w-12 cursor-pointer rounded-xl border-2 border-slate-200 p-0.5"
-                        />
-                      </div>
-                      <div className="flex-1">
-                        <p className="text-sm font-medium text-slate-700">{field.label}</p>
-                        <p className="text-xs text-slate-400">{field.hint}</p>
-                        <p className="mt-0.5 font-mono text-xs text-slate-500">
-                          {(form.branding as any)[field.key]}
-                        </p>
-                      </div>
-                    </div>
-                  ))}
+          <div className="p-6 lg:p-8">
+            {/* STEP 1 — Company Info */}
+            {step === 1 && (
+              <div className="space-y-6">
+                <div>
+                  <h3 className="text-lg font-bold text-slate-900">Company Information</h3>
+                  <p className="mt-1 text-sm text-slate-500">
+                    Business info displayed across showroom screens.
+                  </p>
                 </div>
-
-                {/* Live Preview */}
-                <div className="space-y-4">
-                  <h4 className="text-sm font-semibold text-slate-700">Live Preview</h4>
-                  <div
-                    className="relative overflow-hidden rounded-2xl p-5 shadow-inner"
-                    style={{
-                      background: form.branding.secondaryColor,
-                      fontFamily: form.branding.fontFamily,
-                    }}
-                  >
-                    <div className="flex items-center justify-between mb-4">
-                      <div>
-                        <p
-                          className="text-lg font-bold"
-                          style={{ color: form.branding.primaryColor }}
-                        >
-                          {form.companyName || 'Your Company'}
-                        </p>
-                        <p className="text-xs opacity-60 text-white">Jewellery & Bullion</p>
-                      </div>
-                      <div
-                        className="rounded-lg px-3 py-1 text-xs font-bold"
-                        style={{
-                          background: form.branding.primaryColor,
-                          color: form.branding.secondaryColor,
-                        }}
-                      >
-                        LIVE
-                      </div>
-                    </div>
-                    <div className="grid grid-cols-2 gap-2">
-                      {['GOLD', 'SILVER'].map((metal, i) => (
-                        <div
-                          key={metal}
-                          className="rounded-lg p-3"
-                          style={{
-                            background: `${form.branding.primaryColor}22`,
-                            borderLeft: `3px solid ${i === 0 ? form.branding.primaryColor : form.branding.accentColor}`,
-                          }}
-                        >
-                          <p
-                            className="text-[10px] font-bold"
-                            style={{
-                              color:
-                                i === 0 ? form.branding.primaryColor : form.branding.accentColor,
-                            }}
-                          >
-                            {metal}
-                          </p>
-                          <p className="text-sm font-bold text-white">
-                            {i === 0 ? '2,345.60' : '28.40'}
-                          </p>
-                          <p className="text-[9px] text-white/50">USD/oz</p>
-                        </div>
-                      ))}
-                    </div>
-                    <div
-                      className="mt-3 rounded px-3 py-1.5 text-[10px] font-semibold"
-                      style={{
-                        background: form.branding.accentColor,
-                        color: form.branding.secondaryColor,
-                      }}
-                    >
-                      📢 Special offer: Gold coins available today
-                    </div>
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <div className="sm:col-span-2">
+                    <label className={labelClass}>Company Name *</label>
+                    <input
+                      className={inputClass}
+                      placeholder="e.g. Al Fardan Jewellery"
+                      value={form.companyName}
+                      onChange={(e) => setForm({ ...form, companyName: e.target.value })}
+                    />
                   </div>
-
-                  {/* Font Family */}
                   <div>
-                    <label className={labelClass}>Font Family</label>
+                    <label className={labelClass}>Business Type</label>
                     <Select
-                      value={form.branding.fontFamily}
-                      onChange={(e) =>
-                        setForm((prev) => ({
-                          ...prev,
-                          branding: {
-                            ...prev.branding,
-                            fontFamily: e.target.value as string,
-                          },
-                        }))
-                      }
+                      value={form.businessType}
+                      onChange={(e) => setForm({ ...form, businessType: e.target.value as string })}
                       displayEmpty
                       fullWidth
                       size="small"
@@ -874,7 +559,6 @@ export default function MerchantProfileTab() {
                         height: '42px',
                         fontSize: '0.875rem',
                         backgroundColor: '#fff',
-                        fontFamily: form.branding.fontFamily,
                         '& .MuiOutlinedInput-notchedOutline': { borderColor: '#e2e8f0' },
                         '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: '#cbd5e1' },
                         '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
@@ -884,50 +568,387 @@ export default function MerchantProfileTab() {
                       }}
                     >
                       <MenuItem value="" disabled>
-                        Select font
+                        Select type
                       </MenuItem>
-                      {FONT_FAMILIES.map((f) => (
-                        <MenuItem key={f} value={f} style={{ fontFamily: f }}>
-                          {f}
+                      {BUSINESS_TYPES.map((t) => (
+                        <MenuItem key={t} value={t}>
+                          {t}
                         </MenuItem>
                       ))}
                     </Select>
                   </div>
+                  <div>
+                    <label className={labelClass}>Logo URL</label>
+                    <input
+                      className={inputClass}
+                      placeholder="https://..."
+                      value={form.companyLogo}
+                      onChange={(e) => setForm({ ...form, companyLogo: e.target.value })}
+                    />
+                  </div>
+                  <div>
+                    <label className={labelClass}>Country</label>
+                    <input
+                      className={inputClass}
+                      value={form.country}
+                      onChange={(e) => setForm({ ...form, country: e.target.value })}
+                    />
+                  </div>
+                  <div>
+                    <label className={labelClass}>City</label>
+                    <input
+                      className={inputClass}
+                      placeholder="Dubai"
+                      value={form.city}
+                      onChange={(e) => setForm({ ...form, city: e.target.value })}
+                    />
+                  </div>
+                  <div className="sm:col-span-2">
+                    <label className={labelClass}>Address</label>
+                    <input
+                      className={inputClass}
+                      placeholder="Street, Building, Area"
+                      value={form.address}
+                      onChange={(e) => setForm({ ...form, address: e.target.value })}
+                    />
+                  </div>
+                  <div>
+                    <label className={labelClass}>
+                      <Mail className="inline h-3 w-3 mr-1" />
+                      Email
+                    </label>
+                    <input
+                      type="email"
+                      className={inputClass}
+                      placeholder="info@company.com"
+                      value={form.email}
+                      onChange={(e) => setForm({ ...form, email: e.target.value })}
+                    />
+                  </div>
+                  <div>
+                    <label className={labelClass}>
+                      <Globe className="inline h-3 w-3 mr-1" />
+                      Website
+                    </label>
+                    <input
+                      className={inputClass}
+                      placeholder="https://company.com"
+                      value={form.website}
+                      onChange={(e) => setForm({ ...form, website: e.target.value })}
+                    />
+                  </div>
+                  <div>
+                    <label className={labelClass}>
+                      <Phone className="inline h-3 w-3 mr-1" />
+                      Phone
+                    </label>
+                    <input
+                      className={inputClass}
+                      placeholder="+971 ..."
+                      value={form.phone}
+                      onChange={(e) => setForm({ ...form, phone: e.target.value })}
+                    />
+                  </div>
+                  <div>
+                    <label className={labelClass}>
+                      <MessageCircle className="inline h-3 w-3 mr-1" />
+                      WhatsApp
+                    </label>
+                    <input
+                      className={inputClass}
+                      placeholder="+971 ..."
+                      value={form.whatsapp}
+                      onChange={(e) => setForm({ ...form, whatsapp: e.target.value })}
+                    />
+                  </div>
+                </div>
+                <div className="flex justify-end">
+                  <button
+                    type="button"
+                    onClick={() => setStep(2)}
+                    className="btn-primary cursor-pointer"
+                  >
+                    Next: Choose Services
+                    <ArrowRight className="h-4 w-4" />
+                  </button>
                 </div>
               </div>
+            )}
 
-              <div className="flex justify-between pt-2">
-                <button
-                  type="button"
-                  onClick={() => setStep(2)}
-                  className="btn-secondary cursor-pointer"
-                >
-                  <ArrowLeft className="h-4 w-4" />
-                  Back
-                </button>
-                <button
-                  type="button"
-                  onClick={register}
-                  disabled={saving}
-                  className="btn-primary px-8 cursor-pointer"
-                >
-                  {saving ? (
-                    <>
-                      <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                      Submitting...
-                    </>
-                  ) : (
-                    <>
-                      <Rocket className="h-4 w-4" />
-                      {merchant ? 'Update Registration' : 'Submit Registration'}
-                    </>
-                  )}
-                </button>
+            {/* STEP 2 — Services */}
+            {step === 2 && (
+              <div className="space-y-6">
+                <div>
+                  <h3 className="text-lg font-bold text-slate-900">Select Services</h3>
+                  <p className="mt-1 text-sm text-slate-500">
+                    Choose the services your business requires.
+                  </p>
+                </div>
+                <div className="grid gap-4 sm:grid-cols-3">
+                  {SERVICE_CARDS.map((svc) => {
+                    const selected = form.services[svc.key];
+                    return (
+                      <button
+                        key={svc.key}
+                        type="button"
+                        onClick={() =>
+                          setForm((prev) => ({
+                            ...prev,
+                            services: {
+                              ...prev.services,
+                              [svc.key]: !prev.services[svc.key],
+                            },
+                          }))
+                        }
+                        className={`relative flex flex-col items-start gap-3 rounded-2xl border-2 p-5 text-left transition-all cursor-pointer ${
+                          selected
+                            ? 'border-blue-400 bg-blue-50/50 shadow-sm'
+                            : 'border-slate-200 bg-white hover:border-slate-300'
+                        }`}
+                      >
+                        {selected && (
+                          <span className="absolute right-3 top-3 flex h-6 w-6 items-center justify-center rounded-full bg-blue-600">
+                            <Check className="h-3.5 w-3.5 text-white" />
+                          </span>
+                        )}
+                        <div
+                          className={`flex h-10 w-10 items-center justify-center rounded-xl transition-all shadow-sm ${
+                            selected ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-600'
+                          }`}
+                        >
+                          <svc.icon className="h-5 w-5" />
+                        </div>
+                        <div>
+                          <p className="font-semibold text-slate-900">{svc.title}</p>
+                          <p className="mt-0.5 text-xs text-slate-500">{svc.description}</p>
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
+                <div className="flex justify-between">
+                  <button
+                    type="button"
+                    onClick={() => setStep(1)}
+                    className="btn-secondary cursor-pointer"
+                  >
+                    <ArrowLeft className="h-4 w-4" />
+                    Back
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setStep(3)}
+                    className="btn-primary cursor-pointer"
+                  >
+                    Next: Branding
+                    <ArrowRight className="h-4 w-4" />
+                  </button>
+                </div>
               </div>
-            </div>
-          )}
+            )}
+
+            {/* STEP 3 — Branding */}
+            {step === 3 && (
+              <div className="space-y-6">
+                <div>
+                  <h3 className="text-lg font-bold text-slate-900">Brand Identity</h3>
+                  <p className="mt-1 text-sm text-slate-500">
+                    Define showroom TV screen branding colors.
+                  </p>
+                </div>
+
+                <div className="grid gap-6 lg:grid-cols-2">
+                  {/* Color Pickers */}
+                  <div className="space-y-4">
+                    <h4 className="text-sm font-semibold text-slate-700">Color Palette</h4>
+                    {[
+                      {
+                        key: 'primaryColor',
+                        label: 'Primary Color',
+                        hint: 'Main brand color, used for headings & accents',
+                      },
+                      {
+                        key: 'secondaryColor',
+                        label: 'Secondary Color',
+                        hint: 'Background or supporting color',
+                      },
+                      {
+                        key: 'accentColor',
+                        label: 'Accent Color',
+                        hint: 'Highlight color for prices & badges',
+                      },
+                    ].map((field) => (
+                      <div key={field.key} className="flex items-center gap-4">
+                        <div className="relative">
+                          <input
+                            type="color"
+                            value={(form.branding as any)[field.key]}
+                            onChange={(e) =>
+                              setForm((prev) => ({
+                                ...prev,
+                                branding: {
+                                  ...prev.branding,
+                                  [field.key]: e.target.value,
+                                },
+                              }))
+                            }
+                            className="h-12 w-12 cursor-pointer rounded-xl border-2 border-slate-200 p-0.5"
+                          />
+                        </div>
+                        <div className="flex-1">
+                          <p className="text-sm font-medium text-slate-700">{field.label}</p>
+                          <p className="text-xs text-slate-400">{field.hint}</p>
+                          <p className="mt-0.5 font-mono text-xs text-slate-500">
+                            {(form.branding as any)[field.key]}
+                          </p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Live Preview */}
+                  <div className="space-y-4">
+                    <h4 className="text-sm font-semibold text-slate-700">Live Preview</h4>
+                    <div
+                      className="relative overflow-hidden rounded-2xl p-5 shadow-inner"
+                      style={{
+                        background: form.branding.secondaryColor,
+                        fontFamily: form.branding.fontFamily,
+                      }}
+                    >
+                      <div className="flex items-center justify-between mb-4">
+                        <div>
+                          <p
+                            className="text-lg font-bold"
+                            style={{ color: form.branding.primaryColor }}
+                          >
+                            {form.companyName || 'Your Company'}
+                          </p>
+                          <p className="text-xs opacity-60 text-white">Jewellery & Bullion</p>
+                        </div>
+                        <div
+                          className="rounded-lg px-3 py-1 text-xs font-bold"
+                          style={{
+                            background: form.branding.primaryColor,
+                            color: form.branding.secondaryColor,
+                          }}
+                        >
+                          LIVE
+                        </div>
+                      </div>
+                      <div className="grid grid-cols-2 gap-2">
+                        {['GOLD', 'SILVER'].map((metal, i) => (
+                          <div
+                            key={metal}
+                            className="rounded-lg p-3"
+                            style={{
+                              background: `${form.branding.primaryColor}22`,
+                              borderLeft: `3px solid ${i === 0 ? form.branding.primaryColor : form.branding.accentColor}`,
+                            }}
+                          >
+                            <p
+                              className="text-[10px] font-bold"
+                              style={{
+                                color:
+                                  i === 0 ? form.branding.primaryColor : form.branding.accentColor,
+                              }}
+                            >
+                              {metal}
+                            </p>
+                            <p className="text-sm font-bold text-white">
+                              {i === 0 ? '2,345.60' : '28.40'}
+                            </p>
+                            <p className="text-[9px] text-white/50">USD/oz</p>
+                          </div>
+                        ))}
+                      </div>
+                      <div
+                        className="mt-3 rounded px-3 py-1.5 text-[10px] font-semibold"
+                        style={{
+                          background: form.branding.accentColor,
+                          color: form.branding.secondaryColor,
+                        }}
+                      >
+                        📢 Special offer: Gold coins available today
+                      </div>
+                    </div>
+
+                    {/* Font Family */}
+                    <div>
+                      <label className={labelClass}>Font Family</label>
+                      <Select
+                        value={form.branding.fontFamily}
+                        onChange={(e) =>
+                          setForm((prev) => ({
+                            ...prev,
+                            branding: {
+                              ...prev.branding,
+                              fontFamily: e.target.value as string,
+                            },
+                          }))
+                        }
+                        displayEmpty
+                        fullWidth
+                        size="small"
+                        sx={{
+                          borderRadius: '0.75rem',
+                          height: '42px',
+                          fontSize: '0.875rem',
+                          backgroundColor: '#fff',
+                          fontFamily: form.branding.fontFamily,
+                          '& .MuiOutlinedInput-notchedOutline': { borderColor: '#e2e8f0' },
+                          '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: '#cbd5e1' },
+                          '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                            borderColor: '#3b82f6',
+                            borderWidth: '1px',
+                          },
+                        }}
+                      >
+                        <MenuItem value="" disabled>
+                          Select font
+                        </MenuItem>
+                        {FONT_FAMILIES.map((f) => (
+                          <MenuItem key={f} value={f} style={{ fontFamily: f }}>
+                            {f}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex justify-between pt-2">
+                  <button
+                    type="button"
+                    onClick={() => setStep(2)}
+                    className="btn-secondary cursor-pointer"
+                  >
+                    <ArrowLeft className="h-4 w-4" />
+                    Back
+                  </button>
+                  <button
+                    type="button"
+                    onClick={register}
+                    disabled={saving}
+                    className="btn-primary px-8 cursor-pointer"
+                  >
+                    {saving ? (
+                      <>
+                        <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                        Submitting...
+                      </>
+                    ) : (
+                      <>
+                        <Rocket className="h-4 w-4" />
+                        {merchant ? 'Update Registration' : 'Submit Registration'}
+                      </>
+                    )}
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
-      </div>
       )}
     </div>
   );
