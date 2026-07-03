@@ -19,6 +19,8 @@ export interface Merchant {
   services: Record<string, boolean>;
   branding: Record<string, string>;
   visibility: Record<string, boolean>;
+  maxScreens?: number;
+  serviceEndDate?: string;
 }
 
 export interface MarketplaceTheme {
