@@ -59,12 +59,13 @@ export const decodeToken = (token: string): AuthUser | null => {
   }
 };
 
-const BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
+const BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:5001';
 
 export const apiLogin = async (email: string, password: string): Promise<AuthResponse> => {
   const res = await fetch(`${BASE_URL}/api/auth/login`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
+    credentials: 'include',
     body: JSON.stringify({ email, password }),
   });
   return res.json();
@@ -86,6 +87,7 @@ export const apiRegister = async (data: {
   const res = await fetch(`${BASE_URL}/api/auth/register`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
+    credentials: 'include',
     body: JSON.stringify(data),
   });
   return res.json();
@@ -98,6 +100,7 @@ export const apiGetMe = async (token: string): Promise<AuthResponse> => {
       'Content-Type': 'application/json',
       Authorization: `Bearer ${token}`,
     },
+    credentials: 'include',
   });
   return res.json();
 };

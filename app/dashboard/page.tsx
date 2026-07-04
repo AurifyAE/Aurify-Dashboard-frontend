@@ -1,10 +1,12 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import DashboardShell from '@/components/dashboard/DashboardShell';
 import DashboardData from '@/components/dashboard/DashboardData';
 import Loader from '@/components/loader/loader';
 import { marketplaceApi, type Merchant } from '@/lib/api/marketplace';
+import { useAuth } from '@/context/AuthContext';
 import Link from 'next/link';
 import { AlertCircle, CheckCircle2, Clock, Rocket, XCircle } from 'lucide-react';
 
@@ -95,10 +97,23 @@ function MerchantStatusBanner({ merchant }: { merchant: Merchant | null }) {
 }
 
 export default function DashboardPage() {
+  const { user, hasHydrated } = useAuth();
+  const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [merchant, setMerchant] = useState<Merchant | null | undefined>(undefined);
 
+  const isAdmin = user?.role === 'admin' || user?.role === 'super_admin';
+
+  // Redirect admin/super_admin away — they have no business on the client dashboard
   useEffect(() => {
+    if (!hasHydrated) return;
+    if (isAdmin) {
+      router.replace('/dashboard/admin/clients');
+    }
+  }, [isAdmin, hasHydrated, router]);
+
+  useEffect(() => {
+    if (isAdmin) return; // skip merchant fetch for admins
     // Load merchant status quietly
     marketplaceApi
       .myMerchant()
@@ -111,7 +126,10 @@ export default function DashboardPage() {
       .finally(() => {
         setLoading(false);
       });
-  }, []);
+  }, [isAdmin]);
+
+  // Show nothing while redirect is in flight for admins
+  if (!hasHydrated || isAdmin) return <Loader />;
 
   return (
     <>
