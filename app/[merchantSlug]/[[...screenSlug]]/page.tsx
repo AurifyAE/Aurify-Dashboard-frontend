@@ -4,6 +4,7 @@ import Theme2Layout from '@/components/live-screen/theme2/Theme2Layout';
 import Theme3Layout from '@/components/live-screen/theme3/Theme3Layout';
 import DeviceTracker from '@/components/live-screen/DeviceTracker';
 import ReturnToDashboardButton from '@/components/live-screen/shared/ReturnToDashboardButton';
+import { notFound } from 'next/navigation';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
@@ -35,7 +36,10 @@ export default async function LiveScreenPage({ params }: PageProps) {
   let data;
   try {
     data = await fetchLiveScreen(merchantSlug, screenSlug?.[0] || 'main');
-  } catch (err) {
+  } catch (err: any) {
+    if (err.status === 404) {
+      notFound();
+    }
     return (
       <main className="min-h-screen bg-[#0f172a] flex flex-col items-center justify-center p-8 text-center text-white">
         <div className="max-w-md space-y-5 rounded-3xl border border-slate-800 bg-slate-900/50 p-8 backdrop-blur-sm shadow-xl">

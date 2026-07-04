@@ -223,16 +223,16 @@ function LoginContent() {
             </div>
 
             {/* Forgot Password */}
-            <div className="flex justify-end -mt-1">
+            {/* <div className="flex justify-end -mt-1">
               <a
                 href="/forgot-password"
                 className="text-[13px] text-[#4A90E2] hover:text-[#3A7BC8] transition-colors"
               >
                 Forgot Password?
               </a>
-            </div>
+            </div> */}
 
-            {/* Login Button */}
+             {/* Login Button */}
             <button
               type="submit"
               disabled={isLoading}

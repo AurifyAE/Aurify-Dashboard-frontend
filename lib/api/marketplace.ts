@@ -162,6 +162,10 @@ export async function fetchLiveScreen(merchantSlug: string, screenSlug = 'main')
     cache: 'no-store',
   });
   const json = await res.json().catch(() => ({}));
-  if (!res.ok) throw new Error(json.message || 'Live screen unavailable');
+  if (!res.ok) {
+    const error = new Error(json.message || 'Live screen unavailable') as any;
+    error.status = res.status;
+    throw error;
+  }
   return json.data;
 }
