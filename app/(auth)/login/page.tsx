@@ -5,7 +5,7 @@ import Image from 'next/image';
 import { Eye, EyeOff } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import Swal from 'sweetalert2';
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams, useRouter } from 'next/navigation';
 
 interface FieldErrors {
   email?: string;
@@ -15,6 +15,7 @@ interface FieldErrors {
 function LoginContent() {
   const { login } = useAuth();
   const searchParams = useSearchParams();
+  const router = useRouter();
 
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
@@ -31,8 +32,11 @@ function LoginContent() {
         text: 'Your account has been suspended or deleted by the administrator.',
         confirmButtonColor: '#4A90E2',
       });
+      // Clear the query param so the popup doesn't fire again on re-render
+      router.replace('/login');
     }
-  }, [searchParams]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // ── Client-side validation ─────────────────────────────────────────────────
   const validate = (): boolean => {

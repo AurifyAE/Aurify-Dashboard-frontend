@@ -57,8 +57,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const forceRegisterRedirect = useCallback(() => {
     removeToken();
     setUser(null);
-    router.push('/login?alert=deleted');
-  }, [router]);
+    // Don't redirect if already on an auth page — avoids redirect loops
+    if (!pathname.startsWith('/login') && !pathname.startsWith('/register')) {
+      router.push('/login?alert=deleted');
+    }
+  }, [router, pathname]);
 
   // Hydrate and verify user on mount, route change, and interval
   useEffect(() => {
@@ -90,6 +93,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
       setIsLoading(false);
     };
+
+    // Skip auth checks entirely on public auth pages
+    if (pathname.startsWith('/login') || pathname.startsWith('/register')) {
+      setIsLoading(false);
+      setHasHydrated(true);
+      return;
+    }
 
     checkAuthStatus();
 
