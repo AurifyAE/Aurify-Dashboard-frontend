@@ -4,6 +4,7 @@ export interface AdminMerchant {
   _id: string;
   merchantId: string;
   companyName: string;
+  username?: string;
   email: string;
   status: string;
   maxScreens: number;

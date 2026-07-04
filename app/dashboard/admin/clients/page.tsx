@@ -1,16 +1,20 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import DashboardShell from '@/components/dashboard/DashboardShell';
 import { adminApi, AdminMerchant } from '@/lib/api/admin';
 import Swal from 'sweetalert2';
-import { Users, Search, Edit2, Calendar, Monitor, Tv, Trash2 } from 'lucide-react';
+import { Users, Search, Edit2, Calendar, Monitor, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Select, MenuItem } from '@mui/material';
 
 export default function AdminClientsPage() {
+  const PAGE_SIZE_OPTIONS = [10, 15, 20, 25];
+  const [itemsPerPage, setItemsPerPage] = useState(10);
+
   const [merchants, setMerchants] = useState<AdminMerchant[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
   const [editingMerchant, setEditingMerchant] = useState<AdminMerchant | null>(null);
 
   useEffect(() => {
@@ -86,11 +90,49 @@ export default function AdminClientsPage() {
     }
   };
 
-  const filteredMerchants = merchants.filter(
-    (m) =>
-      m.companyName?.toLowerCase().includes(search.toLowerCase()) ||
-      m.email?.toLowerCase().includes(search.toLowerCase())
-  );
+  const filteredMerchants = useMemo(() => {
+    const q = search.toLowerCase().trim();
+    if (!q) return merchants;
+    return merchants.filter(
+      (m) =>
+        m.username?.toLowerCase().includes(q) ||
+        m.email?.toLowerCase().includes(q) ||
+        m.companyName?.toLowerCase().includes(q)
+    );
+  }, [merchants, search]);
+
+  const totalPages = Math.max(1, Math.ceil(filteredMerchants.length / itemsPerPage));
+
+  const paginatedMerchants = useMemo(() => {
+    const start = (currentPage - 1) * itemsPerPage;
+    return filteredMerchants.slice(start, start + itemsPerPage);
+  }, [filteredMerchants, currentPage, itemsPerPage]);
+
+  const handleItemsPerPageChange = (newSize: number) => {
+    setItemsPerPage(newSize);
+    setCurrentPage(1);
+  };
+
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearch(e.target.value);
+    setCurrentPage(1);
+  };
+
+  const getPageNumbers = () => {
+    const pages: (number | '...')[] = [];
+    if (totalPages <= 7) {
+      for (let i = 1; i <= totalPages; i++) pages.push(i);
+    } else {
+      pages.push(1);
+      if (currentPage > 3) pages.push('...');
+      const start = Math.max(2, currentPage - 1);
+      const end = Math.min(totalPages - 1, currentPage + 1);
+      for (let i = start; i <= end; i++) pages.push(i);
+      if (currentPage < totalPages - 2) pages.push('...');
+      pages.push(totalPages);
+    }
+    return pages;
+  };
 
   return (
     <DashboardShell>
@@ -113,11 +155,19 @@ export default function AdminClientsPage() {
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
               <input
                 type="text"
-                placeholder="Search clients..."
+                placeholder="Search by username or email..."
                 value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                className="pl-9 pr-4 py-2 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none w-64"
+                onChange={handleSearchChange}
+                className="pl-9 pr-4 py-2.5 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-400 outline-none w-72 transition-all shadow-sm"
               />
+              {search && (
+                <button
+                  onClick={() => { setSearch(''); setCurrentPage(1); }}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors text-xs font-bold"
+                >
+                  ✕
+                </button>
+              )}
             </div>
           </div>
         </div>
@@ -131,7 +181,8 @@ export default function AdminClientsPage() {
               <table className="w-full text-left text-sm whitespace-nowrap">
                 <thead className="bg-slate-50 border-b border-slate-200 text-slate-500">
                   <tr>
-                    <th className="px-6 py-4 font-semibold">Company / Email</th>
+                    <th className="px-6 py-4 font-semibold">#</th>
+                    <th className="px-6 py-4 font-semibold">Company / Username / Email</th>
                     <th className="px-6 py-4 font-semibold">Status</th>
                     <th className="px-6 py-4 font-semibold">Service Start Date</th>
                     <th className="px-6 py-4 font-semibold">Service End Date</th>
@@ -140,17 +191,26 @@ export default function AdminClientsPage() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100">
-                  {filteredMerchants.length === 0 ? (
+                  {paginatedMerchants.length === 0 ? (
                     <tr>
-                      <td colSpan={6} className="px-6 py-8 text-center text-slate-500">
-                        No clients found.
+                      <td colSpan={7} className="px-6 py-12 text-center">
+                        <div className="flex flex-col items-center gap-2">
+                          <Search className="w-8 h-8 text-slate-300" />
+                          <span className="text-slate-500 font-medium">No clients found{search ? ` for "${search}"` : ''}.</span>
+                        </div>
                       </td>
                     </tr>
                   ) : (
-                    filteredMerchants.map((merchant) => (
+                    paginatedMerchants.map((merchant, idx) => (
                       <tr key={merchant._id} className="hover:bg-slate-50/50 transition-colors">
+                        <td className="px-6 py-4 text-slate-400 text-xs font-medium">
+                          {(currentPage - 1) * itemsPerPage + idx + 1}
+                        </td>
                         <td className="px-6 py-4">
                           <div className="font-bold text-slate-800">{merchant.companyName}</div>
+                          {merchant.username && (
+                            <div className="text-blue-500 text-xs font-medium">@{merchant.username}</div>
+                          )}
                           <div className="text-slate-500 text-xs">{merchant.email}</div>
                         </td>
                         <td className="px-6 py-4">
@@ -189,7 +249,7 @@ export default function AdminClientsPage() {
                             {merchant.maxScreens || 1}
                           </div>
                         </td>
-                        <td className="px-6 py-4 text-right flex items-center justify-end gap-2">
+                        <td className="px-6 py-4 text-right">
                           <button
                             onClick={() => setEditingMerchant(merchant)}
                             className="inline-flex items-center gap-1.5 text-blue-600 hover:text-blue-800 font-semibold px-3 py-1.5 hover:bg-blue-50 rounded-lg transition-colors"
@@ -203,6 +263,76 @@ export default function AdminClientsPage() {
                   )}
                 </tbody>
               </table>
+            </div>
+          )}
+
+          {/* Pagination */}
+          {!loading && filteredMerchants.length > 0 && (
+            <div className="px-6 py-4 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-3">
+              <div className="flex items-center gap-4">
+                <p className="text-sm text-slate-500">
+                  Showing{' '}
+                  <span className="font-semibold text-slate-700">
+                    {(currentPage - 1) * itemsPerPage + 1}–{Math.min(currentPage * itemsPerPage, filteredMerchants.length)}
+                  </span>{' '}
+                  of{' '}
+                  <span className="font-semibold text-slate-700">{filteredMerchants.length}</span>{' '}
+                  client{filteredMerchants.length !== 1 ? 's' : ''}
+                </p>
+                <div className="flex items-center gap-2">
+                  <label className="text-xs font-medium text-slate-500 whitespace-nowrap">Rows per page:</label>
+                  <select
+                    value={itemsPerPage}
+                    onChange={(e) => handleItemsPerPageChange(Number(e.target.value))}
+                    className="text-sm font-semibold text-slate-700 border border-slate-200 rounded-lg px-2.5 py-1.5 bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-400 outline-none cursor-pointer shadow-sm transition-all"
+                  >
+                    {PAGE_SIZE_OPTIONS.map((size) => (
+                      <option key={size} value={size}>
+                        {size}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+              <div className="flex items-center gap-1">
+                <button
+                  onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                  disabled={currentPage === 1}
+                  className="inline-flex items-center gap-1 px-3 py-1.5 text-sm font-medium rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                >
+                  <ChevronLeft className="w-4 h-4" />
+                  Prev
+                </button>
+
+                {getPageNumbers().map((page, i) =>
+                  page === '...' ? (
+                    <span key={`ellipsis-${i}`} className="px-2 py-1.5 text-slate-400 text-sm select-none">
+                      …
+                    </span>
+                  ) : (
+                    <button
+                      key={page}
+                      onClick={() => setCurrentPage(page as number)}
+                      className={`min-w-[36px] px-3 py-1.5 text-sm font-semibold rounded-lg border transition-all ${
+                        currentPage === page
+                          ? 'bg-blue-600 border-blue-600 text-white shadow-sm'
+                          : 'border-slate-200 text-slate-600 hover:bg-slate-50'
+                      }`}
+                    >
+                      {page}
+                    </button>
+                  )
+                )}
+
+                <button
+                  onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                  disabled={currentPage === totalPages}
+                  className="inline-flex items-center gap-1 px-3 py-1.5 text-sm font-medium rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                >
+                  Next
+                  <ChevronRight className="w-4 h-4" />
+                </button>
+              </div>
             </div>
           )}
         </div>
