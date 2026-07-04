@@ -336,7 +336,7 @@ export default function RegisterPage() {
               </div>
 
               {/* Requested Services */}
-              <div>
+              {/* <div>
                 <label className="block text-[13px] font-medium text-[#374151] mb-3">
                   Requested Services <span className="text-red-500">*</span>
                 </label>
@@ -367,7 +367,7 @@ export default function RegisterPage() {
                     </label>
                   ))}
                 </div>
-              </div>
+              </div> */}
 
               {/* Submit */}
               <button

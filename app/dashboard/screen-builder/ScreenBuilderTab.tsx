@@ -385,10 +385,72 @@ export default function ScreenBuilderTab({
   const [saving, setSaving] = useState(false);
   const isFirstLoad = useRef(true);
 
+  const [slugChecking, setSlugChecking] = useState(false);
+  const [slugAvailable, setSlugAvailable] = useState<boolean | null>(null);
+  const [slugMessage, setSlugMessage] = useState<string>('');
+  const [suggestions, setSuggestions] = useState<string[]>([]);
+
   useEffect(() => {
     if (isFirstLoad.current) return;
     localStorage.setItem('aurify-builder-draft', JSON.stringify(draft));
   }, [draft]);
+
+  useEffect(() => {
+    const slug = draft.screenSlug?.trim();
+    if (!slug) {
+      setSlugAvailable(null);
+      setSlugMessage('');
+      setSuggestions([]);
+      return;
+    }
+
+    if (!/^[a-z0-9-]+$/.test(slug)) {
+      setSlugAvailable(false);
+      setSlugMessage('Only lowercase letters, numbers, and hyphens allowed.');
+      setSuggestions([]);
+      return;
+    }
+
+    const RESERVED_SLUGS = [
+      'admin', 'api', 'assets', 'static', 'login', 'logout', 'register',
+      'screen', 'builder', 'dashboard', 'preview', 'settings', 'support',
+      'help', 'favicon.ico', 'robots.txt'
+    ];
+    if (RESERVED_SLUGS.includes(slug)) {
+      setSlugAvailable(false);
+      setSlugMessage('This slug is a reserved system keyword.');
+      setSuggestions([]);
+      return;
+    }
+
+    setSlugChecking(true);
+    const handler = setTimeout(async () => {
+      try {
+        const res = await marketplaceApi.checkScreenSlug(slug, draft.layoutId);
+        setSlugAvailable(res.available);
+        if (!res.available) {
+          setSlugMessage(res.message || 'Already in use.');
+          // Generate suggestions
+          setSuggestions([
+            `${slug}-2`,
+            `${slug}-${new Date().getFullYear()}`,
+            `${slug}-live`,
+            `${slug}-display`
+          ]);
+        } else {
+          setSlugMessage('');
+          setSuggestions([]);
+        }
+      } catch (err) {
+        console.error('Slug check failed:', err);
+        setSlugAvailable(null);
+      } finally {
+        setSlugChecking(false);
+      }
+    }, 400);
+
+    return () => clearTimeout(handler);
+  }, [draft.screenSlug, draft.layoutId]);
 
   const handleImageUpload = (
     e: React.ChangeEvent<HTMLInputElement>,
@@ -657,14 +719,14 @@ export default function ScreenBuilderTab({
             <Monitor className="h-4 w-4" />
             My Screens
           </button>
-          <button type="button" onClick={save} disabled={saving} className="btn-secondary">
+          <button type="button" onClick={save} disabled={saving || slugAvailable === false || slugChecking} className="btn-secondary">
             {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
             Save Draft
           </button>
           <button
             type="button"
             onClick={publish}
-            disabled={!canGoLive || saving}
+            disabled={!canGoLive || saving || slugAvailable === false || slugChecking}
             className="btn-primary"
           >
             <Rocket className="h-4 w-4" />
@@ -745,15 +807,63 @@ export default function ScreenBuilderTab({
               </div>
 
               <div>
-                <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-500">
-                  URL Slug
+                <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-500 flex items-center justify-between">
+                  <span>URL Slug</span>
+                  {slugChecking ? (
+                    <span className="text-[10px] text-blue-500 animate-pulse">Checking availability…</span>
+                  ) : slugAvailable === true ? (
+                    <span className="text-[10px] text-emerald-600 flex items-center gap-1 font-bold">
+                      ✓ Available
+                    </span>
+                  ) : slugAvailable === false ? (
+                    <span className="text-[10px] text-red-500 flex items-center gap-1 font-bold">
+                      ✕ {slugMessage}
+                    </span>
+                  ) : null}
                 </label>
                 <input
-                  className={inputClass}
+                  className={`${inputClass} ${
+                    slugAvailable === true
+                      ? 'border-emerald-300 focus:border-emerald-500 focus:ring-emerald-500/20'
+                      : slugAvailable === false
+                        ? 'border-red-300 focus:border-red-500 focus:ring-red-500/20'
+                        : ''
+                  }`}
                   placeholder="main"
                   value={draft.screenSlug}
-                  onChange={(e) => setDraft({ ...draft, screenSlug: e.target.value })}
+                  onChange={(e) => {
+                    const rawVal = e.target.value;
+                    const cleanVal = rawVal
+                      .toLowerCase()
+                      .replace(/\s+/g, '-')
+                      .replace(/[^a-z0-9-]/g, '');
+                    setDraft({ ...draft, screenSlug: cleanVal });
+                  }}
                 />
+
+                {draft.screenSlug && (
+                  <p className="mt-1.5 text-[11px] text-slate-500 font-mono break-all">
+                    URL: <span className="text-slate-800 font-semibold">screen.aurify.ae/{merchant?.slug || 'merchant'}/{draft.screenSlug}</span>
+                  </p>
+                )}
+
+                {slugAvailable === false && suggestions.length > 0 && (
+                  <div className="mt-2.5">
+                    <p className="text-[10px] text-slate-500 uppercase tracking-wider font-semibold">Suggestions:</p>
+                    <div className="flex flex-wrap gap-1.5 mt-1.5">
+                      {suggestions.map((sug) => (
+                        <button
+                          key={sug}
+                          type="button"
+                          onClick={() => setDraft({ ...draft, screenSlug: sug })}
+                          className="px-2 py-0.5 rounded text-[11px] bg-slate-100 hover:bg-slate-200 text-slate-700 transition-colors font-medium border border-slate-200"
+                        >
+                          {sug}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
 
               {/* Theme Selection */}
@@ -1173,7 +1283,7 @@ export default function ScreenBuilderTab({
                 <button
                   type="button"
                   onClick={publish}
-                  disabled={saving || !canGoLive}
+                  disabled={saving || !canGoLive || slugAvailable === false || slugChecking}
                   className="btn-primary flex-1"
                 >
                   <Rocket className="h-4 w-4" /> Go Live

@@ -19,27 +19,7 @@ export default function DashboardShell({
 }: DashboardShellProps) {
   return (
     <div className="relative h-screen flex overflow-hidden bg-slate-100">
-      {/* <div className="background_image  pointer-events-none fixed inset-0 -z-0 " aria-hidden>
-        <Image
-          src="/images/background.svg"
-          height={1200}
-          width={1200}
-          alt=""
-          priority
-          className="background_image__img"
-        />
-      </div> */}
       <div className="pointer-events-none fixed inset-0 -z-0 bg-gradient-to-bl from-[#05010D]   via-[#220a38] to-[#08021a]" />{' '}
-      {/* <div className="background_image  pointer-events-none fixed inset-0 -z-0 " aria-hidden>
-        <Image
-          src="/images/background.svg"
-          height={1200}
-          width={1200}
-          alt=""
-          priority
-          className="background_image__img"
-        />
-      </div> */}
       <Sidebar />
       <div className="flex-1 transition-all duration-300 p-5 overflow-hidden relative z-1">
         <div className="h-full bg-white rounded-[15px] overflow-hidden flex flex-col shadow-sm">

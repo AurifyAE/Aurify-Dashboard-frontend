@@ -155,6 +155,14 @@ export const marketplaceApi = {
       method: 'DELETE',
     }),
   allLiveScreens: () => request<any[]>('/screens/all'),
+  checkScreenSlug: (slug: string, excludeLayoutId?: string) =>
+    request<{ available: boolean; message?: string }>(
+      `/screens/check-slug?slug=${encodeURIComponent(slug)}${excludeLayoutId ? `&excludeLayoutId=${encodeURIComponent(excludeLayoutId)}` : ''}`
+    ),
+  checkMerchantSlug: (slug: string) =>
+    request<{ available: boolean; message?: string }>(
+      `/merchant/check-slug?slug=${encodeURIComponent(slug)}`
+    ),
 };
 
 export async function fetchLiveScreen(merchantSlug: string, screenSlug = 'main') {

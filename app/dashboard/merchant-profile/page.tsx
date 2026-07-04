@@ -77,16 +77,73 @@ export default function MerchantProfilePage() {
   const [activeTab, setActiveTab] = useState<'company' | 'social' | 'hours' | 'branches'>(
     'company'
   );
+  const [initialSlug, setInitialSlug] = useState('');
+  const [slugChecking, setSlugChecking] = useState(false);
+  const [slugAvailable, setSlugAvailable] = useState<boolean | null>(null);
+  const [slugMessage, setSlugMessage] = useState('');
 
   useEffect(() => {
     marketplaceApi
       .getProfile()
       .then((data) => {
         setMerchant(data.merchant);
+        setInitialSlug(data.merchant.slug || '');
         setProfile(data.profile || {});
       })
       .catch((err) => setError(err.message));
   }, []);
+
+  useEffect(() => {
+    const slug = merchant?.slug?.trim();
+    if (!slug) {
+      setSlugAvailable(null);
+      setSlugMessage('');
+      return;
+    }
+
+    if (slug === initialSlug) {
+      setSlugAvailable(true);
+      setSlugMessage('');
+      return;
+    }
+
+    if (!/^[a-z0-9-]+$/.test(slug)) {
+      setSlugAvailable(false);
+      setSlugMessage('Only lowercase letters, numbers, and hyphens allowed.');
+      return;
+    }
+
+    const RESERVED_SLUGS = [
+      'admin', 'api', 'assets', 'static', 'login', 'logout', 'register',
+      'screen', 'builder', 'dashboard', 'preview', 'settings', 'support',
+      'help', 'favicon.ico', 'robots.txt'
+    ];
+    if (RESERVED_SLUGS.includes(slug)) {
+      setSlugAvailable(false);
+      setSlugMessage('This slug is a reserved system keyword.');
+      return;
+    }
+
+    setSlugChecking(true);
+    const handler = setTimeout(async () => {
+      try {
+        const res = await marketplaceApi.checkMerchantSlug(slug);
+        setSlugAvailable(res.available);
+        if (!res.available) {
+          setSlugMessage(res.message || 'Already in use.');
+        } else {
+          setSlugMessage('');
+        }
+      } catch (err) {
+        console.error('Merchant slug check failed:', err);
+        setSlugAvailable(null);
+      } finally {
+        setSlugChecking(false);
+      }
+    }, 400);
+
+    return () => clearTimeout(handler);
+  }, [merchant?.slug, initialSlug]);
 
   const save = async () => {
     setSaving(true);
@@ -95,6 +152,7 @@ export default function MerchantProfilePage() {
     try {
       const payload = {
         companyName: merchant?.companyName,
+        slug: merchant?.slug,
         logo: merchant?.logo,
         phone: merchant?.phone,
         whatsapp: merchant?.whatsapp,
@@ -171,7 +229,7 @@ export default function MerchantProfilePage() {
             Manage your brand identity, contact info, social links, and branch locations.
           </p>
         </div>
-        <button onClick={save} disabled={saving} className="btn-primary">
+        <button onClick={save} disabled={saving || slugAvailable === false || slugChecking} className="btn-primary">
           {saving ? (
             <Loader2 className="h-4 w-4 animate-spin" />
           ) : saved ? (
@@ -269,6 +327,46 @@ export default function MerchantProfilePage() {
                   setMerchant((m) => (m ? { ...m, companyName: e.target.value } : m))
                 }
               />
+            </div>
+            <div className="sm:col-span-2">
+              <label className={`${labelClass} flex items-center justify-between`}>
+                <span>Merchant URL Namespace</span>
+                {slugChecking ? (
+                  <span className="text-[10px] text-blue-500 animate-pulse">Checking availability…</span>
+                ) : slugAvailable === true ? (
+                  <span className="text-[10px] text-emerald-600 flex items-center gap-1 font-bold">
+                    ✓ Available
+                  </span>
+                ) : slugAvailable === false ? (
+                  <span className="text-[10px] text-red-500 flex items-center gap-1 font-bold">
+                    ✕ {slugMessage}
+                  </span>
+                ) : null}
+              </label>
+              <input
+                className={`${inputClass} ${
+                  slugAvailable === true
+                    ? 'border-emerald-300 focus:border-emerald-500 focus:ring-emerald-500/20'
+                    : slugAvailable === false
+                      ? 'border-red-300 focus:border-red-500 focus:ring-red-500/20'
+                      : ''
+                }`}
+                placeholder="e.g. al-fardan"
+                value={merchant?.slug || ''}
+                onChange={(e) => {
+                  const rawVal = e.target.value;
+                  const cleanVal = rawVal
+                    .toLowerCase()
+                    .replace(/\s+/g, '-')
+                    .replace(/[^a-z0-9-]/g, '');
+                  setMerchant((m) => (m ? { ...m, slug: cleanVal } : m));
+                }}
+              />
+              {merchant?.slug && (
+                <p className="mt-1.5 text-[11px] text-slate-500 font-mono">
+                  Screens URL prefix: <span className="text-slate-800 font-semibold">screen.aurify.ae/{merchant.slug}</span>
+                </p>
+              )}
             </div>
             <div>
               <label className={labelClass}>

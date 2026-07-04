@@ -157,38 +157,38 @@ export default function Sidebar() {
             {user && (
               <>
                 {/* User card */}
-                <div className="relative rounded-xl bg-white/[0.03] border border-white/[0.07] p-3 overflow-hidden">
-                  {/* Ambient top-right glow */}
-                  <div className="pointer-events-none absolute top-0 right-0 w-20 h-20 bg-[radial-gradient(circle_at_top_right,rgba(251,191,36,0.06),transparent_70%)]" />
+                <div className="relative overflow-hidden rounded-2xl border border-white/[0.06] bg-white/[0.02] p-3.5 backdrop-blur-md">
+                  {/* Very subtle gold gradient top highlight line */}
+                  <div className="absolute left-0 top-0 h-[1px] w-full bg-gradient-to-r from-transparent via-[#E5C37A]/30 to-transparent" />
 
-                  {/* Avatar row */}
-                  <div className="flex items-center gap-2.5 mb-3">
+                  <div className="flex items-center gap-3">
+                    {/* Initials Avatar */}
                     <div className="relative flex-shrink-0">
-                      <div className="w-9 h-9 rounded-full bg-gradient-to-br from-slate-800 to-slate-950 border border-amber-400/35 flex items-center justify-center">
-                        <span className="text-[12px] font-semibold text-amber-400 tracking-wide">
+                      <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-[#E5C37A]/25 bg-gradient-to-br from-[#1C1C1E] to-[#0E0E10] shadow-sm">
+                        <span className="text-[12px] font-semibold tracking-wider text-[#E5C37A]">
                           {getInitials(user.companyName)}
                         </span>
                       </div>
-                      <span className="absolute bottom-px right-px w-1.5 h-1.5 rounded-full bg-emerald-400 ring-[1.5px] ring-[#0f1117]" />
+                      <span className="absolute -bottom-0.5 -right-0.5 h-2 w-2 rounded-full bg-emerald-500 ring-2 ring-[#0B0B0D]" />
                     </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-[13px] font-medium text-white/90 truncate leading-tight">
+
+                    {/* User Info */}
+                    <div className="min-w-0 flex-1">
+                      <h3 className="truncate text-xs font-semibold tracking-wide text-white/95">
                         {user.companyName}
-                      </p>
-                      <p className="text-[11px] font-mono text-white/35 truncate mt-0.5">
-                        {user.email}
-                      </p>
+                      </h3>
+                      <p className="truncate text-[10px] text-white/40 mt-0.5 leading-none">{user.email}</p>
                     </div>
                   </div>
 
-                  {/* Divider */}
-                  <div className="h-px bg-white/[0.06] mb-3" />
+                  {/* Thin Divider */}
+                  <div className="my-2.5 h-px bg-white/[0.05]" />
 
-                  {/* Role row */}
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-1.5">
-                      <span className="w-1 h-1 rounded-full bg-amber-400" />
-                      <span className="text-[11px] text-white/40 tracking-widest uppercase">
+                  {/* Compact Meta Info */}
+                  <div className="flex items-center justify-between text-[10px] text-white/40">
+                    <div className="flex items-center gap-1">
+                      <span>Role:</span>
+                      <span className="font-medium text-white/70">
                         {user.role === 'super_admin'
                           ? 'Super Admin'
                           : user.role === 'admin'
@@ -196,13 +196,12 @@ export default function Sidebar() {
                             : 'User'}
                       </span>
                     </div>
+
                     {user.role === 'super_admin' && (
-                      <div className="flex items-center gap-1 bg-amber-400/[0.08] border border-amber-400/20 rounded-full px-2 py-0.5">
-                        <Crown className="w-2.5 h-2.5 text-amber-400" />
-                        <span className="text-[10px] font-medium text-amber-400 tracking-wide">
-                          Premium
-                        </span>
-                      </div>
+                      <span className="flex items-center gap-1 text-[9px] font-semibold uppercase tracking-wider text-[#E5C37A] bg-[#C9A14A]/10 px-1.5 py-0.5 rounded-md border border-[#C9A14A]/15">
+                        <Crown className="h-2.5 w-2.5 text-[#E5C37A]" />
+                        ADMIN
+                      </span>
                     )}
                   </div>
                 </div>
