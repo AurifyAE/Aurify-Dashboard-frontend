@@ -5,7 +5,7 @@ import io from 'socket.io-client';
 
 // The backend URL where our tracking socket.io is running
 const BACKEND_URL =
-  process.env.NEXT_PUBLIC_API_URL?.replace('/api/v1', '') || 'http://localhost:5000';
+  process.env.NEXT_PUBLIC_BACKEND_URL || 'https://screen.aurify.ae';
 
 interface DeviceTrackerProps {
   merchantId: string;

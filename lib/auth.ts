@@ -59,7 +59,7 @@ export const decodeToken = (token: string): AuthUser | null => {
   }
 };
 
-const BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://127.0.0.1:5001';
+const BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL || 'https://screen.aurify.ae';
 
 export const apiLogin = async (email: string, password: string): Promise<AuthResponse> => {
   const res = await fetch(`${BASE_URL}/api/auth/login`, {

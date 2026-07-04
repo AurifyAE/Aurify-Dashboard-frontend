@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const baseURL = (process.env.NEXT_PUBLIC_BACKEND_URL || 'http://127.0.0.1:5001') + '/api';
+const baseURL = (process.env.NEXT_PUBLIC_BACKEND_URL || 'https://screen.aurify.ae') + '/api';
 
 const axiosInstance = axios.create({
   baseURL,
