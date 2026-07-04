@@ -35,7 +35,7 @@ function LoginContent() {
       // Clear the query param so the popup doesn't fire again on re-render
       router.replace('/login');
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // ── Client-side validation ─────────────────────────────────────────────────

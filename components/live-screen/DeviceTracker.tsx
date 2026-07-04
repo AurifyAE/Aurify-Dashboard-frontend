@@ -4,8 +4,7 @@ import { useEffect, useState } from 'react';
 import io from 'socket.io-client';
 
 // The backend URL where our tracking socket.io is running
-const BACKEND_URL =
-  process.env.NEXT_PUBLIC_BACKEND_URL  ;
+const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
 
 interface DeviceTrackerProps {
   merchantId: string;
