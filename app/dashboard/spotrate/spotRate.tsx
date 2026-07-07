@@ -1096,9 +1096,7 @@ const SpotRate: React.FC = () => {
               calculations.
             </p>
           </div>
-          <div className="flex-shrink-0">
-            <CurrencySelector onCurrencyChange={handleCurrencyChange} />
-          </div>
+    
         </div>
       </div>
 
