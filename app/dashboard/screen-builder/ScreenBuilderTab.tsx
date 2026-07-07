@@ -931,17 +931,17 @@ export default function ScreenBuilderTab({
                   }}
                 />
 
-                {draft.screenSlug && (
+                
                   <div className="mt-2 space-y-1.5">
                     <p className="text-[11px] text-slate-500 font-mono break-all">
-                      URL: <span className="text-slate-800 font-semibold">screen.aurify.ae/{merchant?.slug || 'merchant'}/{draft.screenSlug}</span>
+                      URL: <span className="text-slate-800 font-semibold">screen.aurify.ae/{draft.screenSlug ? `${merchant?.slug || 'merchant'}/${draft.screenSlug}` : "[Screen URL]"}</span>
                     </p>
                     <p className="text-[10px] text-blue-600 bg-blue-50/50 border border-blue-100/30 rounded-lg px-2.5 py-1.5 flex items-start gap-1.5 leading-relaxed">
                       <span className="font-bold flex-shrink-0">Tip:</span>
                       <span>You can customize your URL prefix by changing the brand namespace inside the Company Profile page.</span>
                     </p>
                   </div>
-                )}
+                
 
                 {slugAvailable === false && suggestions.length > 0 && (
                   <div className="mt-2.5">
