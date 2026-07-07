@@ -4,7 +4,7 @@ import React, { useEffect, useState, useMemo } from 'react';
 import DashboardShell from '@/components/dashboard/DashboardShell';
 import { adminApi, AdminMerchant } from '@/lib/api/admin';
 import Swal from 'sweetalert2';
-import { Users, Search, Edit2, Calendar, Monitor, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Users, Search, Edit2, Calendar, Monitor, Tv, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Select, MenuItem } from '@mui/material';
 
 export default function AdminClientsPage() {
@@ -187,13 +187,14 @@ export default function AdminClientsPage() {
                     <th className="px-6 py-4 font-semibold">Service Start Date</th>
                     <th className="px-6 py-4 font-semibold">Service End Date</th>
                     <th className="px-6 py-4 font-semibold">Screens Limit</th>
+                    <th className="px-6 py-4 font-semibold">Devices Limit</th>
                     <th className="px-6 py-4 font-semibold text-right">Actions</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100">
                   {paginatedMerchants.length === 0 ? (
                     <tr>
-                      <td colSpan={7} className="px-6 py-12 text-center">
+                      <td colSpan={8} className="px-6 py-12 text-center">
                         <div className="flex flex-col items-center gap-2">
                           <Search className="w-8 h-8 text-slate-300" />
                           <span className="text-slate-500 font-medium">No clients found{search ? ` for "${search}"` : ''}.</span>
@@ -247,6 +248,12 @@ export default function AdminClientsPage() {
                           <div className="flex items-center gap-1.5 text-slate-600 font-medium">
                             <Monitor className="w-3.5 h-3.5" />
                             {merchant.maxScreens || 1}
+                          </div>
+                        </td>
+                        <td className="px-6 py-4">
+                          <div className="flex items-center gap-1.5 text-slate-600 font-medium">
+                            <Tv className="w-3.5 h-3.5" />
+                            {merchant.maxDevices || 1}
                           </div>
                         </td>
                         <td className="px-6 py-4 text-right">
@@ -481,7 +488,7 @@ export default function AdminClientsPage() {
                         />
                       </div>
                     </div>
-                    <div className="grid grid-cols-1 gap-4">
+                    <div className="grid grid-cols-2 gap-4">
                       <div>
                         <label className="block text-sm font-semibold text-slate-700 mb-1.5">
                           Max Screens Allowed
@@ -493,7 +500,24 @@ export default function AdminClientsPage() {
                           onChange={(e) =>
                             setEditingMerchant({
                               ...editingMerchant,
-                              maxScreens: parseInt(e.target.value),
+                              maxScreens: parseInt(e.target.value) || 1,
+                            })
+                          }
+                          className="w-full rounded-xl border border-slate-200 px-4 py-2.5 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-semibold text-slate-700 mb-1.5">
+                          Max Devices Allowed
+                        </label>
+                        <input
+                          type="number"
+                          min="1"
+                          value={editingMerchant.maxDevices || 1}
+                          onChange={(e) =>
+                            setEditingMerchant({
+                              ...editingMerchant,
+                              maxDevices: parseInt(e.target.value) || 1,
                             })
                           }
                           className="w-full rounded-xl border border-slate-200 px-4 py-2.5 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none"

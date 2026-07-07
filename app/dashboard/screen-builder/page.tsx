@@ -10,6 +10,7 @@ import OthersScreensTab from './OthersScreensTab';
 import NewsManagementTab from './NewsManagementTab';
 import { Monitor, Tv, Palette, Settings2, Tv2, Newspaper } from 'lucide-react';
 import { useSearchParams, useRouter } from 'next/navigation';
+import { marketplaceApi, type Merchant } from '@/lib/api/marketplace';
 
 type TabId = 'my-screens' | 'builder' | 'themes' | 'profile' | 'others' | 'news';
 
@@ -21,6 +22,14 @@ function ScreenConsoleContent() {
   const [activeTab, setActiveTab] = useState<TabId>('my-screens');
   // Loaded layout ID state for ScreenBuilderTab
   const [editingLayoutId, setEditingLayoutId] = useState<string | undefined>(undefined);
+  const [merchant, setMerchant] = useState<Merchant | null>(null);
+
+  useEffect(() => {
+    marketplaceApi
+      .myMerchant()
+      .then((m) => setMerchant(m))
+      .catch((err) => console.error('Failed to fetch merchant details:', err));
+  }, []);
 
   // Sync tab from query parameter if provided (e.g. /dashboard/screen-builder?tab=themes)
   useEffect(() => {
@@ -88,6 +97,21 @@ function ScreenConsoleContent() {
                 brandings.
               </p>
             </div>
+            {merchant && (
+              <div className="flex flex-col gap-1 items-start md:items-end text-xs font-semibold">
+                <span className="text-[10px] uppercase tracking-wider text-slate-400 font-bold">Plan Limits</span>
+                <div className="flex flex-wrap gap-2">
+                  <div className="flex items-center gap-2 rounded-xl bg-blue-50/70 border border-blue-100/50 text-blue-700 px-3 py-1.5 shadow-sm">
+                    <Monitor className="w-3.5 h-3.5 text-blue-500" />
+                    <span>Max Screens: {merchant.maxScreens || 1}</span>
+                  </div>
+                  <div className="flex items-center gap-2 rounded-xl bg-indigo-50/70 border border-indigo-100/50 text-indigo-700 px-3 py-1.5 shadow-sm">
+                    <Tv className="w-3.5 h-3.5 text-indigo-500" />
+                    <span>Max Devices: {merchant.maxDevices || 1}</span>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         </div>
 

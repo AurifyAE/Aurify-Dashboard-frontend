@@ -20,6 +20,7 @@ export interface Merchant {
   branding: Record<string, string>;
   visibility: Record<string, boolean>;
   maxScreens?: number;
+  maxDevices?: number;
   serviceEndDate?: string;
 }
 
