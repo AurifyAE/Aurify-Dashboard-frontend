@@ -34,6 +34,7 @@ import {
   X,
   XCircle,
   AlertTriangle,
+  Plus,
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import Loader from '@/components/loader/loader';
@@ -555,6 +556,7 @@ export default function ScreenBuilderTab({
             ...defaultDraft,
             themeId: currentThemeId,
           });
+          setStep(1);
         }
       }
       isFirstLoad.current = false;
@@ -752,7 +754,6 @@ export default function ScreenBuilderTab({
       // Always save the latest draft state before publishing
       const saved = await marketplaceApi.saveLayout(buildPayload(draft.themeId));
       let layoutId = saved.layoutId;
-      setEditingLayoutId(layoutId);
 
       const result = await marketplaceApi.publishLayout(layoutId, {
         assignedDevices: draft.assignedDevices
@@ -760,7 +761,15 @@ export default function ScreenBuilderTab({
           .map((d) => d.trim())
           .filter(Boolean),
       });
-      setDraft((prev) => ({ ...prev, layoutId }));
+
+      // Clear local storage and reset draft state since screen is now successfully live
+      localStorage.removeItem('aurify-builder-draft');
+      setDraft(defaultDraft);
+      setStep(1);
+      if (setEditingLayoutId) {
+        setEditingLayoutId(undefined);
+      }
+
       showMessage(`🎉 Screen is live: ${result.liveUrl}`, 'success');
       await load();
       if (onSaveSuccess) onSaveSuccess();
@@ -809,6 +818,17 @@ export default function ScreenBuilderTab({
             <Monitor className="h-4 w-4" />
             My Screens
           </button>
+          {draft.layoutId && (
+            <button
+              type="button"
+              onClick={resetForm}
+              className="px-3.5 py-2.5 rounded-xl border border-slate-200 bg-white text-xs font-semibold text-blue-600 hover:bg-blue-50/50 hover:border-blue-300 transition-all flex items-center gap-1.5 shadow-sm"
+              title="Reset Builder and Create New Screen"
+            >
+              <Plus className="h-3.5 w-3.5" />
+              New Screen
+            </button>
+          )}
           <button type="button" onClick={save} disabled={saving || slugAvailable === false || slugChecking} className="btn-secondary">
             {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
             Save Draft

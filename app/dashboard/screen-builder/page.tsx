@@ -46,6 +46,7 @@ function ScreenConsoleContent() {
     setActiveTab(tab);
     const params = new URLSearchParams(searchParams.toString());
     params.set('tab', tab);
+    params.delete('step');
     router.push(`?${params.toString()}`);
   };
 
@@ -125,7 +126,10 @@ function ScreenConsoleContent() {
               editingLayoutId={editingLayoutId}
               setEditingLayoutId={setEditingLayoutId}
               setActiveTab={(tab) => handleTabChange(tab as TabId)}
-              onSaveSuccess={() => handleTabChange('my-screens')}
+              onSaveSuccess={() => {
+                setEditingLayoutId(undefined);
+                handleTabChange('my-screens');
+              }}
             />
           )}
 
