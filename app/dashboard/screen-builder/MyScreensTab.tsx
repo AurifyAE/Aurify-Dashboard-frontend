@@ -168,6 +168,11 @@ export default function MyScreensTab({ onEditLayout, onCreateNew }: MyScreensTab
                       : 'bg-gradient-to-br from-slate-700 to-slate-900'
                   }`}
                 >
+                  <img
+                    src={'/images/aurify-logo1.svg'}
+                    alt="Background"
+                    className="object-cover h-full object-contain absolute top-0 right-0 opacity-5   brightness-0 grayscale-100  "
+                  />
                   <div className="flex justify-between items-start">
                     <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-white/10 backdrop-blur-md shadow-sm border border-white/20">
                       <Monitor className="h-5 w-5 text-white" />
