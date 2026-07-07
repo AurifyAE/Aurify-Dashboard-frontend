@@ -11,6 +11,7 @@ import MerchantLogo from '../shared/MerchantLogo';
 import theme3Bg from '../images/theme3-bg.png';
 import io from 'socket.io-client';
 import { API_URL, API_KEY, SOCKET_SECRET } from '@/lib/env';
+import { getDefaultColumns } from '@/lib/layoutUtils';
 
 export default function Theme3Layout({
   data,
@@ -22,6 +23,8 @@ export default function Theme3Layout({
   const { merchant, theme, layout, commodities, news } = data || {};
   const widgets = layout?.widgets || ['Spot Rates', 'Commodity Table', 'News', 'Clock'];
   const colors = layout?.styles?.colorOverride || layout?.colorOverride || {};
+  const showLogo = layout?.styles?.showLogo ?? true;
+  const showName = layout?.styles?.showName ?? true;
 
   const [marketData, setMarketData] = useState<Record<string, any>>({});
   const [serverURL, setServerURL] = useState<string | null>(null);
@@ -124,6 +127,55 @@ export default function Theme3Layout({
 
   const displayCommodities = commodities ?? [];
 
+  const leftOrder = layout?.styles?.leftColumnOrder || getDefaultColumns('theme3').left;
+  const rightOrder = layout?.styles?.rightColumnOrder || getDefaultColumns('theme3').right;
+
+  const renderWidget = (widgetId: string) => {
+    if (widgetId === 'logo') {
+      return (showLogo || showName) ? (
+        <MerchantLogo key="logo" theme="theme3" merchant={merchant} layout={layout} colors={colors} />
+      ) : null;
+    }
+    if (widgetId === 'commodityTable') {
+      return widgets.includes('Commodity Table') ? (
+        <CommodityTable
+          key="commodityTable"
+          theme="theme3"
+          items={displayCommodities}
+          goldData={goldData}
+          silverData={silverData}
+          colors={colors}
+        />
+      ) : null;
+    }
+    if (widgetId === 'systemClock') {
+      return widgets.includes('Date') ? (
+        <SystemClock key="systemClock" theme="theme3" colors={colors} />
+      ) : null;
+    }
+    if (widgetId === 'worldClock') {
+      return widgets.includes('Clock') ? (
+        <WorldClockHorizontal
+          key="worldClock"
+          theme="theme3"
+          colors={colors}
+          selectedClocks={layout?.styles?.selectedClocks}
+        />
+      ) : null;
+    }
+    if (widgetId === 'spotRates') {
+      return widgets.includes('Spot Rates') ? (
+        <SpotRate key="spotRates" goldData={goldData} silverData={silverData} colors={colors} />
+      ) : null;
+    }
+    if (widgetId === 'footer') {
+      return widgets.includes('Footer') ? (
+        <PoweredByAurify key="footer" colors={colors} defaultColor="#FFC983" />
+      ) : null;
+    }
+    return null;
+  };
+
   return (
     <Box
       sx={{
@@ -186,18 +238,7 @@ export default function Theme3Layout({
       >
         {/* Side: SpotRate & Date Time */}
         <Grid size={{ xs: 12, md: 6 }} sx={{ padding: '1vw', gap: '1vw', display: 'grid' }}>
-          {widgets.includes('Date') && <SystemClock theme="theme3" colors={colors} />}
-          {widgets.includes('Clock') && (
-            <WorldClockHorizontal
-              theme="theme3"
-              colors={colors}
-              selectedClocks={layout?.styles?.selectedClocks}
-            />
-          )}
-          {widgets.includes('Spot Rates') && (
-            <SpotRate goldData={goldData} silverData={silverData} colors={colors} />
-          )}
-          {widgets.includes('Footer') && <PoweredByAurify colors={colors} defaultColor="#FFC983" />}
+          {leftOrder.map(renderWidget)}
         </Grid>
         <Grid
           size={{ xs: 12, md: 6 }}
@@ -210,16 +251,7 @@ export default function Theme3Layout({
             gap: '1vw',
           }}
         >
-          <MerchantLogo theme="theme3" merchant={merchant} layout={layout} colors={colors} />
-          {widgets.includes('Commodity Table') && (
-            <CommodityTable
-              theme="theme3"
-              items={displayCommodities}
-              goldData={goldData}
-              silverData={silverData}
-              colors={colors}
-            />
-          )}
+          {rightOrder.map(renderWidget)}
         </Grid>
 
         {widgets.includes('News') && (

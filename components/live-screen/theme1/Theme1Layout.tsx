@@ -12,6 +12,7 @@ import PoweredByAurify from '../shared/PoweredByAurify';
 import MerchantLogo from '../shared/MerchantLogo';
 import theme1Bg from '../images/theme1-bg.png';
 import { API_URL, API_KEY, SOCKET_SECRET } from '@/lib/env';
+import { getDefaultColumns } from '@/lib/layoutUtils';
 
 export default function Theme1Layout({
   data,
@@ -144,6 +145,55 @@ export default function Theme1Layout({
 
   const displayCommodities = commodities ?? [];
 
+  const leftOrder = layout?.styles?.leftColumnOrder || getDefaultColumns('theme1').left;
+  const rightOrder = layout?.styles?.rightColumnOrder || getDefaultColumns('theme1').right;
+
+  const renderWidget = (widgetId: string) => {
+    if (widgetId === 'logo') {
+      return (showLogo || showName) ? (
+        <MerchantLogo key="logo" theme="theme1" merchant={merchant} layout={layout} colors={colors} />
+      ) : null;
+    }
+    if (widgetId === 'commodityTable') {
+      return widgets.includes('Commodity Table') ? (
+        <CommodityTable
+          key="commodityTable"
+          theme="theme1"
+          items={displayCommodities}
+          goldData={goldData}
+          silverData={silverData}
+          colors={colors}
+        />
+      ) : null;
+    }
+    if (widgetId === 'systemClock') {
+      return widgets.includes('Date') ? (
+        <SystemClock key="systemClock" theme="theme1" colors={colors} />
+      ) : null;
+    }
+    if (widgetId === 'worldClock') {
+      return widgets.includes('Clock') ? (
+        <WorldClockHorizontal
+          key="worldClock"
+          theme="theme1"
+          colors={colors}
+          selectedClocks={layout?.styles?.selectedClocks}
+        />
+      ) : null;
+    }
+    if (widgetId === 'spotRates') {
+      return widgets.includes('Spot Rates') ? (
+        <LiveSpotRate key="spotRates" goldData={goldData} silverData={silverData} colors={colors} />
+      ) : null;
+    }
+    if (widgetId === 'footer') {
+      return widgets.includes('Footer') ? (
+        <PoweredByAurify key="footer" colors={colors} defaultColor="#000000" />
+      ) : null;
+    }
+    return null;
+  };
+
   return (
     <Box
       sx={{
@@ -211,34 +261,11 @@ export default function Theme1Layout({
             gap: '1vw',
           }}
         >
-          <MerchantLogo theme="theme1" merchant={merchant} layout={layout} colors={colors} />
-
-          {widgets.includes('Commodity Table') && (
-            <CommodityTable
-              theme="theme1"
-              items={displayCommodities}
-              goldData={goldData}
-              silverData={silverData}
-              colors={colors}
-            />
-          )}
+          {leftOrder.map(renderWidget)}
         </Grid>
 
         <Grid size={{ xs: 12, md: 6 }} sx={{ gap: '1vw', display: 'grid' }}>
-          {widgets.includes('Date') && <SystemClock theme="theme1" colors={colors} />}
-
-          {widgets.includes('Clock') && (
-            <WorldClockHorizontal
-              theme="theme1"
-              colors={colors}
-              selectedClocks={layout?.styles?.selectedClocks}
-            />
-          )}
-
-          {widgets.includes('Spot Rates') && (
-            <LiveSpotRate goldData={goldData} silverData={silverData} colors={colors} />
-          )}
-          {widgets.includes('Footer') && <PoweredByAurify colors={colors} defaultColor="#000000" />}
+          {rightOrder.map(renderWidget)}
         </Grid>
 
         {widgets.includes('News') && (

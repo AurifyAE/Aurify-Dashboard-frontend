@@ -11,6 +11,7 @@ import MerchantLogo from '../shared/MerchantLogo';
 import theme2Bg from '../images/theme2-bg.png';
 import io from 'socket.io-client';
 import { API_URL, API_KEY, SOCKET_SECRET } from '@/lib/env';
+import { getDefaultColumns } from '@/lib/layoutUtils';
 
 export default function Theme2Layout({
   data,
@@ -136,6 +137,55 @@ export default function Theme2Layout({
 
   const displayCommodities = commodities ?? [];
 
+  const leftOrder = layout?.styles?.leftColumnOrder || getDefaultColumns('theme2').left;
+  const rightOrder = layout?.styles?.rightColumnOrder || getDefaultColumns('theme2').right;
+
+  const renderWidget = (widgetId: string) => {
+    if (widgetId === 'logo') {
+      return (showLogo || showName) ? (
+        <MerchantLogo key="logo" theme="theme2" merchant={merchant} layout={layout} colors={colors} />
+      ) : null;
+    }
+    if (widgetId === 'commodityTable') {
+      return widgets.includes('Commodity Table') ? (
+        <CommodityTable
+          key="commodityTable"
+          theme="theme2"
+          items={displayCommodities}
+          goldData={goldData}
+          silverData={silverData}
+          colors={colors}
+        />
+      ) : null;
+    }
+    if (widgetId === 'systemClock') {
+      return widgets.includes('Date') ? (
+        <SystemClock key="systemClock" theme="theme2" colors={colors} />
+      ) : null;
+    }
+    if (widgetId === 'worldClock') {
+      return widgets.includes('Clock') ? (
+        <WorldClockHorizontal
+          key="worldClock"
+          theme="theme2"
+          colors={colors}
+          selectedClocks={layout?.styles?.selectedClocks}
+        />
+      ) : null;
+    }
+    if (widgetId === 'spotRates') {
+      return widgets.includes('Spot Rates') ? (
+        <SpotRate key="spotRates" goldData={goldData} silverData={silverData} colors={colors} />
+      ) : null;
+    }
+    if (widgetId === 'footer') {
+      return widgets.includes('Footer') ? (
+        <PoweredByAurify key="footer" colors={colors} fontSize={{ xs: '15px', md: '1vw' }} mt="auto" />
+      ) : null;
+    }
+    return null;
+  };
+
   return (
     <Box
       sx={{
@@ -203,35 +253,11 @@ export default function Theme2Layout({
             gap: '1vw',
           }}
         >
-          {widgets.includes('Date') && <SystemClock theme="theme2" colors={colors} />}
-
-          {widgets.includes('Commodity Table') && (
-            <CommodityTable
-              theme="theme2"
-              items={displayCommodities}
-              goldData={goldData}
-              silverData={silverData}
-              colors={colors}
-            />
-          )}
-          {widgets.includes('Clock') && (
-            <WorldClockHorizontal
-              theme="theme2"
-              colors={colors}
-              selectedClocks={layout?.styles?.selectedClocks}
-            />
-          )}
+          {leftOrder.map(renderWidget)}
         </Grid>
 
         <Grid size={{ xs: 12, md: 6 }} sx={{ display: 'grid', padding: '1vw', gap: '1vw' }}>
-          <MerchantLogo theme="theme2" merchant={merchant} layout={layout} colors={colors} />
-
-          {widgets.includes('Spot Rates') && (
-            <SpotRate goldData={goldData} silverData={silverData} colors={colors} />
-          )}
-          {widgets.includes('Footer') && (
-            <PoweredByAurify colors={colors} fontSize={{ xs: '15px', md: '1vw' }} mt="auto" />
-          )}
+          {rightOrder.map(renderWidget)}
         </Grid>
 
         {widgets.includes('News') && (
