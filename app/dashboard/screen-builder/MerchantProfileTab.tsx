@@ -676,15 +676,7 @@ export default function MerchantProfileTab() {
                       ))}
                     </Select>
                   </div>
-                  <div>
-                    <label className={labelClass}>Logo URL</label>
-                    <input
-                      className={inputClass}
-                      placeholder="https://..."
-                      value={form.companyLogo}
-                      onChange={(e) => setForm({ ...form, companyLogo: e.target.value })}
-                    />
-                  </div>
+
                   <div>
                     <label className={labelClass}>Country</label>
                     <input

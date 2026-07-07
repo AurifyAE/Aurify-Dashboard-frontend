@@ -114,9 +114,22 @@ export default function MerchantProfilePage() {
     }
 
     const RESERVED_SLUGS = [
-      'admin', 'api', 'assets', 'static', 'login', 'logout', 'register',
-      'screen', 'builder', 'dashboard', 'preview', 'settings', 'support',
-      'help', 'favicon.ico', 'robots.txt'
+      'admin',
+      'api',
+      'assets',
+      'static',
+      'login',
+      'logout',
+      'register',
+      'screen',
+      'builder',
+      'dashboard',
+      'preview',
+      'settings',
+      'support',
+      'help',
+      'favicon.ico',
+      'robots.txt',
     ];
     if (RESERVED_SLUGS.includes(slug)) {
       setSlugAvailable(false);
@@ -229,16 +242,6 @@ export default function MerchantProfilePage() {
             Manage your brand identity, contact info, social links, and branch locations.
           </p>
         </div>
-        <button onClick={save} disabled={saving || slugAvailable === false || slugChecking} className="btn-primary">
-          {saving ? (
-            <Loader2 className="h-4 w-4 animate-spin" />
-          ) : saved ? (
-            <Check className="h-4 w-4" />
-          ) : (
-            <Save className="h-4 w-4" />
-          )}
-          {saving ? 'Saving...' : saved ? 'Saved!' : 'Save Profile'}
-        </button>
       </div>
 
       {error && (
@@ -249,6 +252,11 @@ export default function MerchantProfilePage() {
 
       {/* Profile Hero Banner */}
       <div className="mb-6 relative overflow-hidden rounded-2xl bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 h-40">
+        <img
+          src="/images/profile-bg.svg"
+          alt="Banner"
+          className="absolute top-0 right-20 h-full w-fit object-contain opacity-40"
+        />
         {profile.banner && (
           <img
             src={profile.banner}
@@ -332,7 +340,9 @@ export default function MerchantProfilePage() {
               <label className={`${labelClass} flex items-center justify-between`}>
                 <span>Merchant URL Namespace</span>
                 {slugChecking ? (
-                  <span className="text-[10px] text-blue-500 animate-pulse">Checking availability…</span>
+                  <span className="text-[10px] text-blue-500 animate-pulse">
+                    Checking availability…
+                  </span>
                 ) : slugAvailable === true ? (
                   <span className="text-[10px] text-emerald-600 flex items-center gap-1 font-bold">
                     ✓ Available
@@ -364,34 +374,14 @@ export default function MerchantProfilePage() {
               />
               {merchant?.slug && (
                 <p className="mt-1.5 text-[11px] text-slate-500 font-mono">
-                  Screens URL prefix: <span className="text-slate-800 font-semibold">screen.aurify.ae/{merchant.slug}</span>
+                  Screens URL prefix:{' '}
+                  <span className="text-slate-800 font-semibold">
+                    screen.aurify.ae/{merchant.slug}
+                  </span>
                 </p>
               )}
             </div>
-            <div>
-              <label className={labelClass}>
-                <Camera className="inline h-3 w-3 mr-1" />
-                Logo URL
-              </label>
-              <input
-                className={inputClass}
-                placeholder="https://..."
-                value={merchant?.logo || ''}
-                onChange={(e) => setMerchant((m) => (m ? { ...m, logo: e.target.value } : m))}
-              />
-            </div>
-            <div>
-              <label className={labelClass}>
-                <ImageIcon className="inline h-3 w-3 mr-1" />
-                Banner URL
-              </label>
-              <input
-                className={inputClass}
-                placeholder="https://..."
-                value={profile.banner || ''}
-                onChange={(e) => setProfile({ ...profile, banner: e.target.value })}
-              />
-            </div>
+
             <div className="sm:col-span-2">
               <label className={labelClass}>About Us</label>
               <textarea
@@ -609,6 +599,24 @@ export default function MerchantProfilePage() {
           )}
         </div>
       )}
+
+      {/* Save Button at Bottom */}
+      <div className="mt-6 flex justify-end">
+        <button
+          onClick={save}
+          disabled={saving || slugAvailable === false || slugChecking}
+          className="btn-primary px-8 py-3 rounded-xl shadow-md transition-all hover:shadow-lg active:scale-[0.98] cursor-pointer flex items-center gap-2"
+        >
+          {saving ? (
+            <Loader2 className="h-4 w-4 animate-spin" />
+          ) : saved ? (
+            <Check className="h-4 w-4" />
+          ) : (
+            <Save className="h-4 w-4" />
+          )}
+          <span>{saving ? 'Saving...' : saved ? 'Saved!' : 'Save Profile'}</span>
+        </button>
+      </div>
     </DashboardShell>
   );
 }
