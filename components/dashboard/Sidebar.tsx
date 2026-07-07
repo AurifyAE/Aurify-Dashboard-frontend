@@ -177,7 +177,9 @@ export default function Sidebar() {
                       <h3 className="truncate text-xs font-semibold tracking-wide text-white/95">
                         {user.companyName}
                       </h3>
-                      <p className="truncate text-[10px] text-white/40 mt-0.5 leading-none">{user.email}</p>
+                      <p className="truncate text-[10px] text-white/40 mt-0.5 leading-none">
+                        {user.email}
+                      </p>
                     </div>
                   </div>
 

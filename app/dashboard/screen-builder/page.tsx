@@ -100,7 +100,9 @@ function ScreenConsoleContent() {
             </div>
             {merchant && (
               <div className="flex flex-col gap-1 items-start md:items-end text-xs font-semibold">
-                <span className="text-[10px] uppercase tracking-wider text-slate-400 font-bold">Plan Limits</span>
+                <span className="text-[10px] uppercase tracking-wider text-slate-400 font-bold">
+                  Plan Limits
+                </span>
                 <div className="flex flex-wrap gap-2">
                   <div className="flex items-center gap-2 rounded-xl bg-blue-50/70 border border-blue-100/50 text-blue-700 px-3 py-1.5 shadow-sm">
                     <Monitor className="w-3.5 h-3.5 text-blue-500" />

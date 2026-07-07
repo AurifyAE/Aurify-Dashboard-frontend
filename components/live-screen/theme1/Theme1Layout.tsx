@@ -150,8 +150,14 @@ export default function Theme1Layout({
 
   const renderWidget = (widgetId: string) => {
     if (widgetId === 'logo') {
-      return (showLogo || showName) ? (
-        <MerchantLogo key="logo" theme="theme1" merchant={merchant} layout={layout} colors={colors} />
+      return showLogo || showName ? (
+        <MerchantLogo
+          key="logo"
+          theme="theme1"
+          merchant={merchant}
+          layout={layout}
+          colors={colors}
+        />
       ) : null;
     }
     if (widgetId === 'commodityTable') {

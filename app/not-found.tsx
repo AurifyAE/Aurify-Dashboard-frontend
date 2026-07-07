@@ -38,7 +38,8 @@ export default function NotFound() {
               Page Not Found
             </h1>
             <p className="text-slate-400 text-sm md:text-base leading-relaxed max-w-md mx-auto">
-              The showroom TV screen, merchant profile, or requested page could not be found. Please check the URL or return to safety.
+              The showroom TV screen, merchant profile, or requested page could not be found. Please
+              check the URL or return to safety.
             </p>
           </div>
 
@@ -51,7 +52,7 @@ export default function NotFound() {
               <Home className="w-4 h-4" />
               Go to Dashboard
             </Link>
-            
+
             <Link
               href="/"
               className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl border border-slate-800 hover:border-slate-700 bg-slate-900/35 hover:bg-slate-900/60 text-slate-300 hover:text-white text-sm font-semibold transition-all duration-300 active:scale-[0.98]"

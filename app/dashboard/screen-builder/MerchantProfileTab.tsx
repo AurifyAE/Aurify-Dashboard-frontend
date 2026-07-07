@@ -252,9 +252,22 @@ export default function MerchantProfileTab() {
     }
 
     const RESERVED_SLUGS = [
-      'admin', 'api', 'assets', 'static', 'login', 'logout', 'register',
-      'screen', 'builder', 'dashboard', 'preview', 'settings', 'support',
-      'help', 'favicon.ico', 'robots.txt'
+      'admin',
+      'api',
+      'assets',
+      'static',
+      'login',
+      'logout',
+      'register',
+      'screen',
+      'builder',
+      'dashboard',
+      'preview',
+      'settings',
+      'support',
+      'help',
+      'favicon.ico',
+      'robots.txt',
     ];
     if (RESERVED_SLUGS.includes(slug)) {
       setSlugAvailable(false);
@@ -609,7 +622,9 @@ export default function MerchantProfileTab() {
                     <label className={`${labelClass} flex items-center justify-between`}>
                       <span>Merchant URL Namespace *</span>
                       {slugChecking ? (
-                        <span className="text-[10px] text-blue-500 animate-pulse">Checking availability…</span>
+                        <span className="text-[10px] text-blue-500 animate-pulse">
+                          Checking availability…
+                        </span>
                       ) : slugAvailable === true ? (
                         <span className="text-[10px] text-emerald-600 flex items-center gap-1 font-bold">
                           ✓ Available
@@ -641,7 +656,10 @@ export default function MerchantProfileTab() {
                     />
                     {form.slug && (
                       <p className="mt-1.5 text-[11px] text-slate-500 font-mono">
-                        Screens URL prefix: <span className="text-slate-800 font-semibold">screen.aurify.ae/{form.slug}</span>
+                        Screens URL prefix:{' '}
+                        <span className="text-slate-800 font-semibold">
+                          screen.aurify.ae/{form.slug}
+                        </span>
                       </p>
                     )}
                   </div>

@@ -142,8 +142,14 @@ export default function Theme2Layout({
 
   const renderWidget = (widgetId: string) => {
     if (widgetId === 'logo') {
-      return (showLogo || showName) ? (
-        <MerchantLogo key="logo" theme="theme2" merchant={merchant} layout={layout} colors={colors} />
+      return showLogo || showName ? (
+        <MerchantLogo
+          key="logo"
+          theme="theme2"
+          merchant={merchant}
+          layout={layout}
+          colors={colors}
+        />
       ) : null;
     }
     if (widgetId === 'commodityTable') {
@@ -180,7 +186,12 @@ export default function Theme2Layout({
     }
     if (widgetId === 'footer') {
       return widgets.includes('Footer') ? (
-        <PoweredByAurify key="footer" colors={colors} fontSize={{ xs: '15px', md: '1vw' }} mt="auto" />
+        <PoweredByAurify
+          key="footer"
+          colors={colors}
+          fontSize={{ xs: '15px', md: '1vw' }}
+          mt="auto"
+        />
       ) : null;
     }
     return null;

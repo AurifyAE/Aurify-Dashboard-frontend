@@ -1096,7 +1096,6 @@ const SpotRate: React.FC = () => {
               calculations.
             </p>
           </div>
-    
         </div>
       </div>
 

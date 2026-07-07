@@ -4,7 +4,16 @@ import React, { useEffect, useState, useMemo } from 'react';
 import DashboardShell from '@/components/dashboard/DashboardShell';
 import { adminApi, AdminMerchant } from '@/lib/api/admin';
 import Swal from 'sweetalert2';
-import { Users, Search, Edit2, Calendar, Monitor, Tv, ChevronLeft, ChevronRight } from 'lucide-react';
+import {
+  Users,
+  Search,
+  Edit2,
+  Calendar,
+  Monitor,
+  Tv,
+  ChevronLeft,
+  ChevronRight,
+} from 'lucide-react';
 import { Select, MenuItem } from '@mui/material';
 
 export default function AdminClientsPage() {
@@ -162,7 +171,10 @@ export default function AdminClientsPage() {
               />
               {search && (
                 <button
-                  onClick={() => { setSearch(''); setCurrentPage(1); }}
+                  onClick={() => {
+                    setSearch('');
+                    setCurrentPage(1);
+                  }}
                   className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors text-xs font-bold"
                 >
                   ✕
@@ -197,7 +209,9 @@ export default function AdminClientsPage() {
                       <td colSpan={8} className="px-6 py-12 text-center">
                         <div className="flex flex-col items-center gap-2">
                           <Search className="w-8 h-8 text-slate-300" />
-                          <span className="text-slate-500 font-medium">No clients found{search ? ` for "${search}"` : ''}.</span>
+                          <span className="text-slate-500 font-medium">
+                            No clients found{search ? ` for "${search}"` : ''}.
+                          </span>
                         </div>
                       </td>
                     </tr>
@@ -210,7 +224,9 @@ export default function AdminClientsPage() {
                         <td className="px-6 py-4">
                           <div className="font-bold text-slate-800">{merchant.companyName}</div>
                           {merchant.username && (
-                            <div className="text-blue-500 text-xs font-medium">@{merchant.username}</div>
+                            <div className="text-blue-500 text-xs font-medium">
+                              @{merchant.username}
+                            </div>
                           )}
                           <div className="text-slate-500 text-xs">{merchant.email}</div>
                         </td>
@@ -280,14 +296,17 @@ export default function AdminClientsPage() {
                 <p className="text-sm text-slate-500">
                   Showing{' '}
                   <span className="font-semibold text-slate-700">
-                    {(currentPage - 1) * itemsPerPage + 1}–{Math.min(currentPage * itemsPerPage, filteredMerchants.length)}
+                    {(currentPage - 1) * itemsPerPage + 1}–
+                    {Math.min(currentPage * itemsPerPage, filteredMerchants.length)}
                   </span>{' '}
                   of{' '}
                   <span className="font-semibold text-slate-700">{filteredMerchants.length}</span>{' '}
                   client{filteredMerchants.length !== 1 ? 's' : ''}
                 </p>
                 <div className="flex items-center gap-2">
-                  <label className="text-xs font-medium text-slate-500 whitespace-nowrap">Rows per page:</label>
+                  <label className="text-xs font-medium text-slate-500 whitespace-nowrap">
+                    Rows per page:
+                  </label>
                   <select
                     value={itemsPerPage}
                     onChange={(e) => handleItemsPerPageChange(Number(e.target.value))}
@@ -313,7 +332,10 @@ export default function AdminClientsPage() {
 
                 {getPageNumbers().map((page, i) =>
                   page === '...' ? (
-                    <span key={`ellipsis-${i}`} className="px-2 py-1.5 text-slate-400 text-sm select-none">
+                    <span
+                      key={`ellipsis-${i}`}
+                      className="px-2 py-1.5 text-slate-400 text-sm select-none"
+                    >
                       …
                     </span>
                   ) : (

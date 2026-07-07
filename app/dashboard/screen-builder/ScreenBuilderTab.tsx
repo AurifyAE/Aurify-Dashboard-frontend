@@ -390,7 +390,10 @@ export default function ScreenBuilderTab({
   const [previewSize, setPreviewSize] = useState<'1920x1080' | '3840x2160'>('1920x1080');
   const [draft, setDraft] = useState<DraftState>(defaultDraft);
   const [draggedSection, setDraggedSection] = useState<string | null>(null);
-  const [draggedItem, setDraggedItem] = useState<{ id: string; sourceCol: 'left' | 'right' } | null>(null);
+  const [draggedItem, setDraggedItem] = useState<{
+    id: string;
+    sourceCol: 'left' | 'right';
+  } | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const isFirstLoad = useRef(true);
@@ -422,9 +425,22 @@ export default function ScreenBuilderTab({
     }
 
     const RESERVED_SLUGS = [
-      'admin', 'api', 'assets', 'static', 'login', 'logout', 'register',
-      'screen', 'builder', 'dashboard', 'preview', 'settings', 'support',
-      'help', 'favicon.ico', 'robots.txt'
+      'admin',
+      'api',
+      'assets',
+      'static',
+      'login',
+      'logout',
+      'register',
+      'screen',
+      'builder',
+      'dashboard',
+      'preview',
+      'settings',
+      'support',
+      'help',
+      'favicon.ico',
+      'robots.txt',
     ];
     if (RESERVED_SLUGS.includes(slug)) {
       setSlugAvailable(false);
@@ -445,7 +461,7 @@ export default function ScreenBuilderTab({
             `${slug}-2`,
             `${slug}-${new Date().getFullYear()}`,
             `${slug}-live`,
-            `${slug}-display`
+            `${slug}-display`,
           ]);
         } else {
           setSlugMessage('');
@@ -537,8 +553,12 @@ export default function ScreenBuilderTab({
               selectedClocks: (target.styles as any)?.selectedClocks?.length
                 ? (target.styles as any).selectedClocks
                 : defaultDraft.selectedClocks,
-              leftColumnOrder: (target.styles as any)?.leftColumnOrder || getDefaultColumns((target.header as any)?.layout || 'theme1').left,
-              rightColumnOrder: (target.styles as any)?.rightColumnOrder || getDefaultColumns((target.header as any)?.layout || 'theme1').right,
+              leftColumnOrder:
+                (target.styles as any)?.leftColumnOrder ||
+                getDefaultColumns((target.header as any)?.layout || 'theme1').left,
+              rightColumnOrder:
+                (target.styles as any)?.rightColumnOrder ||
+                getDefaultColumns((target.header as any)?.layout || 'theme1').right,
             });
           }
         }
@@ -633,7 +653,11 @@ export default function ScreenBuilderTab({
     setDraggedItem(null);
   };
 
-  const moveItem = (id: string, sourceCol: 'left' | 'right', direction: 'up' | 'down' | 'left' | 'right') => {
+  const moveItem = (
+    id: string,
+    sourceCol: 'left' | 'right',
+    direction: 'up' | 'down' | 'left' | 'right'
+  ) => {
     setDraft((prev) => {
       let left = [...prev.leftColumnOrder];
       let right = [...prev.rightColumnOrder];
@@ -742,10 +766,7 @@ export default function ScreenBuilderTab({
       (l) => l.screenSlug === draft.screenSlug && l.layoutId !== draft.layoutId
     );
     if (isDuplicateSlug) {
-      showMessage(
-        'This URL is already in use.',
-        'error'
-      );
+      showMessage('This URL is already in use.', 'error');
       return;
     }
 
@@ -829,7 +850,12 @@ export default function ScreenBuilderTab({
               New Screen
             </button>
           )}
-          <button type="button" onClick={save} disabled={saving || slugAvailable === false || slugChecking} className="btn-secondary">
+          <button
+            type="button"
+            onClick={save}
+            disabled={saving || slugAvailable === false || slugChecking}
+            className="btn-secondary"
+          >
             {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
             Save Draft
           </button>
@@ -920,7 +946,9 @@ export default function ScreenBuilderTab({
                 <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-500 flex items-center justify-between">
                   <span>URL Slug</span>
                   {slugChecking ? (
-                    <span className="text-[10px] text-blue-500 animate-pulse">Checking availability…</span>
+                    <span className="text-[10px] text-blue-500 animate-pulse">
+                      Checking availability…
+                    </span>
                   ) : slugAvailable === true ? (
                     <span className="text-[10px] text-emerald-600 flex items-center gap-1 font-bold">
                       ✓ Available
@@ -951,21 +979,30 @@ export default function ScreenBuilderTab({
                   }}
                 />
 
-                
-                  <div className="mt-2 space-y-1.5">
-                    <p className="text-[11px] text-slate-500 font-mono break-all">
-                      URL: <span className="text-slate-800 font-semibold">screen.aurify.ae/{draft.screenSlug ? `${merchant?.slug || 'merchant'}/${draft.screenSlug}` : "[Screen URL]"}</span>
-                    </p>
-                    <p className="text-[10px] text-blue-600 bg-blue-50/50 border border-blue-100/30 rounded-lg px-2.5 py-1.5 flex items-start gap-1.5 leading-relaxed">
-                      <span className="font-bold flex-shrink-0">Tip:</span>
-                      <span>You can customize your URL prefix by changing the brand namespace inside the Company Profile page.</span>
-                    </p>
-                  </div>
-                
+                <div className="mt-2 space-y-1.5">
+                  <p className="text-[11px] text-slate-500 font-mono break-all">
+                    URL:{' '}
+                    <span className="text-slate-800 font-semibold">
+                      screen.aurify.ae/
+                      {draft.screenSlug
+                        ? `${merchant?.slug || 'merchant'}/${draft.screenSlug}`
+                        : '[Screen URL]'}
+                    </span>
+                  </p>
+                  <p className="text-[10px] text-blue-600 bg-blue-50/50 border border-blue-100/30 rounded-lg px-2.5 py-1.5 flex items-start gap-1.5 leading-relaxed">
+                    <span className="font-bold flex-shrink-0">Tip:</span>
+                    <span>
+                      You can customize your URL prefix by changing the brand namespace inside the
+                      Company Profile page.
+                    </span>
+                  </p>
+                </div>
 
                 {slugAvailable === false && suggestions.length > 0 && (
                   <div className="mt-2.5">
-                    <p className="text-[10px] text-slate-500 uppercase tracking-wider font-semibold">Suggestions:</p>
+                    <p className="text-[10px] text-slate-500 uppercase tracking-wider font-semibold">
+                      Suggestions:
+                    </p>
                     <div className="flex flex-wrap gap-1.5 mt-1.5">
                       {suggestions.map((sug) => (
                         <button
@@ -1053,7 +1090,7 @@ export default function ScreenBuilderTab({
                       onChange={(e) => handleImageUpload(e, 'logoUrl')}
                       className="block w-full text-xs text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer"
                     />
-                     {draft.logoUrl && (
+                    {draft.logoUrl && (
                       <div className="mt-2 flex items-center gap-2 text-xs text-slate-500">
                         <span className="font-semibold">Current:</span>
                         <img
@@ -1321,7 +1358,8 @@ export default function ScreenBuilderTab({
                   </div>
                   <div className="p-4 space-y-4">
                     <p className="text-[11px] text-slate-400 leading-normal">
-                      Drag components between columns or use the arrows to adjust their render order on the screen.
+                      Drag components between columns or use the arrows to adjust their render order
+                      on the screen.
                     </p>
 
                     <div className="grid grid-cols-2 gap-3">
@@ -1342,7 +1380,9 @@ export default function ScreenBuilderTab({
                               draggable
                               onDragStart={() => handleDragStart(item, 'left')}
                               className={`flex items-center justify-between rounded-lg border p-2 bg-white shadow-sm transition-all cursor-grab active:cursor-grabbing ${
-                                active ? 'border-slate-200 hover:border-slate-300' : 'border-slate-100 opacity-50 bg-slate-50'
+                                active
+                                  ? 'border-slate-200 hover:border-slate-300'
+                                  : 'border-slate-100 opacity-50 bg-slate-50'
                               }`}
                             >
                               <div className="flex items-center gap-1.5 min-w-0">
@@ -1398,7 +1438,9 @@ export default function ScreenBuilderTab({
                               draggable
                               onDragStart={() => handleDragStart(item, 'right')}
                               className={`flex items-center justify-between rounded-lg border p-2 bg-white shadow-sm transition-all cursor-grab active:cursor-grabbing ${
-                                active ? 'border-slate-200 hover:border-slate-300' : 'border-slate-100 opacity-50 bg-slate-50'
+                                active
+                                  ? 'border-slate-200 hover:border-slate-300'
+                                  : 'border-slate-100 opacity-50 bg-slate-50'
                               }`}
                             >
                               <div className="flex items-center gap-1.5 min-w-0">
@@ -1525,14 +1567,19 @@ export default function ScreenBuilderTab({
                 {[
                   { label: 'Screen name set', done: Boolean(draft.name.trim()), required: true },
                   { label: 'Theme selected', done: Boolean(draft.selectedLayout), required: true },
-                  { label: 'Merchant approved', done: merchant?.status === 'Active', required: true },
+                  {
+                    label: 'Merchant approved',
+                    done: merchant?.status === 'Active',
+                    required: true,
+                  },
                   {
                     label: 'Custom logo selected',
                     done: Boolean(draft.logoUrl) || Boolean(merchant?.logo),
                     required: false,
-                    warning: !draft.logoUrl && merchant?.logo
-                      ? 'Logo is taken from profile and custom logo is not selected'
-                      : 'Using default placeholder logo',
+                    warning:
+                      !draft.logoUrl && merchant?.logo
+                        ? 'Logo is taken from profile and custom logo is not selected'
+                        : 'Using default placeholder logo',
                     isProfileFallback: !draft.logoUrl && Boolean(merchant?.logo),
                   },
                   {
@@ -1557,7 +1604,15 @@ export default function ScreenBuilderTab({
                       <AlertTriangle className="h-4 w-4 text-amber-500 flex-shrink-0 mt-0.5" />
                     )}
                     <div className="flex-1">
-                      <span className={item.done ? 'text-slate-750' : item.required ? 'text-slate-400 font-medium' : 'text-slate-500 font-medium'}>
+                      <span
+                        className={
+                          item.done
+                            ? 'text-slate-750'
+                            : item.required
+                              ? 'text-slate-400 font-medium'
+                              : 'text-slate-500 font-medium'
+                        }
+                      >
                         {item.label}
                       </span>
                       {item.done && item.isProfileFallback && item.warning && (
