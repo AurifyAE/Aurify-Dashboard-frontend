@@ -741,7 +741,7 @@ export default function ScreenBuilderTab({
     );
     if (isDuplicateSlug) {
       showMessage(
-        'This URL slug is already in use by another screen. Please enter a unique URL Slug.',
+        'This URL is already in use.',
         'error'
       );
       return;
@@ -1508,9 +1508,12 @@ export default function ScreenBuilderTab({
                   { label: 'Merchant approved', done: merchant?.status === 'Active', required: true },
                   {
                     label: 'Custom logo selected',
-                    done: Boolean(draft.logoUrl),
+                    done: Boolean(draft.logoUrl) || Boolean(merchant?.logo),
                     required: false,
-                    warning: 'Using default placeholder logo',
+                    warning: !draft.logoUrl && merchant?.logo
+                      ? 'Logo is taken from profile and custom logo is not selected'
+                      : 'Using default placeholder logo',
+                    isProfileFallback: !draft.logoUrl && Boolean(merchant?.logo),
                   },
                   {
                     label: 'Custom background selected',
@@ -1537,6 +1540,11 @@ export default function ScreenBuilderTab({
                       <span className={item.done ? 'text-slate-750' : item.required ? 'text-slate-400 font-medium' : 'text-slate-500 font-medium'}>
                         {item.label}
                       </span>
+                      {item.done && item.isProfileFallback && item.warning && (
+                        <p className="text-[10px] text-blue-600 font-semibold mt-0.5">
+                          ℹ️ {item.warning}
+                        </p>
+                      )}
                       {!item.done && !item.required && item.warning && (
                         <p className="text-[10px] text-amber-600 font-semibold mt-0.5">
                           ⚠️ {item.warning}
