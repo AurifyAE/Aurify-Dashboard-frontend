@@ -64,7 +64,7 @@ jobs:
             npm run build
 
             if pm2 describe aurify-frontend > /dev/null; then
-              pm2 reload aurify-frontend
+              pm2 reload aurify-frontend --update-env
             else
               pm2 start npm --name aurify-frontend -- start
             fi
