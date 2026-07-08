@@ -274,4 +274,5 @@ input:focus-visible {
 * {
   scrollbar-width: thin;
   scrollbar-color: #cbd5e1 transparent;
+  opacity: 0.3 !important;
 }
