@@ -16,6 +16,7 @@
   interpolate-size: allow-keywords;
 }
 
+
 @theme {
   --color-background: hsl(0 0% 100%);
   --color-foreground: hsl(222.2 84% 4.9%);
