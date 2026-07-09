@@ -275,7 +275,3 @@ input:focus-visible {
   scrollbar-width: thin;
   scrollbar-color: #cbd5e1 transparent;
 }
-
-body{
-  opacity: 0.6 !important;
-}

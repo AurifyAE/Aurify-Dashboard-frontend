@@ -694,11 +694,11 @@ export default function ScreenBuilderTab({
 
   const isWidgetActive = (widgetId: string) => {
     if (widgetId === 'logo') return draft.showLogo || draft.showName;
-    if (widgetId === 'commodityTable') return draft.widgets.includes('Commodity Table');
-    if (widgetId === 'spotRates') return draft.widgets.includes('Spot Rates');
+    if (widgetId === 'commodityTable') return true;
+    if (widgetId === 'spotRates') return true;
     if (widgetId === 'worldClock') return draft.widgets.includes('Clock');
     if (widgetId === 'systemClock') return draft.widgets.includes('Date');
-    if (widgetId === 'footer') return draft.widgets.includes('Footer');
+    if (widgetId === 'footer') return true;
     return true;
   };
 
@@ -715,7 +715,7 @@ export default function ScreenBuilderTab({
     body: { previewSize, sectionOrder: draft.sectionOrder },
     sidebar: {},
     footer: { ticker: 'enabled' },
-    widgets: draft.widgets,
+    widgets: Array.from(new Set([...draft.widgets, 'Spot Rates', 'Commodity Table', 'Footer'])),
     styles: {
       ...((selectedTheme?.customizations as Record<string, unknown>) || {}),
       colorOverride: draft.colorOverride,
@@ -1148,7 +1148,8 @@ export default function ScreenBuilderTab({
                     {COLOR_CATEGORIES.map((category) => {
                       const widget = category.requiredWidget;
                       const hasWidget = !!widget;
-                      const isChecked = hasWidget ? draft.widgets.includes(widget) : true;
+                      const isRequired = hasWidget && ['Spot Rates', 'Commodity Table', 'Footer'].includes(widget);
+                      const isChecked = isRequired ? true : (hasWidget ? draft.widgets.includes(widget) : true);
 
                       return (
                         <div
@@ -1159,11 +1160,15 @@ export default function ScreenBuilderTab({
                         >
                           <div className="w-full flex items-center justify-between px-4 py-3 bg-slate-50 hover:bg-slate-100 transition-colors">
                             {hasWidget ? (
-                              <label className="flex items-center gap-2 text-sm font-semibold text-slate-700 cursor-pointer flex-1">
+                              <label className={`flex items-center gap-2 text-sm font-semibold text-slate-700 flex-1 ${
+                                isRequired ? 'cursor-not-allowed' : 'cursor-pointer'
+                              }`}>
                                 <input
                                   type="checkbox"
                                   checked={isChecked}
+                                  disabled={isRequired}
                                   onChange={(e) => {
+                                    if (isRequired) return;
                                     if (e.target.checked) {
                                       setDraft({ ...draft, widgets: [...draft.widgets, widget] });
                                       setOpenAccordion(category.title);
@@ -1177,9 +1182,18 @@ export default function ScreenBuilderTab({
                                       }
                                     }
                                   }}
-                                  className="rounded border-slate-300 text-blue-600 focus:ring-blue-600 h-4 w-4 cursor-pointer"
+                                  className={`rounded border-slate-300 text-blue-600 focus:ring-blue-600 h-4 w-4 ${
+                                    isRequired ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'
+                                  }`}
                                 />
-                                {WIDGET_LABELS[widget] || widget}
+                                <span className="flex items-center gap-2">
+                                  {WIDGET_LABELS[widget] || widget}
+                                  {isRequired && (
+                                    <span className="text-[10px] font-semibold bg-slate-200/60 text-slate-500 border border-slate-300/40 rounded px-1.5 py-0.5 leading-none select-none">
+                                      Required
+                                    </span>
+                                  )}
+                                </span>
                               </label>
                             ) : (
                               <div className="text-sm font-semibold text-slate-700 flex-1 cursor-default">
