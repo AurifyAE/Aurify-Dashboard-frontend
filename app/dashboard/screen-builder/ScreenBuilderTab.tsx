@@ -35,6 +35,8 @@ import {
   XCircle,
   AlertTriangle,
   Plus,
+  Undo,
+  RotateCcw,
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import Loader from '@/components/loader/loader';
@@ -175,7 +177,13 @@ interface ScreenBuilderTabProps {
   onSaveSuccess?: () => void;
 }
 
-const TVPreviewRenderer = ({ data }: { data: any }) => {
+const TVPreviewRenderer = ({
+  data,
+  onOrderChange,
+}: {
+  data: any;
+  onOrderChange?: (left: string[], right: string[]) => void;
+}) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [scale, setScale] = useState(0.5);
 
@@ -252,11 +260,11 @@ const TVPreviewRenderer = ({ data }: { data: any }) => {
           SCREEN : {enhancedData?.layout?.selectedLayout}
         </div>
         {enhancedData?.layout?.selectedLayout === 'theme3' ? (
-          <Theme3Layout data={enhancedData} isPreview={true} />
+          <Theme3Layout data={enhancedData} isPreview={true} onOrderChange={onOrderChange} />
         ) : enhancedData?.layout?.selectedLayout === 'theme2' ? (
-          <Theme2Layout data={enhancedData} isPreview={true} />
+          <Theme2Layout data={enhancedData} isPreview={true} onOrderChange={onOrderChange} />
         ) : (
-          <Theme1Layout data={enhancedData} isPreview={true} />
+          <Theme1Layout data={enhancedData} isPreview={true} onOrderChange={onOrderChange} />
         )}
       </div>
     </div>
@@ -389,6 +397,7 @@ export default function ScreenBuilderTab({
   const [messageType, setMessageType] = useState<'info' | 'success' | 'error'>('info');
   const [previewSize, setPreviewSize] = useState<'1920x1080' | '3840x2160'>('1920x1080');
   const [draft, setDraft] = useState<DraftState>(defaultDraft);
+  const [columnHistory, setColumnHistory] = useState<{ left: string[]; right: string[] }[]>([]);
   const [draggedSection, setDraggedSection] = useState<string | null>(null);
   const [draggedItem, setDraggedItem] = useState<{
     id: string;
@@ -512,6 +521,7 @@ export default function ScreenBuilderTab({
       setThemes(installed);
       setLayouts(savedLayouts);
       setNews(newsItems);
+      setColumnHistory([]);
 
       const currentThemeId = installed[0]?.themeId || '';
 
@@ -728,6 +738,37 @@ export default function ScreenBuilderTab({
       rightColumnOrder: draft.rightColumnOrder,
     },
   });
+  const defaults = getDefaultColumns(draft.selectedLayout);
+  const isLayoutCustomized =
+    (draft.leftColumnOrder && JSON.stringify(draft.leftColumnOrder) !== JSON.stringify(defaults.left)) ||
+    (draft.rightColumnOrder && JSON.stringify(draft.rightColumnOrder) !== JSON.stringify(defaults.right));
+
+  const handleUndo = () => {
+    if (columnHistory.length === 0) return;
+    const previousState = columnHistory[columnHistory.length - 1];
+    setColumnHistory((prev) => prev.slice(0, -1));
+    setDraft((prev) => ({
+      ...prev,
+      leftColumnOrder: previousState.left,
+      rightColumnOrder: previousState.right,
+    }));
+  };
+
+  const handleResetLayout = () => {
+    const currentDefaults = getDefaultColumns(draft.selectedLayout);
+    setColumnHistory((prev) => [
+      ...prev,
+      {
+        left: draft.leftColumnOrder || currentDefaults.left,
+        right: draft.rightColumnOrder || currentDefaults.right,
+      },
+    ]);
+    setDraft((prev) => ({
+      ...prev,
+      leftColumnOrder: currentDefaults.left,
+      rightColumnOrder: currentDefaults.right,
+    }));
+  };
 
   const save = async () => {
     if (!draft.name.trim()) {
@@ -785,6 +826,7 @@ export default function ScreenBuilderTab({
 
       // Clear local storage and reset draft state since screen is now successfully live
       localStorage.removeItem('aurify-builder-draft');
+      setColumnHistory([]);
       setDraft(defaultDraft);
       setStep(1);
       if (setEditingLayoutId) {
@@ -803,6 +845,7 @@ export default function ScreenBuilderTab({
 
   const resetForm = () => {
     setEditingLayoutId(undefined);
+    setColumnHistory([]);
     setDraft(defaultDraft);
     setStep(1);
     localStorage.removeItem('aurify-builder-draft');
@@ -1030,6 +1073,7 @@ export default function ScreenBuilderTab({
                       onClick={() => {
                         const defaultColors = THEME_DEFAULTS[l.id] || THEME_DEFAULTS.theme1;
                         const defaults = getDefaultColumns(l.id);
+                        setColumnHistory([]);
                         setDraft({
                           ...draft,
                           selectedLayout: l.id,
@@ -1155,14 +1199,12 @@ export default function ScreenBuilderTab({
                         <div
                           key={category.title}
                           className={`border rounded-xl bg-white overflow-hidden ${
-                            isChecked ? 'border-slate-200' : 'border-slate-100 opacity-75'
+                            isChecked ? 'border-slate-200' : 'border-slate-100 '
                           }`}
                         >
                           <div className="w-full flex items-center justify-between px-4 py-3 bg-slate-50 hover:bg-slate-100 transition-colors">
                             {hasWidget ? (
-                              <label className={`flex items-center gap-2 text-sm font-semibold text-slate-700 flex-1 ${
-                                isRequired ? 'cursor-not-allowed' : 'cursor-pointer'
-                              }`}>
+                              <div className="flex items-center gap-2 text-sm font-semibold text-slate-700 flex-1 cursor-default">
                                 <input
                                   type="checkbox"
                                   checked={isChecked}
@@ -1177,16 +1219,16 @@ export default function ScreenBuilderTab({
                                         ...draft,
                                         widgets: draft.widgets.filter((w) => w !== widget),
                                       });
-                                      if (openAccordion === category.title) {
-                                        setOpenAccordion(null);
-                                      }
                                     }
                                   }}
-                                  className={`rounded border-slate-300 text-blue-600 focus:ring-blue-600 h-4 w-4 ${
-                                    isRequired ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'
+                                  className={`rounded border-slate-300 text-blue-600 focus:ring-blue-600 h-4 w-4 cursor-pointer flex-shrink-0 ${
+                                    isRequired ? 'cursor-not-allowed opacity-50' : ''
                                   }`}
                                 />
-                                <span className="flex items-center gap-2">
+                                <span
+                                  onClick={() => setOpenAccordion(openAccordion === category.title ? null : category.title)}
+                                  className="flex items-center gap-2 select-none cursor-pointer hover:text-blue-600 transition-colors flex-1 py-1"
+                                >
                                   {WIDGET_LABELS[widget] || widget}
                                   {isRequired && (
                                     <span className="text-[10px] font-semibold bg-slate-200/60 text-slate-500 border border-slate-300/40 rounded px-1.5 py-0.5 leading-none select-none">
@@ -1194,35 +1236,36 @@ export default function ScreenBuilderTab({
                                     </span>
                                   )}
                                 </span>
-                              </label>
+                              </div>
                             ) : (
-                              <div className="text-sm font-semibold text-slate-700 flex-1 cursor-default">
-                                {category.title}
+                              <div
+                                onClick={() => setOpenAccordion(openAccordion === category.title ? null : category.title)}
+                                className="text-sm font-semibold text-slate-700 flex-1 cursor-pointer hover:text-blue-600 transition-colors py-1"
+                              >
+                                {category.title} 
                               </div>
                             )}
 
-                            {isChecked && (
-                              <button
-                                type="button"
-                                onClick={() =>
-                                  setOpenAccordion(
-                                    openAccordion === category.title ? null : category.title
-                                  )
-                                }
-                                className="p-1 hover:bg-slate-200 rounded-md transition-colors"
-                              >
-                                {openAccordion === category.title ? (
-                                  <ChevronDown className="h-4 w-4 text-slate-500" />
-                                ) : (
-                                  <ChevronRight className="h-4 w-4 text-slate-500" />
-                                )}
-                              </button>
-                            )}
+                            <button
+                              type="button"
+                              onClick={() =>
+                                setOpenAccordion(
+                                  openAccordion === category.title ? null : category.title
+                                )
+                              }
+                              className="p-1 hover:bg-slate-200 rounded-md transition-colors"
+                            >
+                              {openAccordion === category.title ? (
+                                <ChevronDown className="h-4 w-4 text-slate-500" />
+                              ) : (
+                                <ChevronRight className="h-4 w-4 text-slate-500" />
+                              )}
+                            </button>
                           </div>
 
                           <div
                             className={`grid transition-[grid-template-rows,opacity] duration-300 ease-in-out ${
-                              isChecked && openAccordion === category.title
+                              openAccordion === category.title
                                 ? 'grid-rows-[1fr] opacity-100'
                                 : 'grid-rows-[0fr] opacity-0'
                             }`}
@@ -1363,138 +1406,7 @@ export default function ScreenBuilderTab({
                   </div>
                 </div>
 
-                {/* Accordion Block: Arrange Screen Elements */}
-                <div className="border border-slate-200 rounded-xl bg-white overflow-hidden mt-4">
-                  <div className="w-full flex items-center justify-between px-4 py-3 bg-slate-50 border-b border-slate-100">
-                    <div className="text-sm font-semibold text-slate-700 flex-1">
-                      Arrange Layout Columns & Positions
-                    </div>
-                  </div>
-                  <div className="p-4 space-y-4">
-                    <p className="text-[11px] text-slate-400 leading-normal">
-                      Drag components between columns or use the arrows to adjust their render order
-                      on the screen.
-                    </p>
 
-                    <div className="grid grid-cols-2 gap-3">
-                      {/* Left Column Drop Zone */}
-                      <div
-                        onDragOver={handleDragOver}
-                        onDrop={() => handleDrop('left')}
-                        className="rounded-xl border border-dashed border-slate-200 bg-slate-50/50 p-2.5 min-h-[220px] flex flex-col gap-2"
-                      >
-                        <h5 className="text-[10px] font-bold uppercase tracking-wider text-slate-400 text-center mb-1">
-                          Left Column
-                        </h5>
-                        {(draft.leftColumnOrder || []).map((item, idx) => {
-                          const active = isWidgetActive(item);
-                          return (
-                            <div
-                              key={item}
-                              draggable
-                              onDragStart={() => handleDragStart(item, 'left')}
-                              className={`flex items-center justify-between rounded-lg border p-2 bg-white shadow-sm transition-all cursor-grab active:cursor-grabbing ${
-                                active
-                                  ? 'border-slate-200 hover:border-slate-300'
-                                  : 'border-slate-100 opacity-50 bg-slate-50'
-                              }`}
-                            >
-                              <div className="flex items-center gap-1.5 min-w-0">
-                                <GripVertical className="h-3 w-3 text-slate-400 flex-shrink-0" />
-                                <span className="text-[11px] font-medium text-slate-700 truncate">
-                                  {WIDGET_LABEL_MAP[item] || item}
-                                </span>
-                              </div>
-                              <div className="flex items-center gap-0.5 flex-shrink-0">
-                                <button
-                                  type="button"
-                                  onClick={() => moveItem(item, 'left', 'up')}
-                                  disabled={idx === 0}
-                                  className="p-0.5 hover:bg-slate-100 disabled:opacity-30 rounded text-slate-500"
-                                >
-                                  <ArrowUp className="h-3 w-3" />
-                                </button>
-                                <button
-                                  type="button"
-                                  onClick={() => moveItem(item, 'left', 'down')}
-                                  disabled={idx === (draft.leftColumnOrder || []).length - 1}
-                                  className="p-0.5 hover:bg-slate-100 disabled:opacity-30 rounded text-slate-500"
-                                >
-                                  <ArrowDown className="h-3 w-3" />
-                                </button>
-                                <button
-                                  type="button"
-                                  onClick={() => moveItem(item, 'left', 'right')}
-                                  className="p-0.5 hover:bg-slate-100 rounded text-slate-500"
-                                >
-                                  <ArrowRight className="h-3 w-3" />
-                                </button>
-                              </div>
-                            </div>
-                          );
-                        })}
-                      </div>
-
-                      {/* Right Column Drop Zone */}
-                      <div
-                        onDragOver={handleDragOver}
-                        onDrop={() => handleDrop('right')}
-                        className="rounded-xl border border-dashed border-slate-200 bg-slate-50/50 p-2.5 min-h-[220px] flex flex-col gap-2"
-                      >
-                        <h5 className="text-[10px] font-bold uppercase tracking-wider text-slate-400 text-center mb-1">
-                          Right Column
-                        </h5>
-                        {(draft.rightColumnOrder || []).map((item, idx) => {
-                          const active = isWidgetActive(item);
-                          return (
-                            <div
-                              key={item}
-                              draggable
-                              onDragStart={() => handleDragStart(item, 'right')}
-                              className={`flex items-center justify-between rounded-lg border p-2 bg-white shadow-sm transition-all cursor-grab active:cursor-grabbing ${
-                                active
-                                  ? 'border-slate-200 hover:border-slate-300'
-                                  : 'border-slate-100 opacity-50 bg-slate-50'
-                              }`}
-                            >
-                              <div className="flex items-center gap-1.5 min-w-0">
-                                <GripVertical className="h-3 w-3 text-slate-400 flex-shrink-0" />
-                                <span className="text-[11px] font-medium text-slate-700 truncate">
-                                  {WIDGET_LABEL_MAP[item] || item}
-                                </span>
-                              </div>
-                              <div className="flex items-center gap-0.5 flex-shrink-0">
-                                <button
-                                  type="button"
-                                  onClick={() => moveItem(item, 'right', 'up')}
-                                  disabled={idx === 0}
-                                  className="p-0.5 hover:bg-slate-100 disabled:opacity-30 rounded text-slate-500"
-                                >
-                                  <ArrowUp className="h-3 w-3" />
-                                </button>
-                                <button
-                                  type="button"
-                                  onClick={() => moveItem(item, 'right', 'down')}
-                                  disabled={idx === (draft.rightColumnOrder || []).length - 1}
-                                  className="p-0.5 hover:bg-slate-100 disabled:opacity-30 rounded text-slate-500"
-                                >
-                                  <ArrowDown className="h-3 w-3" />
-                                </button>
-                                <button
-                                  type="button"
-                                  onClick={() => moveItem(item, 'right', 'left')}
-                                  className="p-0.5 hover:bg-slate-100 rounded text-slate-500"
-                                >
-                                  <ArrowLeft className="h-3 w-3" />
-                                </button>
-                              </div>
-                            </div>
-                          );
-                        })}
-                      </div>
-                    </div>
-                  </div>
-                </div>
 
                 <div className="flex gap-2 pt-2">
                   <button type="button" onClick={() => setStep(1)} className="btn-secondary">
@@ -1668,8 +1580,29 @@ export default function ScreenBuilderTab({
               <Monitor className="h-5 w-5 text-blue-600" />
               Live TV Preview
             </div>
-            <div className="text-xs font-semibold text-slate-400 uppercase tracking-wide">
-              {previewSize === '1920x1080' ? 'Full HD · 1080p' : '4K UHD · 2160p'}
+            
+            <div className="flex items-center gap-2">
+              {columnHistory.length > 0 && (
+                <button
+                  type="button"
+                  onClick={handleUndo}
+                  className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold transition-all border border-slate-200"
+                >
+                  <Undo className="h-3 w-3" /> Undo
+                </button>
+              )}
+              {isLayoutCustomized && (
+                <button
+                  type="button"
+                  onClick={handleResetLayout}
+                  className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-red-50 hover:bg-red-100 text-red-600 text-xs font-semibold transition-all border border-red-200"
+                >
+                  <RotateCcw className="h-3 w-3" /> Reset Layout
+                </button>
+              )}
+              <div className="text-xs font-semibold text-slate-400 uppercase tracking-wide ml-2">
+                {previewSize === '1920x1080' ? 'Full HD · 1080p' : '4K UHD · 2160p'}
+              </div>
             </div>
           </div>
 
@@ -1682,6 +1615,20 @@ export default function ScreenBuilderTab({
               layout: draft,
               commodities: (merchant as any)?.commodities || [],
               news: news,
+            }}
+            onOrderChange={(newLeft, newRight) => {
+              setColumnHistory((prev) => [
+                ...prev,
+                {
+                  left: draft.leftColumnOrder || defaults.left,
+                  right: draft.rightColumnOrder || defaults.right,
+                },
+              ]);
+              setDraft((prev) => ({
+                ...prev,
+                leftColumnOrder: newLeft,
+                rightColumnOrder: newRight,
+              }));
             }}
           />
 

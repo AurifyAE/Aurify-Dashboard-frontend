@@ -11,14 +11,17 @@ import MerchantLogo from '../shared/MerchantLogo';
 import theme2Bg from '../images/theme2-bg.png';
 import io from 'socket.io-client';
 import { API_URL, API_KEY, SOCKET_SECRET } from '@/lib/env';
+import { DraggableWrapper } from '../shared/DraggableWrapper';
 import { getDefaultColumns } from '@/lib/layoutUtils';
 
 export default function Theme2Layout({
   data,
   isPreview = false,
+  onOrderChange,
 }: {
   data?: any;
   isPreview?: boolean;
+  onOrderChange?: (left: string[], right: string[]) => void;
 }) {
   const { merchant, theme, layout, commodities, news } = data || {};
   const widgets = layout?.widgets || ['Spot Rates', 'Commodity Table', 'News', 'Clock'];
@@ -139,6 +142,78 @@ export default function Theme2Layout({
 
   const leftOrder = layout?.styles?.leftColumnOrder || getDefaultColumns('theme2').left;
   const rightOrder = layout?.styles?.rightColumnOrder || getDefaultColumns('theme2').right;
+
+  const handleDragStart = (e: React.DragEvent, id: string, sourceCol: 'left' | 'right') => {
+    e.dataTransfer.setData('text/plain', JSON.stringify({ id, sourceCol }));
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+  };
+
+  const handleDrop = (e: React.DragEvent, targetCol: 'left' | 'right', targetIndex: number) => {
+    e.preventDefault();
+    try {
+      const dataStr = e.dataTransfer.getData('text/plain');
+      if (!dataStr) return;
+      const { id, sourceCol } = JSON.parse(dataStr);
+      if (!id) return;
+
+      let newLeft = [...leftOrder];
+      let newRight = [...rightOrder];
+
+      if (sourceCol === 'left') {
+        newLeft = newLeft.filter((w) => w !== id);
+      } else {
+        newRight = newRight.filter((w) => w !== id);
+      }
+
+      if (targetCol === 'left') {
+        newLeft.splice(targetIndex, 0, id);
+      } else {
+        newRight.splice(targetIndex, 0, id);
+      }
+
+      if (onOrderChange) {
+        onOrderChange(newLeft, newRight);
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const handleColumnDrop = (e: React.DragEvent, targetCol: 'left' | 'right') => {
+    e.preventDefault();
+    try {
+      const dataStr = e.dataTransfer.getData('text/plain');
+      if (!dataStr) return;
+      const { id, sourceCol } = JSON.parse(dataStr);
+      if (!id) return;
+
+      if (sourceCol === targetCol) return;
+
+      let newLeft = [...leftOrder];
+      let newRight = [...rightOrder];
+
+      if (sourceCol === 'left') {
+        newLeft = newLeft.filter((w) => w !== id);
+      } else {
+        newRight = newRight.filter((w) => w !== id);
+      }
+
+      if (targetCol === 'left') {
+        newLeft.push(id);
+      } else {
+        newRight.push(id);
+      }
+
+      if (onOrderChange) {
+        onOrderChange(newLeft, newRight);
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
   const renderWidget = (widgetId: string) => {
     if (widgetId === 'logo') {
@@ -262,13 +337,60 @@ export default function Theme2Layout({
             flexDirection: 'column',
             padding: '1vw .5vw',
             gap: '1vw',
+            minHeight: isPreview ? '250px' : 'auto',
           }}
+          onDragOver={(e) => isPreview && handleDragOver(e)}
+          onDrop={(e) => isPreview && handleColumnDrop(e, 'left')}
         >
-          {leftOrder.map(renderWidget)}
+          {leftOrder.map((widgetId: string, index: number) => {
+            const el = renderWidget(widgetId);
+            if (!el) return null;
+            return (
+              <DraggableWrapper
+                key={widgetId}
+                id={widgetId}
+                sourceCol="left"
+                index={index}
+                isPreview={isPreview}
+                onDragStart={handleDragStart}
+                onDragOver={handleDragOver}
+                onDrop={handleDrop}
+              >
+                {el}
+              </DraggableWrapper>
+            );
+          })}
         </Grid>
 
-        <Grid size={{ xs: 12, md: 6 }} sx={{ display: 'grid', padding: '1vw', gap: '1vw' }}>
-          {rightOrder.map(renderWidget)}
+        <Grid
+          size={{ xs: 12, md: 6 }}
+          sx={{
+            display: 'grid',
+            padding: '1vw',
+            gap: '1vw',
+            minHeight: isPreview ? '250px' : 'auto',
+          }}
+          onDragOver={(e) => isPreview && handleDragOver(e)}
+          onDrop={(e) => isPreview && handleColumnDrop(e, 'right')}
+        >
+          {rightOrder.map((widgetId: string, index: number) => {
+            const el = renderWidget(widgetId);
+            if (!el) return null;
+            return (
+              <DraggableWrapper
+                key={widgetId}
+                id={widgetId}
+                sourceCol="right"
+                index={index}
+                isPreview={isPreview}
+                onDragStart={handleDragStart}
+                onDragOver={handleDragOver}
+                onDrop={handleDrop}
+              >
+                {el}
+              </DraggableWrapper>
+            );
+          })}
         </Grid>
 
         {widgets.includes('News') && (

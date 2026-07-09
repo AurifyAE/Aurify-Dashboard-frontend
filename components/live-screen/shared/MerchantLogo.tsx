@@ -25,11 +25,10 @@ const MerchantLogo = ({ theme, merchant, layout, colors = {} }: MerchantLogoProp
   // Box dimensions and styling based on theme
   let boxWidth = { xs: '40vw', sm: '18vw' };
   let boxHeight: any = 'auto';
-  let boxMx: any = undefined;
+  let boxMx: any = 'auto';
 
   if (isTheme2) {
     boxWidth = { xs: '40vw', sm: '20vw' };
-    boxMx = 'auto';
   } else if (isTheme3) {
     boxWidth = { xs: '40vw', sm: '25vw' };
     boxHeight = { xs: '150px', sm: '250px' };
@@ -40,6 +39,8 @@ const MerchantLogo = ({ theme, merchant, layout, colors = {} }: MerchantLogoProp
     width: '100%',
     height: isTheme3 ? '100%' : 'auto',
     objectFit: 'contain',
+    display: 'block',
+    margin: '0 auto',
   };
 
   if (isTheme2) {
@@ -53,6 +54,10 @@ const MerchantLogo = ({ theme, merchant, layout, colors = {} }: MerchantLogoProp
         width: boxWidth,
         marginBottom: { xs: '20px', sm: '0vw' },
         mx: boxMx,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        textAlign: 'center',
       }}
     >
       {showLogo ? (
@@ -68,6 +73,8 @@ const MerchantLogo = ({ theme, merchant, layout, colors = {} }: MerchantLogoProp
             sx={{
               color: isTheme1 ? colors.primary || '#d4a017' : '#d4a017',
               fontWeight: 'bold',
+              textAlign: 'center',
+              width: '100%',
             }}
           >
             {companyName}
