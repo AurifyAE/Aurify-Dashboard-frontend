@@ -17,10 +17,12 @@ import { getDefaultColumns } from '@/lib/layoutUtils';
 export default function Theme2Layout({
   data,
   isPreview = false,
+  isDraggable = true,
   onOrderChange,
 }: {
   data?: any;
   isPreview?: boolean;
+  isDraggable?: boolean;
   onOrderChange?: (left: string[], right: string[]) => void;
 }) {
   const { merchant, theme, layout, commodities, news } = data || {};
@@ -352,6 +354,7 @@ export default function Theme2Layout({
                 sourceCol="left"
                 index={index}
                 isPreview={isPreview}
+                isDraggable={isDraggable}
                 onDragStart={handleDragStart}
                 onDragOver={handleDragOver}
                 onDrop={handleDrop}
@@ -383,6 +386,7 @@ export default function Theme2Layout({
                 sourceCol="right"
                 index={index}
                 isPreview={isPreview}
+                isDraggable={isDraggable}
                 onDragStart={handleDragStart}
                 onDragOver={handleDragOver}
                 onDrop={handleDrop}

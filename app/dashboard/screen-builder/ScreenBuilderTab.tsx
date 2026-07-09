@@ -56,7 +56,7 @@ const WIDGET_LABELS: Record<string, string> = {
 const LAYOUTS = [
   {
     id: 'theme1',
-    label: 'Theme 1 (Classic)',
+    label: 'Theme 1',
     colors: [
       { key: 'primary', label: 'Primary', default: '#d4a017' },
       { key: 'secondary', label: 'Secondary', default: '#111827' },
@@ -77,7 +77,7 @@ const LAYOUTS = [
   },
   {
     id: 'theme2',
-    label: 'Theme 2 (Modern)',
+    label: 'Theme 2',
     colors: [
       { key: 'primary', label: 'Primary', default: '#d4a017' },
       { key: 'secondary', label: 'Secondary', default: '#111827' },
@@ -87,7 +87,7 @@ const LAYOUTS = [
   },
   {
     id: 'theme3',
-    label: 'Theme 3 (Premium)',
+    label: 'Theme 3',
     colors: [
       { key: 'primary', label: 'Primary', default: '#d4a017' },
       { key: 'secondary', label: 'Secondary', default: '#111827' },
@@ -179,9 +179,11 @@ interface ScreenBuilderTabProps {
 
 const TVPreviewRenderer = ({
   data,
+  isDraggable = true,
   onOrderChange,
 }: {
   data: any;
+  isDraggable?: boolean;
   onOrderChange?: (left: string[], right: string[]) => void;
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -260,11 +262,11 @@ const TVPreviewRenderer = ({
           SCREEN : {enhancedData?.layout?.selectedLayout}
         </div>
         {enhancedData?.layout?.selectedLayout === 'theme3' ? (
-          <Theme3Layout data={enhancedData} isPreview={true} onOrderChange={onOrderChange} />
+          <Theme3Layout data={enhancedData} isPreview={true} isDraggable={isDraggable} onOrderChange={onOrderChange} />
         ) : enhancedData?.layout?.selectedLayout === 'theme2' ? (
-          <Theme2Layout data={enhancedData} isPreview={true} onOrderChange={onOrderChange} />
+          <Theme2Layout data={enhancedData} isPreview={true} isDraggable={isDraggable} onOrderChange={onOrderChange} />
         ) : (
-          <Theme1Layout data={enhancedData} isPreview={true} onOrderChange={onOrderChange} />
+          <Theme1Layout data={enhancedData} isPreview={true} isDraggable={isDraggable} onOrderChange={onOrderChange} />
         )}
       </div>
     </div>
@@ -1616,6 +1618,7 @@ export default function ScreenBuilderTab({
               commodities: (merchant as any)?.commodities || [],
               news: news,
             }}
+            isDraggable={step === 2}
             onOrderChange={(newLeft, newRight) => {
               setColumnHistory((prev) => [
                 ...prev,

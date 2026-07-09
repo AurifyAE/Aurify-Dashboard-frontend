@@ -6,6 +6,7 @@ interface DraggableWrapperProps {
   sourceCol: 'left' | 'right';
   index: number;
   isPreview?: boolean;
+  isDraggable?: boolean;
   onDragStart: (e: React.DragEvent, id: string, sourceCol: 'left' | 'right') => void;
   onDragOver: (e: React.DragEvent) => void;
   onDrop: (e: React.DragEvent, targetCol: 'left' | 'right', targetIndex: number) => void;
@@ -26,6 +27,7 @@ export const DraggableWrapper = ({
   sourceCol,
   index,
   isPreview,
+  isDraggable = true,
   onDragStart,
   onDragOver,
   onDrop,
@@ -33,7 +35,7 @@ export const DraggableWrapper = ({
 }: DraggableWrapperProps) => {
   const [isDragOver, setIsDragOver] = useState(false);
 
-  if (!isPreview) {
+  if (!isPreview || !isDraggable) {
     return <>{children}</>;
   }
 
