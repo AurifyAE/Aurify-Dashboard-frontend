@@ -14,6 +14,7 @@ import type { UserRole } from '@/lib/auth';
 import {
   ArrowRight,
   BarChart2,
+  Bell,
   Building2,
   Crown,
   GemIcon,
@@ -48,6 +49,7 @@ const navItems: NavItem[] = [
     icon: LayoutDashboard,
     roles: ['user'],
   },
+
   {
     title: 'Spot Rate',
     href: '/dashboard/spotrate',
@@ -64,6 +66,11 @@ const navItems: NavItem[] = [
     title: 'Profile',
     href: '/dashboard/merchant-profile',
     icon: Building2,
+    roles: ['user'],
+  },  {
+    title: 'Notifications',
+    href: '/dashboard/notifications',
+    icon: Bell,
     roles: ['user'],
   },
   {

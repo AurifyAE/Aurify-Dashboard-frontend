@@ -1,24 +1,150 @@
-'use client';
-
 import React, { useEffect, useState } from 'react';
-import { Bell, Settings, CheckCircle2, Clock, AlertCircle, Users } from 'lucide-react';
+import {
+  Bell,
+  Settings,
+  CheckCircle2,
+  Clock,
+  AlertCircle,
+  Users,
+  XCircle,
+  CreditCard,
+  Sliders,
+  Tv,
+  EyeOff,
+  TrendingUp,
+  Key,
+  UserCheck,
+  Trash2,
+  Check,
+  CheckCheck,
+  HelpCircle,
+} from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { useAuth } from '@/context/AuthContext';
+import { useNotifications } from '@/context/NotificationContext';
 import { cn } from '@/lib/utils';
 import axiosInstance from '@/app/axios/axiosInstance';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { type Notification } from '@/lib/api/notifications';
+
+function formatTimeAgo(dateString: string): string {
+  const date = new Date(dateString);
+  const now = new Date();
+  const seconds = Math.floor((now.getTime() - date.getTime()) / 1000);
+  if (seconds < 60) return 'just now';
+  const minutes = Math.floor(seconds / 60);
+  if (minutes < 60) return `${minutes}m ago`;
+  const hours = Math.floor(minutes / 60);
+  if (hours < 24) return `${hours}h ago`;
+  const days = Math.floor(hours / 24);
+  if (days === 1) return 'yesterday';
+  return date.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+}
+
+const NotificationIcon = ({ iconKey, type }: { iconKey?: string; type: string }) => {
+  const getIconColor = () => {
+    switch (type) {
+      case 'SUCCESS':
+        return 'bg-emerald-100 text-emerald-600';
+      case 'WARNING':
+        return 'bg-orange-100 text-orange-600';
+      case 'ERROR':
+        return 'bg-red-100 text-red-600';
+      case 'INFO':
+      default:
+        return 'bg-blue-100 text-blue-600';
+    }
+  };
+
+  const className = `w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${getIconColor()}`;
+
+  switch (iconKey) {
+    case 'check-circle':
+      return (
+        <div className={className}>
+          <CheckCircle2 className="w-4 h-4" />
+        </div>
+      );
+    case 'x-circle':
+      return (
+        <div className={className}>
+          <XCircle className="w-4 h-4" />
+        </div>
+      );
+    case 'credit-card':
+      return (
+        <div className={className}>
+          <CreditCard className="w-4 h-4" />
+        </div>
+      );
+    case 'sliders':
+      return (
+        <div className={className}>
+          <Sliders className="w-4 h-4" />
+        </div>
+      );
+    case 'tv':
+      return (
+        <div className={className}>
+          <Tv className="w-4 h-4" />
+        </div>
+      );
+    case 'eye-off':
+      return (
+        <div className={className}>
+          <EyeOff className="w-4 h-4" />
+        </div>
+      );
+    case 'trending-up':
+      return (
+        <div className={className}>
+          <TrendingUp className="w-4 h-4" />
+        </div>
+      );
+    case 'key':
+      return (
+        <div className={className}>
+          <Key className="w-4 h-4" />
+        </div>
+      );
+    case 'user-check':
+      return (
+        <div className={className}>
+          <UserCheck className="w-4 h-4" />
+        </div>
+      );
+    default:
+      return (
+        <div className={className}>
+          <Bell className="w-4 h-4" />
+        </div>
+      );
+  }
+};
 
 const Header = () => {
   const { user, hasHydrated } = useAuth();
+  const router = useRouter();
   const [pendingUsersCount, setPendingUsersCount] = useState(0);
 
+  const {
+    latestNotifications: notifications,
+    unreadCount,
+    markAsRead,
+    clearNotification,
+    markAllAsRead,
+    loading,
+    merchant,
+  } = useNotifications();
+
+  // Fetch pending users count for admins
   useEffect(() => {
     if (user && (user.role === 'admin' || user.role === 'super_admin')) {
       const fetchPending = async () => {
@@ -38,6 +164,33 @@ const Header = () => {
     }
   }, [user]);
 
+  const handleNotificationClick = async (notif: Notification) => {
+    if (!notif.readAt) {
+      await markAsRead(notif._id);
+    }
+    router.push('/dashboard/notifications');
+  };
+
+  const handleMarkSingleAsRead = async (e: React.MouseEvent, notif: Notification) => {
+    e.stopPropagation();
+    e.preventDefault();
+    if (!notif.readAt) {
+      await markAsRead(notif._id);
+    }
+  };
+
+  const handleClearNotification = async (e: React.MouseEvent, id: string) => {
+    e.stopPropagation();
+    e.preventDefault();
+    await clearNotification(id);
+  };
+
+  const handleMarkAllRead = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    e.preventDefault();
+    await markAllAsRead();
+  };
+
   const getInitials = (name: string): string => {
     return name
       .split(' ')
@@ -46,6 +199,8 @@ const Header = () => {
       .toUpperCase()
       .slice(0, 2);
   };
+
+  const isAdmin = user?.role === 'admin' || user?.role === 'super_admin';
 
   return (
     <header className="sticky top-0 z-30 w-full py-1.5 bg-[#F1F1F1] border-b border-slate-200">
@@ -85,49 +240,52 @@ const Header = () => {
                 <Bell className="h-5 w-5 text-slate-600" />
                 {hasHydrated && user && (
                   <>
-                    {(user.role === 'admin' || user.role === 'super_admin') &&
-                      pendingUsersCount > 0 && (
-                        <span className="absolute top-1.5 right-1.5 flex h-2 w-2">
-                          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
-                          <span className="relative inline-flex rounded-full h-2 w-2 bg-blue-500"></span>
-                        </span>
-                      )}
-                    {!(user.role === 'admin' || user.role === 'super_admin') &&
-                      user.status?.toLowerCase() === 'pending' && (
-                        <span className="absolute top-1.5 right-1.5 flex h-2 w-2">
-                          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
-                          <span className="relative inline-flex rounded-full h-2 w-2 bg-amber-500"></span>
-                        </span>
-                      )}
+                    {isAdmin && pendingUsersCount > 0 && (
+                      <span className="absolute top-1.5 right-1.5 flex h-2 w-2">
+                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
+                        <span className="relative inline-flex rounded-full h-2 w-2 bg-blue-500"></span>
+                      </span>
+                    )}
+                    {!isAdmin && unreadCount > 0 && (
+                      <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[9px] font-bold text-white shadow-sm">
+                        {unreadCount}
+                      </span>
+                    )}
                   </>
                 )}
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent
               align="end"
-              className="w-80 p-0 rounded-2xl shadow-xl border-slate-100 overflow-hidden"
+              className="w-96 p-0 rounded-2xl shadow-xl border border-slate-200/60 bg-white overflow-hidden"
             >
-              <div className="bg-slate-50/50 p-3.5 border-b border-slate-100 flex items-center justify-between">
-                <p className="text-sm font-bold text-slate-800">Notifications</p>
-                {hasHydrated &&
-                  user &&
-                  (user.role === 'admin' || user.role === 'super_admin') &&
-                  pendingUsersCount > 0 && (
-                    <span className="bg-blue-100 text-blue-700 text-[10px] font-bold px-2 py-0.5 rounded-full">
-                      {pendingUsersCount} New
-                    </span>
+              <div className="bg-slate-50/80 p-3.5 border-b border-slate-100 flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-bold text-slate-800">Notifications</p>
+                  {!isAdmin && unreadCount > 0 && (
+                    <p className="text-[11px] text-slate-500 mt-0.5">
+                      You have {unreadCount} unread message{unreadCount > 1 ? 's' : ''}
+                    </p>
                   )}
-                {hasHydrated &&
-                  user &&
-                  !(user.role === 'admin' || user.role === 'super_admin') &&
-                  user.status?.toLowerCase() === 'pending' && (
-                    <span className="bg-amber-100 text-amber-700 text-[10px] font-bold px-2 py-0.5 rounded-full">
-                      1 New
-                    </span>
-                  )}
+                </div>
+                {isAdmin && pendingUsersCount > 0 && (
+                  <span className="bg-blue-100 text-blue-700 text-[10px] font-bold px-2 py-0.5 rounded-full">
+                    {pendingUsersCount} New
+                  </span>
+                )}
+                {!isAdmin && unreadCount > 0 && (
+                  <button
+                    type="button"
+                    onClick={handleMarkAllRead}
+                    className="flex items-center gap-1 text-[11px] font-semibold text-blue-600 hover:text-blue-700 cursor-pointer"
+                  >
+                    <CheckCheck className="w-3.5 h-3.5" />
+                    Mark all read
+                  </button>
+                )}
               </div>
-              <div className="p-2">
-                {hasHydrated && user && (user.role === 'admin' || user.role === 'super_admin') ? (
+              <div className="max-h-[350px] overflow-y-auto p-2 space-y-1">
+                {hasHydrated && user && isAdmin ? (
                   pendingUsersCount > 0 ? (
                     <div className="p-3 rounded-xl border flex gap-3 transition-colors bg-blue-50/50 border-blue-100/50 hover:bg-blue-50">
                       <div className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5 bg-blue-100 text-blue-600">
@@ -136,96 +294,87 @@ const Header = () => {
                       <div>
                         <p className="text-sm font-bold text-blue-900">New Users Pending</p>
                         <p className="text-[12px] mt-0.5 leading-snug text-blue-700/80">
-                          {pendingUsersCount} {pendingUsersCount === 1 ? 'user is' : 'users are'}{' '}
-                          currently pending approval to access the dashboard.
+                          {pendingUsersCount}{' '}
+                          {pendingUsersCount === 1 ? 'user is' : 'users are'} currently pending
+                          approval to access the dashboard.
                         </p>
                       </div>
                     </div>
                   ) : (
-                    <div className="p-4 text-center">
+                    <div className="p-8 text-center">
                       <Bell className="w-8 h-8 text-slate-200 mx-auto mb-2" />
-                      <p className="text-sm text-slate-500">No new notifications</p>
+                      <p className="text-sm text-slate-500 font-medium">No new notifications</p>
                     </div>
                   )
-                ) : hasHydrated && user && user.status?.toLowerCase() !== 'active' ? (
-                  <div
-                    className={cn(
-                      'p-3 rounded-xl border flex gap-3 transition-colors',
-                      user.status?.toLowerCase() === 'active'
-                        ? 'bg-emerald-50/50 border-emerald-100/50 hover:bg-emerald-50'
-                        : user.status?.toLowerCase() === 'pending'
-                          ? 'bg-amber-50/50 border-amber-100/50 hover:bg-amber-50'
-                          : 'bg-rose-50/50 border-rose-100/50 hover:bg-rose-50'
-                    )}
-                  >
+                ) : !isAdmin && notifications.length > 0 ? (
+                  notifications.map((notif) => (
                     <div
+                      key={notif._id}
+                      onClick={() => handleNotificationClick(notif)}
                       className={cn(
-                        'w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5',
-                        user.status?.toLowerCase() === 'active'
-                          ? 'bg-emerald-100 text-emerald-600'
-                          : user.status?.toLowerCase() === 'pending'
-                            ? 'bg-amber-100 text-amber-600'
-                            : 'bg-rose-100 text-rose-600'
+                        'group p-2.5 rounded-xl border flex gap-3 items-center relative transition-all cursor-pointer border-slate-100/50',
+                        notif.readAt
+                          ? 'bg-white hover:bg-slate-50'
+                          : 'bg-blue-50/30 hover:bg-blue-50/60 border-blue-50'
                       )}
                     >
-                      {user.status?.toLowerCase() === 'active' ? (
-                        <CheckCircle2 className="w-4 h-4" />
-                      ) : user.status?.toLowerCase() === 'pending' ? (
-                        <Clock className="w-4 h-4" />
-                      ) : (
-                        <AlertCircle className="w-4 h-4" />
-                      )}
+                      <NotificationIcon iconKey={notif.iconKey} type={notif.type} />
+                      <div className="flex-1 min-w-0 pr-6">
+                        <div className="flex items-center justify-between gap-2">
+                          <p
+                            className={cn(
+                              'text-xs font-semibold text-slate-700 truncate',
+                              !notif.readAt && 'text-slate-900 font-bold'
+                            )}
+                          >
+                            {notif.title}
+                          </p>
+                          <span className="text-[10px] font-medium text-slate-400 shrink-0 group-hover:opacity-0 transition-opacity">
+                            {formatTimeAgo(notif.createdAt)}
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Hover inline actions */}
+                      <div className="absolute right-2 top-3 opacity-0 group-hover:opacity-100 flex gap-1 transition-opacity">
+                        {!notif.readAt && (
+                          <button
+                            type="button"
+                            onClick={(e) => handleMarkSingleAsRead(e, notif)}
+                            title="Mark as read"
+                            className="p-1 hover:bg-slate-200 text-slate-500 hover:text-slate-700 rounded transition-colors cursor-pointer"
+                          >
+                            <Check className="w-3.5 h-3.5" />
+                          </button>
+                        )}
+                        <button
+                          type="button"
+                          onClick={(e) => handleClearNotification(e, notif._id)}
+                          title="Clear notification"
+                          className="p-1 hover:bg-slate-200 text-slate-500 hover:text-red-600 rounded transition-colors cursor-pointer"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
                     </div>
-                    <div>
-                      <p
-                        className={cn(
-                          'text-sm font-bold capitalize',
-                          user.status?.toLowerCase() === 'active'
-                            ? 'text-emerald-900'
-                            : user.status?.toLowerCase() === 'pending'
-                              ? 'text-amber-900'
-                              : 'text-rose-900'
-                        )}
-                      >
-                        Account {user.status?.toLowerCase()}
-                      </p>
-                      <p
-                        className={cn(
-                          'text-[12px] mt-0.5 leading-snug',
-                          user.status?.toLowerCase() === 'active'
-                            ? 'text-emerald-700/80'
-                            : user.status?.toLowerCase() === 'pending'
-                              ? 'text-amber-700/80'
-                              : 'text-rose-700/80'
-                        )}
-                      >
-                        {user.status?.toLowerCase() === 'pending'
-                          ? user.role === 'admin'
-                            ? 'Your account is pending approval from the superadmin.'
-                            : 'Your account is pending approval from the admin.'
-                          : 'Your account is currently suspended or inactive.'}
-                      </p>
-                      <span
-                        className={cn(
-                          'text-[10px] mt-2 block font-semibold',
-                          user.status?.toLowerCase() === 'active'
-                            ? 'text-emerald-600/60'
-                            : user.status?.toLowerCase() === 'pending'
-                              ? 'text-amber-600/60'
-                              : 'text-rose-600/60'
-                        )}
-                      >
-                        Just now
-                      </span>
-                    </div>
-                  </div>
+                  ))
                 ) : (
-                  <div className="p-4 text-center">
+                  <div className="p-8 text-center">
                     <Bell className="w-8 h-8 text-slate-200 mx-auto mb-2" />
-                    <p className="text-sm text-slate-500">No new notifications</p>
+                    <p className="text-sm text-slate-500 font-medium">No new notifications</p>
                   </div>
                 )}
               </div>
+              {!isAdmin && notifications.length > 0 && (
+                <div className="p-2 border-t border-slate-100 bg-slate-50/50 text-center">
+                  <Link
+                    href="/dashboard/notifications"
+                    className="text-xs font-bold text-blue-600 hover:text-blue-700 inline-block py-1 cursor-pointer"
+                  >
+                    View All Activity
+                  </Link>
+                </div>
+              )}
             </DropdownMenuContent>
           </DropdownMenu>
 

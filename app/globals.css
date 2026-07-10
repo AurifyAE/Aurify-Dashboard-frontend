@@ -275,3 +275,37 @@ input:focus-visible {
   scrollbar-width: thin;
   scrollbar-color: #cbd5e1 transparent;
 }
+
+/* ============================= */
+/* NOTIFICATION ROW ANIMATIONS   */
+/* ============================= */
+@keyframes notificationSlideIn {
+  0% {
+    opacity: 0;
+    transform: translateY(-10px);
+    background-color: rgba(96, 165, 250, 0.1);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+    background-color: transparent;
+  }
+}
+
+.notification-row-animate {
+  animation: notificationSlideIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* ============================= */
+/* PREMIUM TOAST STACK TRANSITIONS */
+/* ============================= */
+@keyframes toastIn {
+  0% { transform: translate3d(100%, 0, 0) scale(0.96); opacity: 0; }
+  100% { transform: translate3d(0, 0, 0) scale(1); opacity: 1; }
+}
+@keyframes toastOut {
+  0% { transform: translate3d(0, 0, 0) scale(1); opacity: 1; }
+  100% { transform: translate3d(100%, 0, 0) scale(0.96); opacity: 0; }
+}
+.animate-toast-in { animation: toastIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+.animate-toast-out { animation: toastOut 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards; }

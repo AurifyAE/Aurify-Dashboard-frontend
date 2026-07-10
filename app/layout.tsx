@@ -5,6 +5,8 @@ import { Roboto, Tenor_Sans } from 'next/font/google';
 import { AuthProvider } from '@/context/AuthContext';
 import { SpotRateProvider } from '@/context/SpotRateContext';
 import { CurrencyProvider } from '@/context/CurrencyContext';
+import { NotificationProvider } from '@/context/NotificationContext';
+import NotificationOverlay from '@/components/dashboard/NotificationOverlay';
 import { Toaster } from 'react-hot-toast';
 
 const roboto = Roboto({
@@ -31,10 +33,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en">
       <body className={`antialiased ${roboto.className} ${tenorSans.variable}`}>
         <AuthProvider>
-          <SpotRateProvider>
-            <CurrencyProvider>
-              {children}
-              <Toaster
+          <NotificationProvider>
+            <SpotRateProvider>
+              <CurrencyProvider>
+                {children}
+                <NotificationOverlay />
+                <Toaster
                 position="top-center"
                 toastOptions={{
                   style: {
@@ -60,8 +64,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                   },
                 }}
               />
-            </CurrencyProvider>
-          </SpotRateProvider>
+              </CurrencyProvider>
+            </SpotRateProvider>
+          </NotificationProvider>
         </AuthProvider>
       </body>
     </html>
