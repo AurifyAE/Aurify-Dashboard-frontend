@@ -160,7 +160,13 @@ export default function RegisterPage() {
       </div>
 
       {/* Right */}
-      <div className="w-full lg:w-2/5 flex items-center justify-center bg-white overflow-y-auto">
+      <div className="w-full lg:w-2/5 relative flex items-center justify-center bg-white overflow-y-auto">
+        <img
+          src={'/images/aurify-logo1.svg'}
+          alt="Background"
+          className="object-cover pointer-events-none h-full object-contain absolute top-0 -right-[40%] opacity-1   brightness-0 grayscale-100  "
+        />
+
         <div className="w-full max-w-[500px] px-8 py-12">
           {/* Logo */}
           <div className="mb-6">

@@ -262,11 +262,26 @@ const TVPreviewRenderer = ({
           SCREEN : {enhancedData?.layout?.selectedLayout}
         </div>
         {enhancedData?.layout?.selectedLayout === 'theme3' ? (
-          <Theme3Layout data={enhancedData} isPreview={true} isDraggable={isDraggable} onOrderChange={onOrderChange} />
+          <Theme3Layout
+            data={enhancedData}
+            isPreview={true}
+            isDraggable={isDraggable}
+            onOrderChange={onOrderChange}
+          />
         ) : enhancedData?.layout?.selectedLayout === 'theme2' ? (
-          <Theme2Layout data={enhancedData} isPreview={true} isDraggable={isDraggable} onOrderChange={onOrderChange} />
+          <Theme2Layout
+            data={enhancedData}
+            isPreview={true}
+            isDraggable={isDraggable}
+            onOrderChange={onOrderChange}
+          />
         ) : (
-          <Theme1Layout data={enhancedData} isPreview={true} isDraggable={isDraggable} onOrderChange={onOrderChange} />
+          <Theme1Layout
+            data={enhancedData}
+            isPreview={true}
+            isDraggable={isDraggable}
+            onOrderChange={onOrderChange}
+          />
         )}
       </div>
     </div>
@@ -742,8 +757,10 @@ export default function ScreenBuilderTab({
   });
   const defaults = getDefaultColumns(draft.selectedLayout);
   const isLayoutCustomized =
-    (draft.leftColumnOrder && JSON.stringify(draft.leftColumnOrder) !== JSON.stringify(defaults.left)) ||
-    (draft.rightColumnOrder && JSON.stringify(draft.rightColumnOrder) !== JSON.stringify(defaults.right));
+    (draft.leftColumnOrder &&
+      JSON.stringify(draft.leftColumnOrder) !== JSON.stringify(defaults.left)) ||
+    (draft.rightColumnOrder &&
+      JSON.stringify(draft.rightColumnOrder) !== JSON.stringify(defaults.right));
 
   const handleUndo = () => {
     if (columnHistory.length === 0) return;
@@ -1194,8 +1211,13 @@ export default function ScreenBuilderTab({
                     {COLOR_CATEGORIES.map((category) => {
                       const widget = category.requiredWidget;
                       const hasWidget = !!widget;
-                      const isRequired = hasWidget && ['Spot Rates', 'Commodity Table', 'Footer'].includes(widget);
-                      const isChecked = isRequired ? true : (hasWidget ? draft.widgets.includes(widget) : true);
+                      const isRequired =
+                        hasWidget && ['Spot Rates', 'Commodity Table', 'Footer'].includes(widget);
+                      const isChecked = isRequired
+                        ? true
+                        : hasWidget
+                          ? draft.widgets.includes(widget)
+                          : true;
 
                       return (
                         <div
@@ -1228,7 +1250,11 @@ export default function ScreenBuilderTab({
                                   }`}
                                 />
                                 <span
-                                  onClick={() => setOpenAccordion(openAccordion === category.title ? null : category.title)}
+                                  onClick={() =>
+                                    setOpenAccordion(
+                                      openAccordion === category.title ? null : category.title
+                                    )
+                                  }
                                   className="flex items-center gap-2 select-none cursor-pointer hover:text-blue-600 transition-colors flex-1 py-1"
                                 >
                                   {WIDGET_LABELS[widget] || widget}
@@ -1241,10 +1267,14 @@ export default function ScreenBuilderTab({
                               </div>
                             ) : (
                               <div
-                                onClick={() => setOpenAccordion(openAccordion === category.title ? null : category.title)}
+                                onClick={() =>
+                                  setOpenAccordion(
+                                    openAccordion === category.title ? null : category.title
+                                  )
+                                }
                                 className="text-sm font-semibold text-slate-700 flex-1 cursor-pointer hover:text-blue-600 transition-colors py-1"
                               >
-                                {category.title} 
+                                {category.title}
                               </div>
                             )}
 
@@ -1407,8 +1437,6 @@ export default function ScreenBuilderTab({
                     })}
                   </div>
                 </div>
-
-
 
                 <div className="flex gap-2 pt-2">
                   <button type="button" onClick={() => setStep(1)} className="btn-secondary">
@@ -1582,7 +1610,7 @@ export default function ScreenBuilderTab({
               <Monitor className="h-5 w-5 text-blue-600" />
               Live TV Preview
             </div>
-            
+
             <div className="flex items-center gap-2">
               {columnHistory.length > 0 && (
                 <button

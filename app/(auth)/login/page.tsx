@@ -134,7 +134,13 @@ function LoginContent() {
         </div>
       </div>
       {/* Right Side - Login Form */}
-      <div className="w-full lg:w-2/5 flex items-center justify-center bg-white relative">
+      <div className="w-full lg:w-2/5 flex relative items-center justify-center bg-white relative">
+        <img
+          src={'/images/aurify-logo1.svg'}
+          alt="Background"
+          className="object-cover h-full pointer-events-none object-contain absolute top-0 -right-[40%] opacity-1   brightness-0 grayscale-100  "
+        />
+
         <div className="w-full max-w-[500px] px-8 py-12">
           {/* Logo */}
           <div className="mb-5">

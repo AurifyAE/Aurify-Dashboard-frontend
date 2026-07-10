@@ -59,7 +59,7 @@ export const DraggableWrapper = ({
       ghost.style.zIndex = '99999';
       document.body.appendChild(ghost);
       e.dataTransfer.setDragImage(ghost, 20, 20);
-      
+
       // Clean up the ghost DOM node immediately in the next tick
       setTimeout(() => {
         if (document.body.contains(ghost)) {
