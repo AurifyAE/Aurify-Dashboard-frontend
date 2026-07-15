@@ -13,6 +13,7 @@ import {
   Tv,
   ChevronLeft,
   ChevronRight,
+  ChevronDown,
 } from 'lucide-react';
 import { Select, MenuItem } from '@mui/material';
 
@@ -307,17 +308,20 @@ export default function AdminClientsPage() {
                   <label className="text-xs font-medium text-slate-500 whitespace-nowrap">
                     Rows per page:
                   </label>
-                  <select
-                    value={itemsPerPage}
-                    onChange={(e) => handleItemsPerPageChange(Number(e.target.value))}
-                    className="text-sm font-semibold text-slate-700 border border-slate-200 rounded-lg px-2.5 py-1.5 bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-400 outline-none cursor-pointer shadow-sm transition-all"
-                  >
-                    {PAGE_SIZE_OPTIONS.map((size) => (
-                      <option key={size} value={size}>
-                        {size}
-                      </option>
-                    ))}
-                  </select>
+                  <div className="relative flex items-center">
+                    <select
+                      value={itemsPerPage}
+                      onChange={(e) => handleItemsPerPageChange(Number(e.target.value))}
+                      className="text-sm font-semibold text-slate-700 border border-slate-200 rounded-lg pl-2.5 pr-8 py-1.5 bg-white appearance-none focus:ring-2 focus:ring-blue-500 focus:border-blue-400 outline-none cursor-pointer shadow-sm transition-all"
+                    >
+                      {PAGE_SIZE_OPTIONS.map((size) => (
+                        <option key={size} value={size}>
+                          {size}
+                        </option>
+                      ))}
+                    </select>
+                    <ChevronDown className="w-4 h-4 text-slate-400 absolute right-2.5 pointer-events-none" />
+                  </div>
                 </div>
               </div>
               <div className="flex items-center gap-1">
