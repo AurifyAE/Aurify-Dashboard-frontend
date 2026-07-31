@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useState, useMemo } from 'react';
+import { renderToString } from 'react-dom/server';
 import DashboardShell from '@/components/dashboard/DashboardShell';
 import { adminApi, AdminMerchant } from '@/lib/api/admin';
 import Swal from 'sweetalert2';
@@ -14,6 +15,8 @@ import {
   ChevronLeft,
   ChevronRight,
   ChevronDown,
+  Eye,
+  EyeOff,
 } from 'lucide-react';
 import { Select, MenuItem } from '@mui/material';
 
@@ -72,21 +75,43 @@ export default function AdminClientsPage() {
   const handleResetPassword = async (id: string) => {
     const { value: newPassword } = await Swal.fire({
       title: 'Reset Password',
-      input: 'password',
-      inputLabel: 'New Password',
-      inputPlaceholder: 'Enter new password (min 8 chars)',
-      inputAttributes: {
-        minlength: '8',
-        autocapitalize: 'off',
-        autocorrect: 'off',
-      },
+      html: `
+        <div class="relative w-full text-left mt-3">
+          <label class="block text-xs font-semibold text-slate-600 mb-1">New Password</label>
+          <div class="relative">
+            <input id="swal-new-password" type="password" class="w-full px-3.5 py-2.5 pr-10 border border-slate-300 rounded-lg text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all" placeholder="Enter new password (min 8 chars)" minlength="8" autocapitalize="off" autocorrect="off" />
+            <button id="swal-toggle-password" type="button" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 p-1 flex items-center justify-center transition-colors cursor-pointer">
+              ${renderToString(<Eye className="w-4 h-4" />)}
+            </button>
+          </div>
+        </div>
+      `,
       showCancelButton: true,
       confirmButtonColor: '#3b82f6',
       confirmButtonText: 'Reset Password',
-      inputValidator: (value) => {
-        if (!value || value.length < 8) {
-          return 'Password must be at least 8 characters!';
+      didOpen: () => {
+        const popup = Swal.getPopup();
+        const input = popup?.querySelector('#swal-new-password') as HTMLInputElement;
+        const toggleBtn = popup?.querySelector('#swal-toggle-password') as HTMLButtonElement;
+        let isVisible = false;
+        if (input && toggleBtn) {
+          toggleBtn.addEventListener('click', () => {
+            isVisible = !isVisible;
+            input.type = isVisible ? 'text' : 'password';
+            toggleBtn.innerHTML = renderToString(
+              isVisible ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />
+            );
+          });
         }
+      },
+      preConfirm: () => {
+        const input = Swal.getPopup()?.querySelector('#swal-new-password') as HTMLInputElement;
+        const val = input?.value || '';
+        if (!val || val.length < 8) {
+          Swal.showValidationMessage('Password must be at least 8 characters!');
+          return false;
+        }
+        return val;
       },
     });
 
@@ -429,10 +454,10 @@ export default function AdminClientsPage() {
                 <button
                   type="button"
                   onClick={() => handleResetPassword(editingMerchant._id)}
-                  className="absolute top-4 right-4 bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 hover:text-blue-600 font-medium text-xs px-3 py-1.5 rounded-lg shadow-sm transition-all"
+                  className="absolute top-4 right-4 bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 hover:text-blue-600 font-medium text-xs px-3 py-1.5 rounded-lg shadow-sm transition-all inline-flex items-center gap-1.5"
                 >
-                  Reset Password
-                </button>
+                 Reset Password
+                 </button>
               </div>
 
               {/* Grid 1: Status & Limits */}
