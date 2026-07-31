@@ -84,6 +84,7 @@ export const notificationsApi = {
   readAll: () => request<{ unread: number }>('/read-all', { method: 'PATCH' }),
   clear: (id: string) =>
     request<{ notification: Notification; unread: number }>(`/${id}/clear`, { method: 'PATCH' }),
+  clearAll: () => request<{ success: boolean }>('/clear-all', { method: 'PATCH' }),
   clearAllRead: () => request<{ success: boolean }>(`/clear-all-read`, { method: 'PATCH' }),
   clearSelected: (ids: string[]) =>
     request<{ unread: number }>('/clear-selected', {

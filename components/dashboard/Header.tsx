@@ -18,7 +18,9 @@ import {
   Check,
   CheckCheck,
   HelpCircle,
+  X,
 } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import {
@@ -139,6 +141,7 @@ const Header = () => {
     unreadCount,
     markAsRead,
     clearNotification,
+    clearSelected,
     markAllAsRead,
     loading,
     merchant,
@@ -183,6 +186,15 @@ const Header = () => {
     e.stopPropagation();
     e.preventDefault();
     await clearNotification(id);
+  };
+
+  const handleClearAllHeaderNotifs = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    e.preventDefault();
+    if (notifications.length > 0) {
+      const ids = notifications.map((n) => n._id);
+      await clearSelected(ids);
+    }
   };
 
   const handleMarkAllRead = async (e: React.MouseEvent) => {
@@ -273,15 +285,28 @@ const Header = () => {
                     {pendingUsersCount} New
                   </span>
                 )}
-                {!isAdmin && unreadCount > 0 && (
-                  <button
-                    type="button"
-                    onClick={handleMarkAllRead}
-                    className="flex items-center gap-1 text-[11px] font-semibold text-blue-600 hover:text-blue-700 cursor-pointer"
-                  >
-                    <CheckCheck className="w-3.5 h-3.5" />
-                    Mark all read
-                  </button>
+                {!isAdmin && notifications.length > 0 && (
+                  <div className="flex items-center gap-2">
+                    {unreadCount > 0 && (
+                      <button
+                        type="button"
+                        onClick={handleMarkAllRead}
+                        className="flex items-center gap-1 text-[11px] font-semibold text-blue-600 hover:text-blue-700 cursor-pointer"
+                      >
+                        <CheckCheck className="w-3.5 h-3.5" />
+                        Mark read
+                      </button>
+                    )}
+                    <button
+                      type="button"
+                      onClick={handleClearAllHeaderNotifs}
+                      className="flex items-center gap-1 text-[11px] font-semibold text-slate-400 hover:text-red-600 transition-colors cursor-pointer"
+                      title="Clear all notifications from header panel"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                      Clear all
+                    </button>
+                  </div>
                 )}
               </div>
               <div className="max-h-[350px] overflow-y-auto p-2 space-y-1">
@@ -312,37 +337,40 @@ const Header = () => {
                       key={notif._id}
                       onClick={() => handleNotificationClick(notif)}
                       className={cn(
-                        'group p-2.5 rounded-xl border flex gap-3 items-center relative transition-all cursor-pointer border-slate-100/50',
+                        'group p-2.5 rounded-xl border flex gap-3 items-center relative transition-colors cursor-pointer border-slate-100/50',
                         notif.readAt
                           ? 'bg-white hover:bg-slate-50'
                           : 'bg-blue-50/30 hover:bg-blue-50/60 border-blue-50'
                       )}
                     >
                       <NotificationIcon iconKey={notif.iconKey} type={notif.type} />
-                      <div className="flex-1 min-w-0 pr-6">
+                      <div className="flex-1 min-w-0 pr-12">
                         <div className="flex items-center justify-between gap-2">
                           <p
                             className={cn(
-                              'text-xs font-semibold text-slate-700 truncate',
+                              'text-xs font-semibold truncate text-slate-700',
                               !notif.readAt && 'text-slate-900 font-bold'
                             )}
                           >
                             {notif.title}
                           </p>
-                          <span className="text-[10px] font-medium text-slate-400 shrink-0 group-hover:opacity-0 transition-opacity">
+                          <span className="text-[10px] font-medium shrink-0 group-hover:opacity-0 transition-opacity text-slate-400">
                             {formatTimeAgo(notif.createdAt)}
                           </span>
                         </div>
+                        <p className="text-[11px] truncate mt-0.5 text-slate-500">
+                          {notif.message}
+                        </p>
                       </div>
 
-                      {/* Hover inline actions */}
-                      <div className="absolute right-2 top-3 opacity-0 group-hover:opacity-100 flex gap-1 transition-opacity">
+                      {/* Inline action buttons */}
+                      <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity bg-white/90 backdrop-blur-sm pl-1 py-0.5 rounded-lg">
                         {!notif.readAt && (
                           <button
                             type="button"
                             onClick={(e) => handleMarkSingleAsRead(e, notif)}
                             title="Mark as read"
-                            className="p-1 hover:bg-slate-200 text-slate-500 hover:text-slate-700 rounded transition-colors cursor-pointer"
+                            className="p-1 hover:bg-blue-50 text-slate-400 hover:text-blue-600 rounded transition-colors cursor-pointer"
                           >
                             <Check className="w-3.5 h-3.5" />
                           </button>
@@ -351,7 +379,7 @@ const Header = () => {
                           type="button"
                           onClick={(e) => handleClearNotification(e, notif._id)}
                           title="Clear notification"
-                          className="p-1 hover:bg-slate-200 text-slate-500 hover:text-red-600 rounded transition-colors cursor-pointer"
+                          className="p-1 hover:bg-red-50 text-slate-400 hover:text-red-600 rounded transition-colors cursor-pointer"
                         >
                           <Trash2 className="w-3.5 h-3.5" />
                         </button>

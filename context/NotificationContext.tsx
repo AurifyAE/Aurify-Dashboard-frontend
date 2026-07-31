@@ -39,6 +39,7 @@ interface NotificationContextValue {
   markAsRead: (id: string) => Promise<void>;
   markAllAsRead: () => Promise<void>;
   clearNotification: (id: string) => Promise<void>;
+  clearAll: () => Promise<void>;
   clearAllRead: () => Promise<void>;
   clearSelected: (ids: string[]) => Promise<void>;
   socket: Socket | null;
@@ -168,21 +169,7 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
       });
 
       setUnreadCount(data.unreadCount);
-
-      // Trigger live toast unless silent or active page is the notifications center itself
-      const isOnNotificationsPage =
-        pathRef.current === '/dashboard/notifications' ||
-        (typeof window !== 'undefined' && window.location.pathname === '/dashboard/notifications');
-
-      if (!data.notification.silent && !isOnNotificationsPage) {
-        addToast({
-          title: data.notification.title,
-          message: data.notification.message,
-          variant: data.notification.type as ToastVariant,
-          iconKey: data.notification.iconKey,
-          actions: data.notification.actions,
-        });
-      }
+      // Popup notifications disabled per requirement
     });
 
     socket.on('notification:count', (data: { unreadCount: number }) => {
@@ -258,6 +245,23 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  const clearAll = async () => {
+    const prevNotifs = [...latestNotifications];
+    const prevCount = unreadCount;
+
+    // Optimistic Update: empty notifications list & reset count immediately
+    setLatestNotifications([]);
+    setUnreadCount(0);
+
+    try {
+      await notificationsApi.clearAll();
+    } catch (err) {
+      console.error('[NotificationContext] Failed to clear all notifications, rolling back...', err);
+      setLatestNotifications(prevNotifs);
+      setUnreadCount(prevCount);
+    }
+  };
+
   const clearAllRead = async () => {
     const prevNotifs = [...latestNotifications];
 
@@ -309,6 +313,7 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
         markAsRead,
         markAllAsRead,
         clearNotification,
+        clearAll,
         clearAllRead,
         clearSelected,
         socket: socketRef.current,

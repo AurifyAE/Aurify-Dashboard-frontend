@@ -17,6 +17,7 @@ import {
   ChevronDown,
   Eye,
   EyeOff,
+  Loader2,
 } from 'lucide-react';
 import { Select, MenuItem } from '@mui/material';
 
@@ -26,6 +27,7 @@ export default function AdminClientsPage() {
 
   const [merchants, setMerchants] = useState<AdminMerchant[]>([]);
   const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
   const [search, setSearch] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [editingMerchant, setEditingMerchant] = useState<AdminMerchant | null>(null);
@@ -49,9 +51,10 @@ export default function AdminClientsPage() {
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!editingMerchant) return;
+    if (!editingMerchant || saving) return;
 
     try {
+      setSaving(true);
       const dataToSave = {
         status: editingMerchant.status,
         maxScreens: editingMerchant.maxScreens,
@@ -63,12 +66,13 @@ export default function AdminClientsPage() {
       };
 
       const updated = await adminApi.updateMerchant(editingMerchant._id, dataToSave);
-      setMerchants(merchants.map((m) => (m._id === updated._id ? updated : m)));
+      setMerchants((prev) => prev.map((m) => (m._id === updated._id ? updated : m)));
       setEditingMerchant(null);
-      fetchMerchants();
     } catch (err) {
       console.error(err);
       Swal.fire('Error', 'Failed to update merchant', 'error');
+    } finally {
+      setSaving(false);
     }
   };
 
@@ -696,9 +700,17 @@ export default function AdminClientsPage() {
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2.5 text-sm font-bold text-white bg-blue-600 hover:bg-blue-700 shadow-sm rounded-xl transition-all"
+                  disabled={saving}
+                  className="px-5 py-2.5 text-sm font-bold text-white bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 disabled:cursor-not-allowed shadow-sm rounded-xl transition-all flex items-center gap-2 cursor-pointer"
                 >
-                  Save Changes
+                  {saving ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      Saving...
+                    </>
+                  ) : (
+                    'Save Changes'
+                  )}
                 </button>
               </div>
             </form>

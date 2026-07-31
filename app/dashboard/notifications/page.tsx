@@ -19,6 +19,7 @@ import {
   HelpCircle,
   Loader2,
 } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { notificationsApi, type Notification } from '@/lib/api/notifications';
 import { marketplaceApi } from '@/lib/api/marketplace';
 import { useAuth } from '@/context/AuthContext';
@@ -134,7 +135,6 @@ export default function NotificationsPage() {
   const [selectedCategory, setSelectedCategory] = useState<string>('ALL');
   const [unreadOnly, setUnreadOnly] = useState<boolean>(false);
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
-
   const {
     socket,
     markAsRead,
@@ -227,13 +227,10 @@ export default function NotificationsPage() {
   }, [socket, selectedCategory, unreadOnly]);
 
   const handleMarkAsRead = async (id: string) => {
-    // Local state optimistic update
     setNotifications((prev) =>
       prev.map((n) => (n._id === id ? { ...n, readAt: new Date().toISOString() } : n))
     );
     setUnreadCount((c) => Math.max(0, c - 1));
-
-    // Call context which manages global badge state and API call
     await markAsRead(id);
   };
 
@@ -293,7 +290,7 @@ export default function NotificationsPage() {
     }
   };
 
-  // Group notifications helper memoized to prevent re-computations and UI glitches on selections
+  // Group notifications into Today, Yesterday, and Earlier
   const { today, yesterday, earlier } = useMemo(() => {
     const todayGroup: Notification[] = [];
     const yesterdayGroup: Notification[] = [];
@@ -329,7 +326,7 @@ export default function NotificationsPage() {
             <div
               key={notif._id}
               className={cn(
-                'py-3 flex items-center justify-between gap-4 relative group transition-colors notification-row-animate',
+                'py-3 flex items-center justify-between gap-4 relative group transition-colors',
                 !notif.readAt && 'bg-blue-50/15 -mx-5 px-5 rounded-lg'
               )}
             >
