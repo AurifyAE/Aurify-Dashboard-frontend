@@ -20,6 +20,7 @@ import {
   Loader2,
 } from 'lucide-react';
 import { Select, MenuItem } from '@mui/material';
+import { cn } from '@/lib/utils';
 
 export default function AdminClientsPage() {
   const PAGE_SIZE_OPTIONS = [10, 15, 20, 25];
@@ -30,7 +31,26 @@ export default function AdminClientsPage() {
   const [saving, setSaving] = useState(false);
   const [search, setSearch] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
-  const [editingMerchant, setEditingMerchant] = useState<AdminMerchant | null>(null);
+  const [editingMerchant, setEditingMerchant] = useState<any>(null);
+
+  // Validation rules for Max Screens & Max Devices
+  const isMaxScreensValid = useMemo(() => {
+    if (!editingMerchant) return true;
+    const val = editingMerchant.maxScreens;
+    if (val === '' || val === null || val === undefined) return false;
+    const num = Number(val);
+    return !isNaN(num) && num >= 1;
+  }, [editingMerchant?.maxScreens]);
+
+  const isMaxDevicesValid = useMemo(() => {
+    if (!editingMerchant) return true;
+    const val = editingMerchant.maxDevices;
+    if (val === '' || val === null || val === undefined) return false;
+    const num = Number(val);
+    return !isNaN(num) && num >= 1;
+  }, [editingMerchant?.maxDevices]);
+
+  const isFormValid = isMaxScreensValid && isMaxDevicesValid;
 
   useEffect(() => {
     fetchMerchants();
@@ -51,14 +71,14 @@ export default function AdminClientsPage() {
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!editingMerchant || saving) return;
+    if (!editingMerchant || saving || !isFormValid) return;
 
     try {
       setSaving(true);
       const dataToSave = {
         status: editingMerchant.status,
-        maxScreens: editingMerchant.maxScreens,
-        maxDevices: editingMerchant.maxDevices,
+        maxScreens: Number(editingMerchant.maxScreens),
+        maxDevices: Number(editingMerchant.maxDevices),
         serviceEndDate: editingMerchant.serviceEndDate,
         services: editingMerchant.services,
         additionalFeatures: editingMerchant.additionalFeatures,
@@ -551,15 +571,27 @@ export default function AdminClientsPage() {
                         <input
                           type="number"
                           min="1"
-                          value={editingMerchant.maxScreens || 1}
-                          onChange={(e) =>
+                          value={editingMerchant.maxScreens ?? ''}
+                          onChange={(e) => {
+                            const val = e.target.value;
                             setEditingMerchant({
                               ...editingMerchant,
-                              maxScreens: parseInt(e.target.value) || 1,
-                            })
-                          }
-                          className="w-full rounded-xl border border-slate-200 px-4 py-2.5 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none"
+                              maxScreens: val === '' ? '' : (isNaN(parseInt(val, 10)) ? '' : parseInt(val, 10)),
+                            });
+                          }}
+                          placeholder="Enter max screens"
+                          className={cn(
+                            'w-full rounded-xl border px-4 py-2.5 text-sm outline-none transition-all [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none',
+                            !isMaxScreensValid
+                              ? 'border-red-500 focus:border-red-500 focus:ring-1 focus:ring-red-500 bg-red-50/10 text-red-900'
+                              : 'border-slate-200 focus:border-blue-500 focus:ring-1 focus:ring-blue-500'
+                          )}
                         />
+                        {!isMaxScreensValid && (
+                          <p className="text-[11px] font-medium text-red-500 mt-1.5">
+                            Max screens is required (at least 1)
+                          </p>
+                        )}
                       </div>
                       <div>
                         <label className="block text-sm font-semibold text-slate-700 mb-1.5">
@@ -568,15 +600,27 @@ export default function AdminClientsPage() {
                         <input
                           type="number"
                           min="1"
-                          value={editingMerchant.maxDevices || 1}
-                          onChange={(e) =>
+                          value={editingMerchant.maxDevices ?? ''}
+                          onChange={(e) => {
+                            const val = e.target.value;
                             setEditingMerchant({
                               ...editingMerchant,
-                              maxDevices: parseInt(e.target.value) || 1,
-                            })
-                          }
-                          className="w-full rounded-xl border border-slate-200 px-4 py-2.5 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none"
+                              maxDevices: val === '' ? '' : (isNaN(parseInt(val, 10)) ? '' : parseInt(val, 10)),
+                            });
+                          }}
+                          placeholder="Enter max devices"
+                          className={cn(
+                            'w-full rounded-xl border px-4 py-2.5 text-sm outline-none transition-all [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none',
+                            !isMaxDevicesValid
+                              ? 'border-red-500 focus:border-red-500 focus:ring-1 focus:ring-red-500 bg-red-50/10 text-red-900'
+                              : 'border-slate-200 focus:border-blue-500 focus:ring-1 focus:ring-blue-500'
+                          )}
                         />
+                        {!isMaxDevicesValid && (
+                          <p className="text-[11px] font-medium text-red-500 mt-1.5">
+                            Max devices is required (at least 1)
+                          </p>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -636,7 +680,7 @@ export default function AdminClientsPage() {
                                 ...editingMerchant,
                                 allowedCommodities: e.target.checked
                                   ? [...arr, commodity]
-                                  : arr.filter((c) => c !== commodity),
+                                  : arr.filter((c: string) => c !== commodity),
                               });
                             }}
                             className="w-4 h-4 rounded text-blue-600 focus:ring-blue-500"
@@ -678,7 +722,7 @@ export default function AdminClientsPage() {
                               ...editingMerchant,
                               additionalFeatures: e.target.checked
                                 ? [...arr, feature]
-                                : arr.filter((f) => f !== feature),
+                                : arr.filter((f: string) => f !== feature),
                             });
                           }}
                           className="w-4 h-4 rounded text-blue-600 focus:ring-blue-500"
@@ -700,8 +744,8 @@ export default function AdminClientsPage() {
                 </button>
                 <button
                   type="submit"
-                  disabled={saving}
-                  className="px-5 py-2.5 text-sm font-bold text-white bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 disabled:cursor-not-allowed shadow-sm rounded-xl transition-all flex items-center gap-2 cursor-pointer"
+                  disabled={saving || !isFormValid}
+                  className="px-5 py-2.5 text-sm font-bold text-white bg-blue-600 hover:bg-blue-700 disabled:bg-slate-300 disabled:text-slate-500 disabled:cursor-not-allowed shadow-sm rounded-xl transition-all flex items-center gap-2 cursor-pointer"
                 >
                   {saving ? (
                     <>
