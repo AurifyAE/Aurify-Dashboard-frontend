@@ -92,7 +92,7 @@ export default function SettingsPage() {
 
   return (
     <DashboardShell>
-      <div className="max-w-3xl mx-auto space-y-6">
+      <div className="max-w-[1400px] mx-auto space-y-6">
         <div>
           <h1 className="text-2xl font-bold text-slate-900">Account Settings</h1>
           <p className="mt-0.5 text-sm text-slate-500">

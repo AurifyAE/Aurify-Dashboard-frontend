@@ -99,7 +99,6 @@ function MerchantStatusBanner({ merchant }: { merchant: Merchant | null }) {
 export default function DashboardPage() {
   const { user, hasHydrated } = useAuth();
   const router = useRouter();
-  const [loading, setLoading] = useState(true);
   const [merchant, setMerchant] = useState<Merchant | null | undefined>(undefined);
 
   const isAdmin = user?.role === 'admin' || user?.role === 'super_admin';
@@ -114,7 +113,7 @@ export default function DashboardPage() {
 
   useEffect(() => {
     if (isAdmin) return; // skip merchant fetch for admins
-    // Load merchant status quietly
+    // Load merchant status quietly in the background without blocking the UI
     marketplaceApi
       .myMerchant()
       .then((data) => {
@@ -122,9 +121,6 @@ export default function DashboardPage() {
       })
       .catch(() => {
         setMerchant(null);
-      })
-      .finally(() => {
-        setLoading(false);
       });
   }, [isAdmin]);
 
@@ -132,13 +128,10 @@ export default function DashboardPage() {
   if (!hasHydrated || isAdmin) return <Loader />;
 
   return (
-    <>
-      {loading && <Loader />}
-      <DashboardShell className="space-y-6">
-        {/* Merchant Status Banner */}
-        {merchant !== undefined && <MerchantStatusBanner merchant={merchant} />}
-        <DashboardData />
-      </DashboardShell>
-    </>
+    <DashboardShell className="space-y-6">
+      {/* Merchant Status Banner */}
+      {merchant !== undefined && <MerchantStatusBanner merchant={merchant} />}
+      <DashboardData />
+    </DashboardShell>
   );
 }

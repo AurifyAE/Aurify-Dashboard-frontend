@@ -1,6 +1,6 @@
 'use client';
 
-import React, { createContext, useContext, useState, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useCallback, useMemo, ReactNode } from 'react';
 
 interface CurrencyContextType {
   currency: string;
@@ -10,13 +10,20 @@ interface CurrencyContextType {
 const CurrencyContext = createContext<CurrencyContextType | undefined>(undefined);
 
 export const CurrencyProvider = ({ children }: { children: ReactNode }) => {
-  const [currency, setCurrency] = useState('AED');
+  const [currency, setCurrencyState] = useState('AED');
 
-  return (
-    <CurrencyContext.Provider value={{ currency, setCurrency }}>
-      {children}
-    </CurrencyContext.Provider>
+  // Stable setter — prevents new function reference on every parent render
+  const setCurrency = useCallback((c: string) => {
+    setCurrencyState(c);
+  }, []);
+
+  // Memoized value — new object only when currency actually changes
+  const value = useMemo<CurrencyContextType>(
+    () => ({ currency, setCurrency }),
+    [currency, setCurrency]
   );
+
+  return <CurrencyContext.Provider value={value}>{children}</CurrencyContext.Provider>;
 };
 
 export const useCurrency = () => {

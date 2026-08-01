@@ -1,7 +1,6 @@
 'use client';
 
-import React, { ReactNode } from 'react';
-import Image from 'next/image';
+import React, { ReactNode, memo } from 'react';
 import Header from '@/components/dashboard/Header';
 import Sidebar from '@/components/dashboard/Sidebar';
 import { cn } from '@/lib/utils';
@@ -12,7 +11,20 @@ interface DashboardShellProps {
   contentClassName?: string;
 }
 
-export default function DashboardShell({
+/**
+ * DashboardShell — wrapped in React.memo so page-level state changes
+ * (e.g. merchant fetch, local UI state) do not cause the global
+ * Header and Sidebar to re-render unnecessarily.
+ *
+ * React.memo is effective here because DashboardShell's props
+ * (children, className, contentClassName) rarely change — children
+ * is a new React element reference each render, but React.memo does a
+ * shallow comparison of each prop; since children is always the same
+ * logical subtree and className/contentClassName are string literals,
+ * the shell itself skips re-renders while the children slot still
+ * updates correctly.
+ */
+const DashboardShell = memo(function DashboardShell({
   children,
   className,
   contentClassName,
@@ -31,4 +43,6 @@ export default function DashboardShell({
       </div>
     </div>
   );
-}
+});
+
+export default DashboardShell;

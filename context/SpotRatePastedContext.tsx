@@ -1,6 +1,13 @@
 'use client';
 
-import React, { createContext, useCallback, useContext, useState, ReactNode } from 'react';
+import React, {
+  createContext,
+  useCallback,
+  useContext,
+  useState,
+  useMemo,
+  ReactNode,
+} from 'react';
 import axiosInstance from '../app/axios/axiosInstance';
 
 export interface SpotRatePastedContextValue {
@@ -100,21 +107,39 @@ export const SpotRatePastedProvider: React.FC<{ children: ReactNode }> = ({ chil
     [adminId, fetchData]
   );
 
-  const value: SpotRatePastedContextValue = {
-    marketData,
-    updateMarketData,
-    commodities,
-    spreadMarginData,
-    getSpreadOrMarginFromDB,
-    categoryId,
-    setCategoryId: setCategoryIdAndFetchData,
-    adminId,
-    setAdminId: setAdminIdAndFetchData,
-    isLoading,
-    fetchData,
-    bidAskPrices,
-    updateBidAskPrices,
-  };
+  // Memoize the entire value object to prevent consumers from re-rendering on parent renders
+  const value = useMemo<SpotRatePastedContextValue>(
+    () => ({
+      marketData,
+      updateMarketData,
+      commodities,
+      spreadMarginData,
+      getSpreadOrMarginFromDB,
+      categoryId,
+      setCategoryId: setCategoryIdAndFetchData,
+      adminId,
+      setAdminId: setAdminIdAndFetchData,
+      isLoading,
+      fetchData,
+      bidAskPrices,
+      updateBidAskPrices,
+    }),
+    [
+      marketData,
+      updateMarketData,
+      commodities,
+      spreadMarginData,
+      getSpreadOrMarginFromDB,
+      categoryId,
+      setCategoryIdAndFetchData,
+      adminId,
+      setAdminIdAndFetchData,
+      isLoading,
+      fetchData,
+      bidAskPrices,
+      updateBidAskPrices,
+    ]
+  );
 
   return <SpotRateContext.Provider value={value}>{children}</SpotRateContext.Provider>;
 };
