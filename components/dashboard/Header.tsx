@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import {
   Bell,
   Settings,
@@ -152,7 +152,7 @@ const Header = () => {
     if (user && (user.role === 'admin' || user.role === 'super_admin')) {
       const fetchPending = async () => {
         try {
-          const res = await axiosInstance.get('/api/admin/users');
+          const res = await axiosInstance.get('/admin/users');
           const merchants = res.data.data || [];
           const pending = merchants.filter((m: any) => m.status?.toLowerCase() === 'pending');
           setPendingUsersCount(pending.length);
@@ -166,6 +166,23 @@ const Header = () => {
       return () => clearInterval(interval);
     }
   }, [user]);
+
+  // State to track notifications cleared locally from header panel view
+  const [headerDismissedIds, setHeaderDismissedIds] = useState<string[]>(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const stored = localStorage.getItem('aurify_header_dismissed_notifs');
+        return stored ? JSON.parse(stored) : [];
+      } catch {
+        return [];
+      }
+    }
+    return [];
+  });
+
+  const headerNotifications = useMemo(() => {
+    return notifications.filter((n: Notification) => !headerDismissedIds.includes(n._id));
+  }, [notifications, headerDismissedIds]);
 
   const handleNotificationClick = async (notif: Notification) => {
     if (!notif.readAt) {
@@ -182,18 +199,35 @@ const Header = () => {
     }
   };
 
-  const handleClearNotification = async (e: React.MouseEvent, id: string) => {
+  // Clear/dismiss from header dropdown panel ONLY (does not delete from DB or Notification page)
+  const handleClearNotification = (e: React.MouseEvent, id: string) => {
     e.stopPropagation();
     e.preventDefault();
-    await clearNotification(id);
+    const updated = [...headerDismissedIds, id];
+    setHeaderDismissedIds(updated);
+    if (typeof window !== 'undefined') {
+      try {
+        localStorage.setItem('aurify_header_dismissed_notifs', JSON.stringify(updated));
+      } catch (err) {
+        console.error(err);
+      }
+    }
   };
 
-  const handleClearAllHeaderNotifs = async (e: React.MouseEvent) => {
+  const handleClearAllHeaderNotifs = (e: React.MouseEvent) => {
     e.stopPropagation();
     e.preventDefault();
-    if (notifications.length > 0) {
-      const ids = notifications.map((n) => n._id);
-      await clearSelected(ids);
+    if (headerNotifications.length > 0) {
+      const allIds = headerNotifications.map((n: Notification) => n._id);
+      const updated = Array.from(new Set([...headerDismissedIds, ...allIds]));
+      setHeaderDismissedIds(updated);
+      if (typeof window !== 'undefined') {
+        try {
+          localStorage.setItem('aurify_header_dismissed_notifs', JSON.stringify(updated));
+        } catch (err) {
+          console.error(err);
+        }
+      }
     }
   };
 
@@ -285,7 +319,7 @@ const Header = () => {
                     {pendingUsersCount} New
                   </span>
                 )}
-                {!isAdmin && notifications.length > 0 && (
+                {!isAdmin && headerNotifications.length > 0 && (
                   <div className="flex items-center gap-2">
                     {unreadCount > 0 && (
                       <button
@@ -331,8 +365,8 @@ const Header = () => {
                       <p className="text-sm text-slate-500 font-medium">No new notifications</p>
                     </div>
                   )
-                ) : !isAdmin && notifications.length > 0 ? (
-                  notifications.map((notif) => (
+                ) : !isAdmin && headerNotifications.length > 0 ? (
+                  headerNotifications.map((notif: Notification) => (
                     <div
                       key={notif._id}
                       onClick={() => handleNotificationClick(notif)}
@@ -378,7 +412,7 @@ const Header = () => {
                         <button
                           type="button"
                           onClick={(e) => handleClearNotification(e, notif._id)}
-                          title="Clear notification"
+                          title="Clear from panel"
                           className="p-1 hover:bg-red-50 text-slate-400 hover:text-red-600 rounded transition-colors cursor-pointer"
                         >
                           <Trash2 className="w-3.5 h-3.5" />

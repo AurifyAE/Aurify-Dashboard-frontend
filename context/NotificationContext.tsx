@@ -7,6 +7,7 @@ import React, {
   useEffect,
   useRef,
   useCallback,
+  useMemo,
   ReactNode,
 } from 'react';
 import io, { Socket } from 'socket.io-client';
@@ -186,16 +187,18 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
 
   // --- API ACTIONS WITH OPTIMISTIC UPDATES & ROLLBACK ---
 
-  const markAsRead = async (id: string) => {
-    // Save state before optimistic changes
-    const prevNotifs = [...latestNotifications];
-    const prevCount = unreadCount;
+  const markAsRead = useCallback(async (id: string) => {
+    let prevNotifs: Notification[] = [];
+    let prevCount = 0;
 
-    // Optimistic Update
-    setLatestNotifications((prev) =>
-      prev.map((n) => (n._id === id ? { ...n, readAt: new Date().toISOString() } : n))
-    );
-    setUnreadCount((c) => Math.max(0, c - 1));
+    setLatestNotifications((prev) => {
+      prevNotifs = prev;
+      return prev.map((n) => (n._id === id ? { ...n, readAt: new Date().toISOString() } : n));
+    });
+    setUnreadCount((c) => {
+      prevCount = c;
+      return Math.max(0, c - 1);
+    });
 
     try {
       await notificationsApi.markAsRead(id);
@@ -204,15 +207,20 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
       setLatestNotifications(prevNotifs);
       setUnreadCount(prevCount);
     }
-  };
+  }, []);
 
-  const markAllAsRead = async () => {
-    const prevNotifs = [...latestNotifications];
-    const prevCount = unreadCount;
+  const markAllAsRead = useCallback(async () => {
+    let prevNotifs: Notification[] = [];
+    let prevCount = 0;
 
-    // Optimistic Update
-    setLatestNotifications((prev) => prev.map((n) => ({ ...n, readAt: new Date().toISOString() })));
-    setUnreadCount(0);
+    setLatestNotifications((prev) => {
+      prevNotifs = prev;
+      return prev.map((n) => ({ ...n, readAt: new Date().toISOString() }));
+    });
+    setUnreadCount((c) => {
+      prevCount = c;
+      return 0;
+    });
 
     try {
       await notificationsApi.readAll();
@@ -221,20 +229,16 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
       setLatestNotifications(prevNotifs);
       setUnreadCount(prevCount);
     }
-  };
+  }, []);
 
-  const clearNotification = async (id: string) => {
-    const prevNotifs = [...latestNotifications];
-    const prevCount = unreadCount;
+  const clearNotification = useCallback(async (id: string) => {
+    let prevNotifs: Notification[] = [];
+    let prevCount = 0;
 
-    const notif = latestNotifications.find((n) => n._id === id);
-    const wasUnread = notif && !notif.readAt;
-
-    // Optimistic Update
-    setLatestNotifications((prev) => prev.filter((n) => n._id !== id));
-    if (wasUnread) {
-      setUnreadCount((c) => Math.max(0, c - 1));
-    }
+    setLatestNotifications((prev) => {
+      prevNotifs = prev;
+      return prev.filter((n) => n._id !== id);
+    });
 
     try {
       await notificationsApi.clear(id);
@@ -243,15 +247,20 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
       setLatestNotifications(prevNotifs);
       setUnreadCount(prevCount);
     }
-  };
+  }, []);
 
-  const clearAll = async () => {
-    const prevNotifs = [...latestNotifications];
-    const prevCount = unreadCount;
+  const clearAll = useCallback(async () => {
+    let prevNotifs: Notification[] = [];
+    let prevCount = 0;
 
-    // Optimistic Update: empty notifications list & reset count immediately
-    setLatestNotifications([]);
-    setUnreadCount(0);
+    setLatestNotifications((prev) => {
+      prevNotifs = prev;
+      return [];
+    });
+    setUnreadCount((c) => {
+      prevCount = c;
+      return 0;
+    });
 
     try {
       await notificationsApi.clearAll();
@@ -260,13 +269,15 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
       setLatestNotifications(prevNotifs);
       setUnreadCount(prevCount);
     }
-  };
+  }, []);
 
-  const clearAllRead = async () => {
-    const prevNotifs = [...latestNotifications];
+  const clearAllRead = useCallback(async () => {
+    let prevNotifs: Notification[] = [];
 
-    // Optimistic Update
-    setLatestNotifications((prev) => prev.filter((n) => !n.readAt));
+    setLatestNotifications((prev) => {
+      prevNotifs = prev;
+      return prev.filter((n) => !n.readAt);
+    });
 
     try {
       await notificationsApi.clearAllRead();
@@ -274,23 +285,16 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
       console.error('[NotificationContext] Failed to clear all read, rolling back...', err);
       setLatestNotifications(prevNotifs);
     }
-  };
+  }, []);
 
-  const clearSelected = async (ids: string[]) => {
-    const prevNotifs = [...latestNotifications];
-    const prevCount = unreadCount;
+  const clearSelected = useCallback(async (ids: string[]) => {
+    let prevNotifs: Notification[] = [];
+    let prevCount = 0;
 
-    // Calculate optimistic count change
-    let unreadClearedCount = 0;
-    latestNotifications.forEach((n) => {
-      if (ids.includes(n._id) && !n.readAt) {
-        unreadClearedCount++;
-      }
+    setLatestNotifications((prev) => {
+      prevNotifs = prev;
+      return prev.filter((n) => !ids.includes(n._id));
     });
-
-    // Optimistic Update
-    setLatestNotifications((prev) => prev.filter((n) => !ids.includes(n._id)));
-    setUnreadCount((c) => Math.max(0, c - unreadClearedCount));
 
     try {
       await notificationsApi.clearSelected(ids);
@@ -299,30 +303,43 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
       setLatestNotifications(prevNotifs);
       setUnreadCount(prevCount);
     }
-  };
+  }, []);
 
-  return (
-    <NotificationContext.Provider
-      value={{
-        latestNotifications,
-        unreadCount,
-        toastQueue,
-        loading,
-        addToast,
-        dismissToast,
-        markAsRead,
-        markAllAsRead,
-        clearNotification,
-        clearAll,
-        clearAllRead,
-        clearSelected,
-        socket: socketRef.current,
-        merchant,
-      }}
-    >
-      {children}
-    </NotificationContext.Provider>
+  const value = useMemo(
+    () => ({
+      latestNotifications,
+      unreadCount,
+      toastQueue,
+      loading,
+      addToast,
+      dismissToast,
+      markAsRead,
+      markAllAsRead,
+      clearNotification,
+      clearAll,
+      clearAllRead,
+      clearSelected,
+      socket: socketRef.current,
+      merchant,
+    }),
+    [
+      latestNotifications,
+      unreadCount,
+      toastQueue,
+      loading,
+      addToast,
+      dismissToast,
+      markAsRead,
+      markAllAsRead,
+      clearNotification,
+      clearAll,
+      clearAllRead,
+      clearSelected,
+      merchant,
+    ]
   );
+
+  return <NotificationContext.Provider value={value}>{children}</NotificationContext.Provider>;
 }
 
 export function useNotifications() {
