@@ -7,6 +7,7 @@ import React, {
   useEffect,
   useRef,
   useCallback,
+  useMemo,
   ReactNode,
 } from 'react';
 import { io, Socket } from 'socket.io-client';
@@ -230,7 +231,7 @@ export function SpotRateProvider({ children }: { children: ReactNode }) {
     [user]
   );
 
-  // Process incoming raw market data and update state
+  // Process incoming raw market data and update state only when values change
   const processMarketData = useCallback(
     (symbol: string, data: { bid?: number; ask?: number; low?: number; high?: number }) => {
       const { goldBidSpread, goldAskSpread, silverBidSpread, silverAskSpread } = spreadRef.current;
@@ -243,15 +244,28 @@ export function SpotRateProvider({ children }: { children: ReactNode }) {
         const lowVals = calcValues(low, goldBidSpread, goldAskSpread, 0.5, 2);
         const highVals = calcValues(high, goldBidSpread, goldAskSpread, 0.5, 2);
 
-        setGoldData({
-          bid,
-          ask: Number(data.ask ?? 0),
-          low,
-          high,
-          displayBid: vals.bid,
-          displayAsk: vals.ask,
-          displayLow: lowVals.bid,
-          displayHigh: highVals.bid,
+        // ── Equality guard: skip setState if display values haven't changed ──
+        setGoldData((prev) => {
+          if (
+            prev &&
+            prev.bid === bid &&
+            prev.displayBid === vals.bid &&
+            prev.displayAsk === vals.ask &&
+            prev.displayLow === lowVals.bid &&
+            prev.displayHigh === highVals.bid
+          ) {
+            return prev; // identical — skip re-render
+          }
+          return {
+            bid,
+            ask: Number(data.ask ?? 0),
+            low,
+            high,
+            displayBid: vals.bid,
+            displayAsk: vals.ask,
+            displayLow: lowVals.bid,
+            displayHigh: highVals.bid,
+          };
         });
       }
 
@@ -263,15 +277,28 @@ export function SpotRateProvider({ children }: { children: ReactNode }) {
         const lowVals = calcValues(low, silverBidSpread, silverAskSpread, 0.05, 3);
         const highVals = calcValues(high, silverBidSpread, silverAskSpread, 0.05, 3);
 
-        setSilverData({
-          bid,
-          ask: Number(data.ask ?? 0),
-          low,
-          high,
-          displayBid: vals.bid,
-          displayAsk: vals.ask,
-          displayLow: lowVals.bid,
-          displayHigh: highVals.bid,
+        // ── Equality guard: skip setState if display values haven't changed ──
+        setSilverData((prev) => {
+          if (
+            prev &&
+            prev.bid === bid &&
+            prev.displayBid === vals.bid &&
+            prev.displayAsk === vals.ask &&
+            prev.displayLow === lowVals.bid &&
+            prev.displayHigh === highVals.bid
+          ) {
+            return prev; // identical — skip re-render
+          }
+          return {
+            bid,
+            ask: Number(data.ask ?? 0),
+            low,
+            high,
+            displayBid: vals.bid,
+            displayAsk: vals.ask,
+            displayLow: lowVals.bid,
+            displayHigh: highVals.bid,
+          };
         });
       }
     },
@@ -407,19 +434,19 @@ export function SpotRateProvider({ children }: { children: ReactNode }) {
     });
   }, [spreadSettings]);
 
-  return (
-    <SpotRateContext.Provider
-      value={{
-        goldData,
-        silverData,
-        isConnected,
-        spreadSettings,
-        updateSpreadSettings,
-      }}
-    >
-      {children}
-    </SpotRateContext.Provider>
+  // ── Memoize the Context value so consumers only re-render when their slice changes ──
+  const value = useMemo<SpotRateContextValue>(
+    () => ({
+      goldData,
+      silverData,
+      isConnected,
+      spreadSettings,
+      updateSpreadSettings,
+    }),
+    [goldData, silverData, isConnected, spreadSettings, updateSpreadSettings]
   );
+
+  return <SpotRateContext.Provider value={value}>{children}</SpotRateContext.Provider>;
 }
 
 // ─── Hook ─────────────────────────────────────────────────────────────────────

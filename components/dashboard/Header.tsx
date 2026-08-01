@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo } from 'react';
+import React, { useEffect, useState, useMemo, useCallback, memo } from 'react';
 import {
   Bell,
   Settings,
@@ -29,12 +29,22 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { useAuth } from '@/context/AuthContext';
-import { useNotifications } from '@/context/NotificationContext';
+import { useNotificationData, useNotificationActions } from '@/context/NotificationContext';
 import { cn } from '@/lib/utils';
 import axiosInstance from '@/app/axios/axiosInstance';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { type Notification } from '@/lib/api/notifications';
+
+// ── Pure helper — lives outside component, never recreated ───────────────────
+function getInitials(name: string): string {
+  return name
+    .split(' ')
+    .map((n) => n[0])
+    .join('')
+    .toUpperCase()
+    .slice(0, 2);
+}
 
 function formatTimeAgo(dateString: string): string {
   const date = new Date(dateString);
@@ -50,102 +60,49 @@ function formatTimeAgo(dateString: string): string {
   return date.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
 }
 
-const NotificationIcon = ({ iconKey, type }: { iconKey?: string; type: string }) => {
-  const getIconColor = () => {
+// ── Notification icon component — memoized ───────────────────────────────────
+const NotificationIcon = memo(({ iconKey, type }: { iconKey?: string; type: string }) => {
+  const colorClass = useMemo(() => {
     switch (type) {
-      case 'SUCCESS':
-        return 'bg-emerald-100 text-emerald-600';
-      case 'WARNING':
-        return 'bg-orange-100 text-orange-600';
-      case 'ERROR':
-        return 'bg-red-100 text-red-600';
-      case 'INFO':
-      default:
-        return 'bg-blue-100 text-blue-600';
+      case 'SUCCESS': return 'bg-emerald-100 text-emerald-600';
+      case 'WARNING': return 'bg-orange-100 text-orange-600';
+      case 'ERROR':   return 'bg-red-100 text-red-600';
+      default:        return 'bg-blue-100 text-blue-600';
     }
-  };
+  }, [type]);
 
-  const className = `w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${getIconColor()}`;
+  const className = `w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${colorClass}`;
 
   switch (iconKey) {
-    case 'check-circle':
-      return (
-        <div className={className}>
-          <CheckCircle2 className="w-4 h-4" />
-        </div>
-      );
-    case 'x-circle':
-      return (
-        <div className={className}>
-          <XCircle className="w-4 h-4" />
-        </div>
-      );
-    case 'credit-card':
-      return (
-        <div className={className}>
-          <CreditCard className="w-4 h-4" />
-        </div>
-      );
-    case 'sliders':
-      return (
-        <div className={className}>
-          <Sliders className="w-4 h-4" />
-        </div>
-      );
-    case 'tv':
-      return (
-        <div className={className}>
-          <Tv className="w-4 h-4" />
-        </div>
-      );
-    case 'eye-off':
-      return (
-        <div className={className}>
-          <EyeOff className="w-4 h-4" />
-        </div>
-      );
-    case 'trending-up':
-      return (
-        <div className={className}>
-          <TrendingUp className="w-4 h-4" />
-        </div>
-      );
-    case 'key':
-      return (
-        <div className={className}>
-          <Key className="w-4 h-4" />
-        </div>
-      );
-    case 'user-check':
-      return (
-        <div className={className}>
-          <UserCheck className="w-4 h-4" />
-        </div>
-      );
-    default:
-      return (
-        <div className={className}>
-          <Bell className="w-4 h-4" />
-        </div>
-      );
+    case 'check-circle':  return <div className={className}><CheckCircle2 className="w-4 h-4" /></div>;
+    case 'x-circle':      return <div className={className}><XCircle className="w-4 h-4" /></div>;
+    case 'credit-card':   return <div className={className}><CreditCard className="w-4 h-4" /></div>;
+    case 'sliders':       return <div className={className}><Sliders className="w-4 h-4" /></div>;
+    case 'tv':            return <div className={className}><Tv className="w-4 h-4" /></div>;
+    case 'eye-off':       return <div className={className}><EyeOff className="w-4 h-4" /></div>;
+    case 'trending-up':   return <div className={className}><TrendingUp className="w-4 h-4" /></div>;
+    case 'key':           return <div className={className}><Key className="w-4 h-4" /></div>;
+    case 'user-check':    return <div className={className}><UserCheck className="w-4 h-4" /></div>;
+    default:              return <div className={className}><Bell className="w-4 h-4" /></div>;
   }
-};
+});
+NotificationIcon.displayName = 'NotificationIcon';
 
-const Header = () => {
+// ─── Header — wrapped in React.memo ──────────────────────────────────────────
+// It subscribes to:
+//   - useAuth (user, hasHydrated) — stable after login
+//   - useNotificationData (latestNotifications, unreadCount) — notification-only updates
+//   - useNotificationActions (markAsRead, markAllAsRead) — stable actions
+// It does NOT subscribe to SpotRateContext, so gold/silver price ticks
+// will never cause Header to re-render.
+const Header = memo(function Header() {
   const { user, hasHydrated } = useAuth();
   const router = useRouter();
   const [pendingUsersCount, setPendingUsersCount] = useState(0);
 
-  const {
-    latestNotifications: notifications,
-    unreadCount,
-    markAsRead,
-    clearNotification,
-    clearSelected,
-    markAllAsRead,
-    loading,
-    merchant,
-  } = useNotifications();
+  // Subscribe to data and actions from the split contexts
+  const { latestNotifications: notifications, unreadCount } = useNotificationData();
+  const { markAsRead, clearNotification, clearSelected, markAllAsRead } = useNotificationActions();
 
   // Fetch pending users count for admins
   useEffect(() => {
@@ -184,42 +141,33 @@ const Header = () => {
     return notifications.filter((n: Notification) => !headerDismissedIds.includes(n._id));
   }, [notifications, headerDismissedIds]);
 
-  const handleNotificationClick = async (notif: Notification) => {
-    if (!notif.readAt) {
-      await markAsRead(notif._id);
-    }
-    router.push('/dashboard/notifications');
-  };
-
-  const handleMarkSingleAsRead = async (e: React.MouseEvent, notif: Notification) => {
-    e.stopPropagation();
-    e.preventDefault();
-    if (!notif.readAt) {
-      await markAsRead(notif._id);
-    }
-  };
-
-  // Clear/dismiss from header dropdown panel ONLY (does not delete from DB or Notification page)
-  const handleClearNotification = (e: React.MouseEvent, id: string) => {
-    e.stopPropagation();
-    e.preventDefault();
-    const updated = [...headerDismissedIds, id];
-    setHeaderDismissedIds(updated);
-    if (typeof window !== 'undefined') {
-      try {
-        localStorage.setItem('aurify_header_dismissed_notifs', JSON.stringify(updated));
-      } catch (err) {
-        console.error(err);
+  // ── Stable event handlers ────────────────────────────────────────────────
+  const handleNotificationClick = useCallback(
+    async (notif: Notification) => {
+      if (!notif.readAt) {
+        await markAsRead(notif._id);
       }
-    }
-  };
+      router.push('/dashboard/notifications');
+    },
+    [markAsRead, router]
+  );
 
-  const handleClearAllHeaderNotifs = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    e.preventDefault();
-    if (headerNotifications.length > 0) {
-      const allIds = headerNotifications.map((n: Notification) => n._id);
-      const updated = Array.from(new Set([...headerDismissedIds, ...allIds]));
+  const handleMarkSingleAsRead = useCallback(
+    async (e: React.MouseEvent, notif: Notification) => {
+      e.stopPropagation();
+      e.preventDefault();
+      if (!notif.readAt) {
+        await markAsRead(notif._id);
+      }
+    },
+    [markAsRead]
+  );
+
+  const handleClearNotification = useCallback(
+    (e: React.MouseEvent, id: string) => {
+      e.stopPropagation();
+      e.preventDefault();
+      const updated = [...headerDismissedIds, id];
       setHeaderDismissedIds(updated);
       if (typeof window !== 'undefined') {
         try {
@@ -228,23 +176,38 @@ const Header = () => {
           console.error(err);
         }
       }
-    }
-  };
+    },
+    [headerDismissedIds]
+  );
 
-  const handleMarkAllRead = async (e: React.MouseEvent) => {
-    e.stopPropagation();
-    e.preventDefault();
-    await markAllAsRead();
-  };
+  const handleClearAllHeaderNotifs = useCallback(
+    (e: React.MouseEvent) => {
+      e.stopPropagation();
+      e.preventDefault();
+      if (headerNotifications.length > 0) {
+        const allIds = headerNotifications.map((n: Notification) => n._id);
+        const updated = Array.from(new Set([...headerDismissedIds, ...allIds]));
+        setHeaderDismissedIds(updated);
+        if (typeof window !== 'undefined') {
+          try {
+            localStorage.setItem('aurify_header_dismissed_notifs', JSON.stringify(updated));
+          } catch (err) {
+            console.error(err);
+          }
+        }
+      }
+    },
+    [headerNotifications, headerDismissedIds]
+  );
 
-  const getInitials = (name: string): string => {
-    return name
-      .split(' ')
-      .map((n) => n[0])
-      .join('')
-      .toUpperCase()
-      .slice(0, 2);
-  };
+  const handleMarkAllRead = useCallback(
+    async (e: React.MouseEvent) => {
+      e.stopPropagation();
+      e.preventDefault();
+      await markAllAsRead();
+    },
+    [markAllAsRead]
+  );
 
   const isAdmin = user?.role === 'admin' || user?.role === 'super_admin';
 
@@ -460,6 +423,6 @@ const Header = () => {
       </div>
     </header>
   );
-};
+});
 
 export default Header;

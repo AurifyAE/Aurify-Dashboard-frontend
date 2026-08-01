@@ -33,7 +33,7 @@ import {
 import { notificationsApi, type Notification } from '@/lib/api/notifications';
 import { marketplaceApi } from '@/lib/api/marketplace';
 import { useAuth } from '@/context/AuthContext';
-import { useNotifications } from '@/context/NotificationContext';
+import { useNotificationActions } from '@/context/NotificationContext';
 import { cn } from '@/lib/utils';
 import Link from 'next/link';
 import DashboardShell from '@/components/dashboard/DashboardShell';
@@ -309,7 +309,6 @@ const PAGE_SIZE = 10;
 
 export default function NotificationsPage() {
   const { user } = useAuth();
-  const [merchant, setMerchant] = useState<any>(null);
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [total, setTotal] = useState(0);
   const [unreadCount, setUnreadCount] = useState(0);
@@ -323,14 +322,17 @@ export default function NotificationsPage() {
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [openMenuId, setOpenMenuId] = useState<string | null>(null);
   const [categoryCounts, setCategoryCounts] = useState<Record<string, number>>({});
+  
+  // Use actions-only hook — this page manages its own local notification state.
   const {
     socket,
+    merchant,
     markAsRead,
     clearNotification,
     markAllAsRead,
     clearAllRead,
     clearSelected,
-  } = useNotifications();
+  } = useNotificationActions();
 
   // Close menu when clicking outside
   useEffect(() => {
@@ -339,16 +341,6 @@ export default function NotificationsPage() {
     document.addEventListener('click', handle);
     return () => document.removeEventListener('click', handle);
   }, [openMenuId]);
-
-  // Load merchant info
-  useEffect(() => {
-    if (user && user.role === 'user') {
-      marketplaceApi
-        .myMerchant()
-        .then((m) => setMerchant(m))
-        .catch((err) => console.error('Failed to load merchant', err));
-    }
-  }, [user]);
 
   const loadNotifications = useCallback(
     async (targetPage: number) => {
@@ -402,10 +394,9 @@ export default function NotificationsPage() {
 
   useEffect(() => {
     if (merchant) {
-      setPage(1);
       loadNotifications(1);
     }
-  }, [merchant, loadNotifications]);
+  }, [merchant, selectedCategory, statusFilter, loadNotifications]);
 
   // Socket filter ref
   const filterRef = useRef({ selectedCategory, statusFilter });
@@ -726,39 +717,40 @@ export default function NotificationsPage() {
               </label>
             </div>
 
-            {/* Bulk action bar */}
-            {selectedIds.length > 0 && (
-              <div className="flex items-center justify-between bg-blue-50/60 border-b border-blue-100/60 px-5 py-2">
-                <p className="text-xs font-bold text-blue-700">
-                  {selectedIds.length} selected
-                </p>
-                <div className="flex gap-2">
-                  <button
-                    onClick={handleClearSelected}
-                    className="text-xs font-bold text-red-600 bg-white hover:bg-red-50 border border-red-200/50 rounded-lg px-2.5 py-1 transition-colors cursor-pointer"
-                  >
-                    Delete Selected
-                  </button>
-                  <button
-                    onClick={() => setSelectedIds([])}
-                    className="text-xs font-semibold text-slate-500 bg-white hover:bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-1 transition-colors cursor-pointer"
-                  >
-                    Cancel
-                  </button>
-                </div>
-              </div>
-            )}
-
-            {/* Select all row */}
+            {/* Combined Selection & Bulk Action Row */}
             {!loading && filtered.length > 0 && (
-              <div className="flex items-center gap-3 px-5 py-2.5 border-b border-slate-100 bg-slate-50/40">
-                <input
-                  type="checkbox"
-                  checked={selectedIds.length === notifications.length && notifications.length > 0}
-                  onChange={handleToggleSelectAll}
-                  className="rounded border-slate-300 text-blue-600 focus:ring-blue-500 w-4 h-4 cursor-pointer"
-                />
-                <span className="text-xs font-semibold text-slate-500">Select all visible</span>
+              <div className="flex items-center justify-between px-5 py-2.5 border-b border-slate-100 bg-slate-50/40">
+                <div className="flex items-center gap-3">
+                  <input
+                    type="checkbox"
+                    checked={selectedIds.length === notifications.length && notifications.length > 0}
+                    onChange={handleToggleSelectAll}
+                    className="rounded border-slate-300 text-blue-600 focus:ring-blue-500 w-4 h-4 cursor-pointer"
+                  />
+                  <span className="text-xs font-semibold text-slate-600">Select all visible</span>
+                  {selectedIds.length > 0 && (
+                    <span className="text-xs font-bold text-blue-600 bg-blue-50 border border-blue-200/60 px-2.5 py-0.5 rounded-full">
+                      {selectedIds.length} selected
+                    </span>
+                  )}
+                </div>
+
+                {selectedIds.length > 0 && (
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={handleClearSelected}
+                      className="text-xs font-bold text-red-600 bg-white hover:bg-red-50 border border-red-200/60 rounded-lg px-3 py-1 transition-colors cursor-pointer shadow-xs"
+                    >
+                      Delete Selected
+                    </button>
+                    <button
+                      onClick={() => setSelectedIds([])}
+                      className="text-xs font-semibold text-slate-500 bg-white hover:bg-slate-50 border border-slate-200 rounded-lg px-3 py-1 transition-colors cursor-pointer shadow-xs"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                )}
               </div>
             )}
 
