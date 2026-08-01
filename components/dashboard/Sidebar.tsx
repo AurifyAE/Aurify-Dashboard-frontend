@@ -67,7 +67,8 @@ const navItems: NavItem[] = [
     href: '/dashboard/merchant-profile',
     icon: Building2,
     roles: ['user'],
-  },  {
+  },
+  {
     title: 'Notifications',
     href: '/dashboard/notifications',
     icon: Bell,

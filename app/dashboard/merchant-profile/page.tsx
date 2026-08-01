@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
+import { motion } from 'framer-motion';
 import DashboardShell from '@/components/dashboard/DashboardShell';
 import { marketplaceApi, type Merchant } from '@/lib/api/marketplace';
 import {
@@ -300,22 +301,33 @@ export default function MerchantProfilePage() {
       </div>
 
       {/* Tab Navigation */}
-      <div className="mb-6 flex overflow-x-auto rounded-2xl border border-slate-200 bg-slate-50/70 p-1">
-        {TABS.map((tab) => (
-          <button
-            key={tab.key}
-            type="button"
-            onClick={() => setActiveTab(tab.key)}
-            className={`flex flex-1 items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold transition-all whitespace-nowrap ${
-              activeTab === tab.key
-                ? 'bg-white text-amber-700 shadow-sm'
-                : 'text-slate-500 hover:text-slate-700'
-            }`}
-          >
-            <tab.icon className="h-4 w-4" />
-            <span className="hidden sm:block">{tab.label}</span>
-          </button>
-        ))}
+      <div className="mb-6 relative flex overflow-x-auto rounded-2xl border border-slate-200 bg-slate-50/70 p-1">
+        {TABS.map((tab) => {
+          const isActive = activeTab === tab.key;
+          return (
+            <button
+              key={tab.key}
+              type="button"
+              onClick={() => setActiveTab(tab.key)}
+              className={`relative z-10 flex flex-1 items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold transition-colors whitespace-nowrap cursor-pointer ${
+                isActive
+                  ? 'text-amber-700 font-bold'
+                  : 'text-slate-500 hover:text-slate-700'
+              }`}
+            >
+              {isActive && (
+                <motion.div
+                  layoutId="activeTabBg"
+                  className="absolute inset-0 bg-white rounded-xl shadow-xs -z-10 border border-slate-200/60"
+                  transition={{ type: 'spring', stiffness: 350, damping: 30 }}
+                />
+              )}
+            
+              <tab.icon className="h-4 w-4" />
+              <span>{tab.label}</span>
+            </button>
+          );
+        })}
       </div>
 
       {/* TAB: Company */}
