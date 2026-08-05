@@ -127,9 +127,10 @@ export default function Sidebar() {
               height={36}
               priority
               className="flex-shrink-0 relative z-10"
+              style={{ width: 36, height: 'auto' }}
             />
             <div className={cn('transition-all duration-300 relative z-0 opacity-100 visible')}>
-              <Image src="/images/aurify-logo2.svg" alt="Aurify" width={120} height={30} priority />
+              <Image src="/images/aurify-logo2.svg" alt="Aurify" width={120} height={30} priority style={{ width: 120, height: 'auto' }} />
             </div>
           </div>
         </div>
