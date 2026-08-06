@@ -90,7 +90,7 @@ const navItems: NavItem[] = [
 
 export default function Sidebar() {
   const pathname = usePathname();
-  const { user, logout } = useAuth();
+  const { user, logout, isLoggingOut } = useAuth();
   const [isMobileOpen, setIsMobileOpen] = useState(false);
 
   const visibleNavItems = navItems.filter((item) => {
@@ -221,16 +221,26 @@ export default function Sidebar() {
 
             {/* Logout */}
             <button
-              onClick={logout}
-              className="w-full flex items-center gap-2.5 bg-white/[0.02] hover:bg-red-500/[0.08] border border-white/[0.06] hover:border-red-500/20 rounded-xl px-3 py-2.5 transition-all duration-200 group/logout"
+              onClick={() => !isLoggingOut && logout()}
+              disabled={isLoggingOut}
+              className={cn(
+                'w-full flex items-center gap-2.5 bg-white/[0.02] hover:bg-red-500/[0.08] border border-white/[0.06] hover:border-red-500/20 rounded-xl px-3 py-2.5 transition-all duration-200 group/logout',
+                isLoggingOut && 'opacity-60 cursor-not-allowed pointer-events-none'
+              )}
             >
               <div className="w-7 h-7 flex-shrink-0 rounded-[7px] bg-red-500/[0.08] border border-red-500/15 flex items-center justify-center">
-                <HugeiconsIcon icon={Logout01Icon} size={14} color="#f87171" strokeWidth={1.5} />
+                {isLoggingOut ? (
+                  <div className="w-3.5 h-3.5 border-2 border-red-400/30 border-t-red-400 rounded-full animate-spin" />
+                ) : (
+                  <HugeiconsIcon icon={Logout01Icon} size={14} color="#f87171" strokeWidth={1.5} />
+                )}
               </div>
               <span className="text-[13px] font-medium text-white/50 flex-1 text-left">
-                Sign out
+                {isLoggingOut ? 'Signing out...' : 'Sign out'}
               </span>
-              <ArrowRight className="w-3.5 h-3.5 text-red-400 opacity-0 -translate-x-1 group-hover/logout:opacity-100 group-hover/logout:translate-x-0 transition-all duration-200" />
+              {!isLoggingOut && (
+                <ArrowRight className="w-3.5 h-3.5 text-red-400 opacity-0 -translate-x-1 group-hover/logout:opacity-100 group-hover/logout:translate-x-0 transition-all duration-200" />
+              )}
             </button>
           </div>
           <span className="text-[12px] mb-2 font-medium text-white/50   flex justify-center">

@@ -16,6 +16,8 @@ import { BACKEND_URL } from '@/lib/env';
 import { getToken } from '@/lib/auth';
 import { notificationsApi, type Notification } from '@/lib/api/notifications';
 import { marketplaceApi } from '@/lib/api/marketplace';
+import { SocketRegistry } from '@/lib/SocketRegistry';
+import { LogoutManager } from '@/services/auth/logoutManager';
 
 // ─── Toast Types ─────────────────────────────────────────────────────────────
 export type ToastVariant = 'SUCCESS' | 'ERROR' | 'WARNING' | 'INFO' | 'LOADING';
@@ -81,6 +83,22 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
   const [socketInstance, setSocketInstance] = useState<Socket | null>(null);
   const isInitialConnectRef = useRef(true);
   const pathRef = useRef<string>('');
+
+  // Register reset hook with LogoutManager
+  useEffect(() => {
+    const unregister = LogoutManager.onReset(() => {
+      setMerchant(null);
+      setLatestNotifications([]);
+      setUnreadCount(0);
+      setToastQueue([]);
+      if (socketRef.current) {
+        socketRef.current.disconnect();
+        socketRef.current = null;
+        setSocketInstance(null);
+      }
+    });
+    return unregister;
+  }, []);
 
   // Keep track of current location path to suppress toast popups on Notifications page
   useEffect(() => {
@@ -170,6 +188,9 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
 
     socketRef.current = socket;
     setSocketInstance(socket);
+
+    // Register socket with SocketRegistry
+    const unregisterSocket = SocketRegistry.registerSocket('notification', socket);
 
     socket.on('connect', () => {
       console.log('[NotificationContext] Socket connected successfully:', socket.id);

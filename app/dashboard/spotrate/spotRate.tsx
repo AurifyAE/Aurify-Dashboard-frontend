@@ -1002,8 +1002,8 @@ const SpotRate: React.FC = () => {
               {`${row.unit} ${row.weight}`}
             </span>
           </TableCell>
-          <TableCell sx={{ fontWeight: 'bold', color: '#dc2626', py: 1.5 }}>{sellPrice}</TableCell>
           <TableCell sx={{ fontWeight: 'bold', color: '#16a34a', py: 1.5 }}>{buyPrice}</TableCell>
+          <TableCell sx={{ fontWeight: 'bold', color: '#dc2626', py: 1.5 }}>{sellPrice}</TableCell>
           <TableCell sx={{ color: '#475569', py: 1.5 }}>
             {row.sellPremium !== undefined && row.sellPremium !== null
               ? `+${row.sellPremium}`
@@ -1310,6 +1310,17 @@ const SpotRate: React.FC = () => {
                 >
                   Unit
                 </TableCell>
+                 <TableCell
+                  sx={{
+                    fontWeight: 'bold',
+                    color: '#64748b',
+                    fontSize: '12px',
+                    textTransform: 'uppercase',
+                    py: 1.5,
+                  }}
+                >
+                  Buy ({currency})
+                </TableCell>
                 <TableCell
                   sx={{
                     fontWeight: 'bold',
@@ -1321,17 +1332,7 @@ const SpotRate: React.FC = () => {
                 >
                   Sell ({currency})
                 </TableCell>
-                <TableCell
-                  sx={{
-                    fontWeight: 'bold',
-                    color: '#64748b',
-                    fontSize: '12px',
-                    textTransform: 'uppercase',
-                    py: 1.5,
-                  }}
-                >
-                  Buy ({currency})
-                </TableCell>
+               
                 <TableCell
                   sx={{
                     fontWeight: 'bold',
