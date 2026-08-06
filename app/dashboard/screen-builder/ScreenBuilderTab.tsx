@@ -431,7 +431,11 @@ export default function ScreenBuilderTab({
 
   useEffect(() => {
     if (isFirstLoad.current) return;
-    localStorage.setItem('aurify-builder-draft', JSON.stringify(draft));
+    try {
+      localStorage.setItem('aurify-builder-draft', JSON.stringify(draft));
+    } catch (e) {
+      console.warn('Draft state could not be cached to localStorage (quota limit):', e);
+    }
   }, [draft]);
 
   useEffect(() => {
@@ -480,22 +484,11 @@ export default function ScreenBuilderTab({
       try {
         const res = await marketplaceApi.checkScreenSlug(slug, draft.layoutId);
         setSlugAvailable(res.available);
-        if (!res.available) {
-          setSlugMessage(res.message || 'Already in use.');
-          // Generate suggestions
-          setSuggestions([
-            `${slug}-2`,
-            `${slug}-${new Date().getFullYear()}`,
-            `${slug}-live`,
-            `${slug}-display`,
-          ]);
-        } else {
-          setSlugMessage('');
-          setSuggestions([]);
-        }
-      } catch (err) {
-        console.error('Slug check failed:', err);
+        setSlugMessage(res.message);
+        setSuggestions(res.suggestions || []);
+      } catch (err: any) {
         setSlugAvailable(null);
+        setSlugMessage('Unable to verify URL availability.');
       } finally {
         setSlugChecking(false);
       }
@@ -509,13 +502,59 @@ export default function ScreenBuilderTab({
     field: 'logoUrl' | 'backgroundUrl'
   ) => {
     const file = e.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setDraft((prev) => ({ ...prev, [field]: reader.result as string }));
-      };
-      reader.readAsDataURL(file);
+    if (!file) return;
+
+    // 5MB file size limit check
+    const MAX_SIZE_MB = 5;
+    const MAX_SIZE_BYTES = MAX_SIZE_MB * 1024 * 1024;
+
+    if (file.size > MAX_SIZE_BYTES) {
+      showMessage(`⚠️ File size exceeds ${MAX_SIZE_MB}MB (${(file.size / (1024 * 1024)).toFixed(1)}MB). Please choose an image smaller than 5MB.`, 'error');
+      e.target.value = ''; // Reset input field
+      return;
     }
+
+    // Auto-compress and scale to standard high-resolution display dimensions
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const img = new Image();
+      img.onload = () => {
+        const MAX_WIDTH = field === 'logoUrl' ? 600 : 1920;
+        const MAX_HEIGHT = field === 'logoUrl' ? 600 : 1080;
+        let width = img.width;
+        let height = img.height;
+
+        if (width > MAX_WIDTH || height > MAX_HEIGHT) {
+          if (width / height > MAX_WIDTH / MAX_HEIGHT) {
+            height = Math.round((height * MAX_WIDTH) / width);
+            width = MAX_WIDTH;
+          } else {
+            width = Math.round((width * MAX_HEIGHT) / height);
+            height = MAX_HEIGHT;
+          }
+        }
+
+        const canvas = document.createElement('canvas');
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        if (ctx) {
+          ctx.drawImage(img, 0, 0, width, height);
+          const compressedDataUrl = canvas.toDataURL(
+            file.type === 'image/png' ? 'image/png' : 'image/jpeg',
+            0.85
+          );
+          setDraft((prev) => ({ ...prev, [field]: compressedDataUrl }));
+        } else {
+          setDraft((prev) => ({ ...prev, [field]: event.target?.result as string }));
+        }
+      };
+      img.onerror = () => {
+        setDraft((prev) => ({ ...prev, [field]: event.target?.result as string }));
+      };
+      img.src = event.target?.result as string;
+    };
+    reader.readAsDataURL(file);
   };
 
   const showMessage = (text: string, type: 'info' | 'success' | 'error' = 'info') => {
@@ -1144,8 +1183,9 @@ export default function ScreenBuilderTab({
                 </h4>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-500">
-                      Upload Logo
+                    <label className="mb-1.5 flex items-center justify-between text-xs font-semibold uppercase tracking-wide text-slate-500">
+                      <span>Upload Logo</span>
+                      <span className="text-[10px] lowercase text-slate-400 font-normal">Max 5MB</span>
                     </label>
                     <input
                       type="file"
@@ -1173,8 +1213,9 @@ export default function ScreenBuilderTab({
                     )}
                   </div>
                   <div>
-                    <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-500">
-                      Background Image
+                    <label className="mb-1.5 flex items-center justify-between text-xs font-semibold uppercase tracking-wide text-slate-500">
+                      <span>Background Image</span>
+                      <span className="text-[10px] lowercase text-slate-400 font-normal">Max 5MB (1080p/4K)</span>
                     </label>
                     <input
                       type="file"
