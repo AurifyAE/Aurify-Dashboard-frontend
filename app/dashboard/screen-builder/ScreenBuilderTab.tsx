@@ -431,7 +431,11 @@ export default function ScreenBuilderTab({
 
   useEffect(() => {
     if (isFirstLoad.current) return;
-    localStorage.setItem('aurify-builder-draft', JSON.stringify(draft));
+    try {
+      localStorage.setItem('aurify-builder-draft', JSON.stringify(draft));
+    } catch (e) {
+      console.warn('Draft state could not be cached to localStorage (quota limit):', e);
+    }
   }, [draft]);
 
   useEffect(() => {
@@ -480,22 +484,11 @@ export default function ScreenBuilderTab({
       try {
         const res = await marketplaceApi.checkScreenSlug(slug, draft.layoutId);
         setSlugAvailable(res.available);
-        if (!res.available) {
-          setSlugMessage(res.message || 'Already in use.');
-          // Generate suggestions
-          setSuggestions([
-            `${slug}-2`,
-            `${slug}-${new Date().getFullYear()}`,
-            `${slug}-live`,
-            `${slug}-display`,
-          ]);
-        } else {
-          setSlugMessage('');
-          setSuggestions([]);
-        }
-      } catch (err) {
-        console.error('Slug check failed:', err);
+        setSlugMessage(res.message);
+        setSuggestions(res.suggestions || []);
+      } catch (err: any) {
         setSlugAvailable(null);
+        setSlugMessage('Unable to verify URL availability.');
       } finally {
         setSlugChecking(false);
       }
@@ -509,13 +502,59 @@ export default function ScreenBuilderTab({
     field: 'logoUrl' | 'backgroundUrl'
   ) => {
     const file = e.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setDraft((prev) => ({ ...prev, [field]: reader.result as string }));
-      };
-      reader.readAsDataURL(file);
+    if (!file) return;
+
+    // 5MB file size limit check
+    const MAX_SIZE_MB = 5;
+    const MAX_SIZE_BYTES = MAX_SIZE_MB * 1024 * 1024;
+
+    if (file.size > MAX_SIZE_BYTES) {
+      showMessage(`⚠️ File size exceeds ${MAX_SIZE_MB}MB (${(file.size / (1024 * 1024)).toFixed(1)}MB). Please choose an image smaller than 5MB.`, 'error');
+      e.target.value = ''; // Reset input field
+      return;
     }
+
+    // Auto-compress and scale to standard high-resolution display dimensions
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const img = new Image();
+      img.onload = () => {
+        const MAX_WIDTH = field === 'logoUrl' ? 600 : 1920;
+        const MAX_HEIGHT = field === 'logoUrl' ? 600 : 1080;
+        let width = img.width;
+        let height = img.height;
+
+        if (width > MAX_WIDTH || height > MAX_HEIGHT) {
+          if (width / height > MAX_WIDTH / MAX_HEIGHT) {
+            height = Math.round((height * MAX_WIDTH) / width);
+            width = MAX_WIDTH;
+          } else {
+            width = Math.round((width * MAX_HEIGHT) / height);
+            height = MAX_HEIGHT;
+          }
+        }
+
+        const canvas = document.createElement('canvas');
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        if (ctx) {
+          ctx.drawImage(img, 0, 0, width, height);
+          const compressedDataUrl = canvas.toDataURL(
+            file.type === 'image/png' ? 'image/png' : 'image/jpeg',
+            0.85
+          );
+          setDraft((prev) => ({ ...prev, [field]: compressedDataUrl }));
+        } else {
+          setDraft((prev) => ({ ...prev, [field]: event.target?.result as string }));
+        }
+      };
+      img.onerror = () => {
+        setDraft((prev) => ({ ...prev, [field]: event.target?.result as string }));
+      };
+      img.src = event.target?.result as string;
+    };
+    reader.readAsDataURL(file);
   };
 
   const showMessage = (text: string, type: 'info' | 'success' | 'error' = 'info') => {
@@ -755,6 +794,7 @@ export default function ScreenBuilderTab({
       rightColumnOrder: draft.rightColumnOrder,
     },
   });
+
   const defaults = getDefaultColumns(draft.selectedLayout);
   const isLayoutCustomized =
     (draft.leftColumnOrder &&
@@ -791,7 +831,12 @@ export default function ScreenBuilderTab({
 
   const save = async () => {
     if (!draft.name.trim()) {
-      showMessage('Give your screen a name first.', 'error');
+      showMessage('Please enter a screen name in Step 1 before saving.', 'error');
+      setStep(1);
+      return;
+    }
+    if (slugAvailable === false) {
+      showMessage(`The URL slug "${draft.screenSlug}" is unavailable. Please choose another.`, 'error');
       setStep(1);
       return;
     }
@@ -805,34 +850,44 @@ export default function ScreenBuilderTab({
       showMessage('Draft saved successfully.', 'success');
       if (onSaveSuccess) onSaveSuccess();
     } catch (err: any) {
-      showMessage(err instanceof Error ? err.message : err?.message || 'Save failed', 'error');
+      const msg = err?.response?.data?.message || err?.message || 'Save failed. Please try again.';
+      showMessage(msg, 'error');
     } finally {
       setSaving(false);
     }
   };
 
   const publish = async () => {
-    if (!canGoLive) {
-      showMessage(
-        merchant?.status !== 'Active'
-          ? 'Your account must be approved before going live.'
-          : 'Select a theme and screen name first.',
-        'error'
-      );
+    if (!draft.name.trim()) {
+      showMessage('Please provide a screen name in Step 1 before going live.', 'error');
+      setStep(1);
       return;
     }
 
-    const isDuplicateSlug = layouts.some(
-      (l) => l.screenSlug === draft.screenSlug && l.layoutId !== draft.layoutId
-    );
-    if (isDuplicateSlug) {
-      showMessage('This URL is already in use.', 'error');
+    if (merchant?.status !== 'Active') {
+      showMessage('Your merchant account must be approved and active before going live.', 'error');
+      return;
+    }
+
+    if (!draft.selectedLayout) {
+      showMessage('Please select a layout in Step 1.', 'error');
+      setStep(1);
+      return;
+    }
+
+    if (slugChecking) {
+      showMessage('Validating screen URL, please wait a moment...', 'info');
+      return;
+    }
+
+    if (slugAvailable === false) {
+      showMessage(`The URL slug "${draft.screenSlug}" is already in use. Please enter an available URL.`, 'error');
+      setStep(1);
       return;
     }
 
     setSaving(true);
     try {
-      // Always save the latest draft state before publishing
       const saved = await marketplaceApi.saveLayout(buildPayload(draft.themeId));
       let layoutId = saved.layoutId;
 
@@ -843,7 +898,6 @@ export default function ScreenBuilderTab({
           .filter(Boolean),
       });
 
-      // Clear local storage and reset draft state since screen is now successfully live
       localStorage.removeItem('aurify-builder-draft');
       setColumnHistory([]);
       setDraft(defaultDraft);
@@ -856,19 +910,22 @@ export default function ScreenBuilderTab({
       await load();
       if (onSaveSuccess) onSaveSuccess();
     } catch (err: any) {
-      showMessage(err instanceof Error ? err.message : err?.message || 'Publish failed', 'error');
+      const msg = err?.response?.data?.message || err?.message || 'Publish failed. Please check your screen configuration.';
+      showMessage(msg, 'error');
     } finally {
       setSaving(false);
     }
   };
 
   const resetForm = () => {
-    setEditingLayoutId(undefined);
+    if (setEditingLayoutId) {
+      setEditingLayoutId(undefined);
+    }
     setColumnHistory([]);
     setDraft(defaultDraft);
     setStep(1);
     localStorage.removeItem('aurify-builder-draft');
-    showMessage('Form reset. Creating a new screen config.', 'info');
+    showMessage('Form reset. Ready to create a new screen config.', 'info');
   };
 
   const inputClass =
@@ -1144,8 +1201,9 @@ export default function ScreenBuilderTab({
                 </h4>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-500">
-                      Upload Logo
+                    <label className="mb-1.5 flex items-center justify-between text-xs font-semibold uppercase tracking-wide text-slate-500">
+                      <span>Upload Logo</span>
+                      <span className="text-[10px] lowercase text-slate-400 font-normal">Max 5MB</span>
                     </label>
                     <input
                       type="file"
@@ -1173,8 +1231,9 @@ export default function ScreenBuilderTab({
                     )}
                   </div>
                   <div>
-                    <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-500">
-                      Background Image
+                    <label className="mb-1.5 flex items-center justify-between text-xs font-semibold uppercase tracking-wide text-slate-500">
+                      <span>Background Image</span>
+                      <span className="text-[10px] lowercase text-slate-400 font-normal">Max 5MB (1080p/4K)</span>
                     </label>
                     <input
                       type="file"

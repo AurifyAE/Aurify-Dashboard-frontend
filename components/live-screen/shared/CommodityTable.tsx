@@ -286,6 +286,7 @@ const CommodityTable = ({
                   }}
                 >
                   <Typography
+                    component="div"
                     sx={{
                       fontSize: {
                         xs: '14px',
@@ -304,8 +305,9 @@ const CommodityTable = ({
                       gap: { xs: '7px', lg: '0.3vw' },
                     }}
                   >
-                    {row.metal_name || row.metal}
+                    <span>{row.metal_name || row.metal}</span>
                     <Typography
+                      component="span"
                       sx={{
                         fontSize: { xs: '12px', sm: '10px', lg: '1.2vw' },
                         fontWeight: 400,

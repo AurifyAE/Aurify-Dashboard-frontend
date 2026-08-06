@@ -15,6 +15,8 @@ import { API_URL, API_KEY, SOCKET_SECRET } from '@/lib/env';
 import { BACKEND_URL } from '@/lib/env';
 import { useAuth } from '@/context/AuthContext';
 import { getToken } from '@/lib/auth';
+import { SocketRegistry } from '@/lib/SocketRegistry';
+import { LogoutManager } from '@/services/auth/logoutManager';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 export interface MetalLiveData {
@@ -166,6 +168,16 @@ export function SpotRateProvider({ children }: { children: ReactNode }) {
     silverBidSpread: 0,
     silverAskSpread: 0.05,
   });
+
+  // Register reset hook with LogoutManager
+  useEffect(() => {
+    const unregister = LogoutManager.onReset(() => {
+      setGoldData(null);
+      setSilverData(null);
+      setIsConnected(false);
+    });
+    return unregister;
+  }, []);
 
   // Keep latest spread settings accessible inside socket callbacks
   const spreadRef = useRef(spreadSettings);
@@ -349,6 +361,9 @@ export function SpotRateProvider({ children }: { children: ReactNode }) {
           transports: ['websocket'],
           withCredentials: true,
         });
+
+        // Register socket with SocketRegistry for centralized teardown
+        const unregisterSocket = SocketRegistry.registerSocket('spotrate', socket);
 
         socket.on('connect', () => {
           console.log('[SpotRate] ✅ Connected to WebSocket server');

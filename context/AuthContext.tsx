@@ -22,13 +22,21 @@ import {
   apiRegister,
   apiGetMe,
 } from '@/lib/auth';
+import {
+  LogoutManager,
+  AuthState,
+  LogoutResult,
+} from '@/services/auth/logoutManager';
+import { CleanupRegistry } from '@/lib/CleanupRegistry';
 
 // ─── Context Types ────────────────────────────────────────────────────────────
-interface AuthContextValue {
+export interface AuthContextValue {
   user: AuthUser | null;
+  authState: AuthState;
   isLoading: boolean;
   hasHydrated: boolean;
   isAuthenticated: boolean;
+  isLoggingOut: boolean;
   login: (email: string, password: string) => Promise<AuthResponse>;
   register: (data: {
     companyName: string;
@@ -43,7 +51,8 @@ interface AuthContextValue {
       mobileApp: boolean;
     };
   }) => Promise<AuthResponse>;
-  logout: () => void;
+  logout: (options?: { redirectUrl?: string }) => Promise<LogoutResult>;
+  reset: () => void;
 }
 
 const AuthContext = createContext<AuthContextValue | null>(null);
@@ -51,56 +60,83 @@ const AuthContext = createContext<AuthContextValue | null>(null);
 // ─── Provider ─────────────────────────────────────────────────────────────────
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<AuthUser | null>(null);
+  const [authState, setAuthState] = useState<AuthState>(LogoutManager.state);
   const [isLoading, setIsLoading] = useState(true);
   const [hasHydrated, setHasHydrated] = useState(false);
   const router = useRouter();
   const pathname = usePathname();
 
-  // Keep the latest pathname in a ref so callbacks can read it without becoming deps
+  // Subscribe to LogoutManager auth state machine transitions
+  useEffect(() => {
+    const unregister = LogoutManager.onStateChange((newState) => {
+      setAuthState(newState);
+      if (newState === 'unauthenticated') {
+        setUser(null);
+      }
+    });
+    return unregister;
+  }, []);
+
+  // Explicit reset handler registered with LogoutManager
+  const reset = useCallback(() => {
+    setUser(null);
+    setIsLoading(false);
+    setHasHydrated(true);
+  }, []);
+
+  useEffect(() => {
+    const unregister = LogoutManager.onReset(reset);
+    return unregister;
+  }, [reset]);
+
+  // Keep the latest pathname in a ref
   const pathnameRef = useRef(pathname);
   useEffect(() => {
     pathnameRef.current = pathname;
   }, [pathname]);
 
-  // Keep track of hydration in a ref to avoid re-creating the auth-check function
   const hasHydratedRef = useRef(hasHydrated);
   useEffect(() => {
     hasHydratedRef.current = hasHydrated;
   }, [hasHydrated]);
 
-  // Stable redirect helper — reads pathname from ref, never recreated on route change
+  // Stable redirect helper for suspended or deleted accounts
   const forceRegisterRedirect = useCallback(() => {
     removeToken();
     setUser(null);
-    // Don't redirect if already on an auth page — avoids redirect loops
-    if (
-      !pathnameRef.current.startsWith('/login') &&
-      !pathnameRef.current.startsWith('/register')
-    ) {
+    LogoutManager.setState('unauthenticated');
+    if (!pathnameRef.current.startsWith('/login') && !pathnameRef.current.startsWith('/register')) {
       router.push('/login?alert=deleted');
     }
-  }, [router]); // router is stable across navigations in Next.js
+  }, [router]);
 
-  // Keep the latest forceRegisterRedirect in a ref so the polling effect
-  // doesn't need it as a dependency (and therefore doesn't restart the interval)
   const forceRegisterRedirectRef = useRef(forceRegisterRedirect);
   useEffect(() => {
     forceRegisterRedirectRef.current = forceRegisterRedirect;
   }, [forceRegisterRedirect]);
 
-  // Stable auth-check function that reads from refs — not recreated on navigation
+  // Stable auth-check function
   const checkAuthStatus = useCallback(async () => {
     const token = getToken();
     if (!token) {
       setIsLoading(false);
       setHasHydrated(true);
+      LogoutManager.setState('unauthenticated');
       return;
     }
 
-    // Fast initial hydration via local decode (no network)
+    // Fast initial hydration via local decode (no network delay)
     if (!hasHydratedRef.current) {
       const decoded = decodeToken(token);
-      setUser(decoded);
+      if (decoded && decoded.id && decoded.email) {
+        setUser({
+          id: decoded.id,
+          email: decoded.email,
+          role: (decoded.role as any) || 'user',
+          companyName: decoded.companyName || '',
+        });
+        LogoutManager.setState('authenticated');
+      }
       setHasHydrated(true);
     }
 
@@ -122,6 +158,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           }
           return newUser;
         });
+        LogoutManager.setState('authenticated');
       } else {
         forceRegisterRedirectRef.current();
       }
@@ -129,14 +166,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       console.error('Auth check failed:', err);
     }
     setIsLoading(false);
-  }, []); // stable — reads everything from refs
+  }, []);
 
-  // ── Bootstrap: run once and start polling every 10s ──
-  // Only restart the effect (and therefore the polling interval) when:
-  // - pathname changes to/from an auth page (to skip or resume polling)
-  // This avoids restarting the interval on every internal navigation.
-  const isOnAuthPage =
-    pathname.startsWith('/login') || pathname.startsWith('/register');
+  const isOnAuthPage = pathname.startsWith('/login') || pathname.startsWith('/register');
 
   useEffect(() => {
     if (isOnAuthPage) {
@@ -153,8 +185,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       checkAuthStatus();
     }, 10000);
 
-    return () => clearInterval(interval);
-  }, [isOnAuthPage, checkAuthStatus]); // checkAuthStatus is stable; isOnAuthPage changes only on auth-page entry/exit
+    // Register interval teardown with CleanupRegistry so it stops immediately on logout
+    const unregisterCleanup = CleanupRegistry.registerCleanup(() => {
+      clearInterval(interval);
+    });
+
+    return () => {
+      clearInterval(interval);
+      unregisterCleanup();
+    };
+  }, [isOnAuthPage, checkAuthStatus]);
 
   const login = useCallback(
     async (email: string, password: string): Promise<AuthResponse> => {
@@ -162,6 +202,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (response.success && response.token && response.user) {
         setToken(response.token);
         setUser(response.user);
+        LogoutManager.setState('authenticated');
         if (response.user.role === 'admin' || response.user.role === 'super_admin') {
           router.push('/dashboard/admin/clients');
         } else {
@@ -191,6 +232,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (response.success && response.token && response.user) {
         setToken(response.token);
         setUser(response.user);
+        LogoutManager.setState('authenticated');
         router.push('/dashboard');
       }
       return response;
@@ -198,24 +240,26 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     [router]
   );
 
-  const logout = useCallback(() => {
-    removeToken();
-    setUser(null);
-    router.push('/login');
-  }, [router]);
+  const logout = useCallback((options?: { redirectUrl?: string }) => {
+    return LogoutManager.executeLogout(options);
+  }, []);
 
-  // ── Memoize Provider value so consumers don't re-render on unrelated parent renders ──
+  const isLoggingOut = authState === 'logging_out';
+
   const value = useMemo<AuthContextValue>(
     () => ({
       user,
+      authState,
       isLoading,
       hasHydrated,
-      isAuthenticated: !!user,
+      isAuthenticated: !!user && authState === 'authenticated',
+      isLoggingOut,
       login,
       register,
       logout,
+      reset,
     }),
-    [user, isLoading, hasHydrated, login, register, logout]
+    [user, authState, isLoading, hasHydrated, isLoggingOut, login, register, logout, reset]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

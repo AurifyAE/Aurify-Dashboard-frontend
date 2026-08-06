@@ -313,7 +313,7 @@ const AddCommodityModal: React.FC<AddCommodityModalProps> = ({
             { _id: 'gold', symbol: 'Gold' },
             { _id: 'gold-kilobar', symbol: 'Gold Kilobar' },
             { _id: 'gold-tola', symbol: 'Gold TOLA' },
-            { _id: 'gold-ten-tola', symbol: 'Ten TOLA' },
+            { _id: 'gold-ten-tola', symbol: 'Gold Ten TOLA' },
             { _id: 'gold-coin', symbol: 'Gold Coin' },
             { _id: 'minted-bar', symbol: 'Minted Bar' },
           ];
@@ -495,7 +495,7 @@ const AddCommodityModal: React.FC<AddCommodityModalProps> = ({
               {commodities.length > 0 ? (
                 commodities.map((commodity) => (
                   <MenuItem key={commodity._id} value={commodity.symbol} sx={{ fontSize: '13px' }}>
-                    {commodity.symbol}
+                    {commodity.symbol=="Gold Ten TOLA" ? "Ten TOLA" : commodity.symbol}
                   </MenuItem>
                 ))
               ) : (
