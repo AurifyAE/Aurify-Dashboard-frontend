@@ -794,6 +794,7 @@ export default function ScreenBuilderTab({
       rightColumnOrder: draft.rightColumnOrder,
     },
   });
+
   const defaults = getDefaultColumns(draft.selectedLayout);
   const isLayoutCustomized =
     (draft.leftColumnOrder &&
@@ -830,7 +831,12 @@ export default function ScreenBuilderTab({
 
   const save = async () => {
     if (!draft.name.trim()) {
-      showMessage('Give your screen a name first.', 'error');
+      showMessage('Please enter a screen name in Step 1 before saving.', 'error');
+      setStep(1);
+      return;
+    }
+    if (slugAvailable === false) {
+      showMessage(`The URL slug "${draft.screenSlug}" is unavailable. Please choose another.`, 'error');
       setStep(1);
       return;
     }
@@ -844,34 +850,44 @@ export default function ScreenBuilderTab({
       showMessage('Draft saved successfully.', 'success');
       if (onSaveSuccess) onSaveSuccess();
     } catch (err: any) {
-      showMessage(err instanceof Error ? err.message : err?.message || 'Save failed', 'error');
+      const msg = err?.response?.data?.message || err?.message || 'Save failed. Please try again.';
+      showMessage(msg, 'error');
     } finally {
       setSaving(false);
     }
   };
 
   const publish = async () => {
-    if (!canGoLive) {
-      showMessage(
-        merchant?.status !== 'Active'
-          ? 'Your account must be approved before going live.'
-          : 'Select a theme and screen name first.',
-        'error'
-      );
+    if (!draft.name.trim()) {
+      showMessage('Please provide a screen name in Step 1 before going live.', 'error');
+      setStep(1);
       return;
     }
 
-    const isDuplicateSlug = layouts.some(
-      (l) => l.screenSlug === draft.screenSlug && l.layoutId !== draft.layoutId
-    );
-    if (isDuplicateSlug) {
-      showMessage('This URL is already in use.', 'error');
+    if (merchant?.status !== 'Active') {
+      showMessage('Your merchant account must be approved and active before going live.', 'error');
+      return;
+    }
+
+    if (!draft.selectedLayout) {
+      showMessage('Please select a layout in Step 1.', 'error');
+      setStep(1);
+      return;
+    }
+
+    if (slugChecking) {
+      showMessage('Validating screen URL, please wait a moment...', 'info');
+      return;
+    }
+
+    if (slugAvailable === false) {
+      showMessage(`The URL slug "${draft.screenSlug}" is already in use. Please enter an available URL.`, 'error');
+      setStep(1);
       return;
     }
 
     setSaving(true);
     try {
-      // Always save the latest draft state before publishing
       const saved = await marketplaceApi.saveLayout(buildPayload(draft.themeId));
       let layoutId = saved.layoutId;
 
@@ -882,7 +898,6 @@ export default function ScreenBuilderTab({
           .filter(Boolean),
       });
 
-      // Clear local storage and reset draft state since screen is now successfully live
       localStorage.removeItem('aurify-builder-draft');
       setColumnHistory([]);
       setDraft(defaultDraft);
@@ -895,19 +910,22 @@ export default function ScreenBuilderTab({
       await load();
       if (onSaveSuccess) onSaveSuccess();
     } catch (err: any) {
-      showMessage(err instanceof Error ? err.message : err?.message || 'Publish failed', 'error');
+      const msg = err?.response?.data?.message || err?.message || 'Publish failed. Please check your screen configuration.';
+      showMessage(msg, 'error');
     } finally {
       setSaving(false);
     }
   };
 
   const resetForm = () => {
-    setEditingLayoutId(undefined);
+    if (setEditingLayoutId) {
+      setEditingLayoutId(undefined);
+    }
     setColumnHistory([]);
     setDraft(defaultDraft);
     setStep(1);
     localStorage.removeItem('aurify-builder-draft');
-    showMessage('Form reset. Creating a new screen config.', 'info');
+    showMessage('Form reset. Ready to create a new screen config.', 'info');
   };
 
   const inputClass =
