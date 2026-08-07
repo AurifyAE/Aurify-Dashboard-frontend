@@ -271,14 +271,14 @@ export default function MyScreensTab({ onEditLayout, onCreateNew }: MyScreensTab
                   <div className="mt-auto grid grid-cols-2 gap-2">
                     <button
                       onClick={() => onEditLayout(layout.layoutId)}
-                      className="btn-secondary cursor-pointer justify-center"
+                      className="btn-secondary cursor-pointer justify-center hover:!bg-slate-100 hover:!text-blue-600 hover:!border-blue-300 transition-all"
                     >
                       <Pencil className="h-3.5 w-3.5" />
                       Edit
                     </button>
                     <button
                       onClick={() => handleDelete(layout.layoutId, layout.name)}
-                      className="btn-secondary px-3 border-red-200 text-red-600 hover:bg-red-50 hover:border-red-300 cursor-pointer"
+                      className="btn-secondary px-3 !border-red-200 !text-red-600 hover:!bg-red-600 hover:!text-white hover:!border-red-600 cursor-pointer transition-all"
                       title="Delete Screen"
                     >
                       <Trash2 className="h-4 w-4" />
@@ -288,7 +288,7 @@ export default function MyScreensTab({ onEditLayout, onCreateNew }: MyScreensTab
                     {!isPublished ? (
                       <button
                         onClick={() => onEditLayout(layout.layoutId)}
-                        className="btn-primary cursor-pointer justify-center col-span-2"
+                        className="btn-primary cursor-pointer justify-center col-span-2 hover:!brightness-110 hover:!shadow-md transition-all active:scale-[0.99]"
                       >
                         <Rocket className="h-3.5 w-3.5" />
                         Publish
@@ -298,7 +298,7 @@ export default function MyScreensTab({ onEditLayout, onCreateNew }: MyScreensTab
                         href={url}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="btn-secondary col-span-2 justify-center bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100 hover:border-blue-300"
+                        className="btn-secondary col-span-2 justify-center !bg-blue-50 !text-blue-700 !border-blue-200 hover:!bg-blue-600 hover:!text-white hover:!border-blue-600 transition-all shadow-xs hover:shadow-md"
                       >
                         <ExternalLink className="h-3.5 w-3.5" />
                         View Live
