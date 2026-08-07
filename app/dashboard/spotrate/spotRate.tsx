@@ -1310,7 +1310,7 @@ const SpotRate: React.FC = () => {
                 >
                   Unit
                 </TableCell>
-                 <TableCell
+                <TableCell
                   sx={{
                     fontWeight: 'bold',
                     color: '#64748b',
@@ -1332,7 +1332,7 @@ const SpotRate: React.FC = () => {
                 >
                   Sell ({currency})
                 </TableCell>
-               
+
                 <TableCell
                   sx={{
                     fontWeight: 'bold',

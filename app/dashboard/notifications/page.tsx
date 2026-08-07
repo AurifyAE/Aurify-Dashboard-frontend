@@ -40,12 +40,36 @@ import DashboardShell from '@/components/dashboard/DashboardShell';
 
 // --- STATIC CONSTANTS ---
 const CATEGORIES = [
-  { label: 'All Activities', value: 'ALL', icon: LayoutGrid, color: 'text-blue-600', bg: 'bg-blue-50' },
-  { label: 'Approvals', value: 'APPROVAL', icon: CheckCircle2, color: 'text-purple-600', bg: 'bg-purple-50' },
-  { label: 'Admin Changes', value: 'ADMIN', icon: Sliders, color: 'text-orange-600', bg: 'bg-orange-50' },
+  {
+    label: 'All Activities',
+    value: 'ALL',
+    icon: LayoutGrid,
+    color: 'text-blue-600',
+    bg: 'bg-blue-50',
+  },
+  {
+    label: 'Approvals',
+    value: 'APPROVAL',
+    icon: CheckCircle2,
+    color: 'text-purple-600',
+    bg: 'bg-purple-50',
+  },
+  {
+    label: 'Admin Changes',
+    value: 'ADMIN',
+    icon: Sliders,
+    color: 'text-orange-600',
+    bg: 'bg-orange-50',
+  },
   { label: 'System', value: 'SYSTEM', icon: Settings, color: 'text-blue-500', bg: 'bg-blue-50' },
   { label: 'Billing', value: 'BILLING', icon: Receipt, color: 'text-amber-600', bg: 'bg-amber-50' },
-  { label: 'Security', value: 'SECURITY', icon: ShieldCheck, color: 'text-green-600', bg: 'bg-green-50' },
+  {
+    label: 'Security',
+    value: 'SECURITY',
+    icon: ShieldCheck,
+    color: 'text-green-600',
+    bg: 'bg-green-50',
+  },
 ] as const;
 
 type CategoryValue = (typeof CATEGORIES)[number]['value'];
@@ -104,7 +128,9 @@ const CategoryIcon = React.memo(({ category }: { category: string }) => {
   };
   const Icon = IconMap[category] ?? Bell;
   return (
-    <div className={cn('w-10 h-10 rounded-full flex items-center justify-center shrink-0', styles.bg)}>
+    <div
+      className={cn('w-10 h-10 rounded-full flex items-center justify-center shrink-0', styles.bg)}
+    >
       <Icon className={cn('w-5 h-5', styles.text)} />
     </div>
   );
@@ -123,7 +149,15 @@ interface NotificationRowProps {
 }
 
 const NotificationRow = React.memo(
-  ({ notif, isSelected, onToggleSelect, onMarkAsRead, onClear, openMenuId, onToggleMenu }: NotificationRowProps) => {
+  ({
+    notif,
+    isSelected,
+    onToggleSelect,
+    onMarkAsRead,
+    onClear,
+    openMenuId,
+    onToggleMenu,
+  }: NotificationRowProps) => {
     const isUnread = !notif.readAt;
 
     return (
@@ -162,7 +196,9 @@ const NotificationRow = React.memo(
           </p>
 
           {/* Message */}
-          <p className="text-xs text-slate-500 mt-0.5 leading-relaxed line-clamp-2">{notif.message}</p>
+          <p className="text-xs text-slate-500 mt-0.5 leading-relaxed line-clamp-2">
+            {notif.message}
+          </p>
 
           {/* Action Buttons */}
           {notif.actions && notif.actions.length > 0 && (
@@ -184,7 +220,9 @@ const NotificationRow = React.memo(
         <div className="flex flex-col items-end gap-2 shrink-0 ml-2">
           <div className="flex items-center gap-2">
             <div className="text-right">
-              <p className="text-[11px] text-slate-400 font-medium">{formatTimeAgo(notif.createdAt)}</p>
+              <p className="text-[11px] text-slate-400 font-medium">
+                {formatTimeAgo(notif.createdAt)}
+              </p>
               {notif.actor && (
                 <p className="text-[10px] text-slate-400 mt-0.5">by {notif.actor.name}</p>
               )}
@@ -241,68 +279,70 @@ const NotificationRow = React.memo(
 NotificationRow.displayName = 'NotificationRow';
 
 // Pagination component
-const Pagination = React.memo(({
-  page,
-  totalPages,
-  onPageChange,
-  totalItems,
-  pageSize,
-}: {
-  page: number;
-  totalPages: number;
-  onPageChange: (p: number) => void;
-  totalItems: number;
-  pageSize: number;
-}) => {
-  const start = (page - 1) * pageSize + 1;
-  const end = Math.min(page * pageSize, totalItems);
+const Pagination = React.memo(
+  ({
+    page,
+    totalPages,
+    onPageChange,
+    totalItems,
+    pageSize,
+  }: {
+    page: number;
+    totalPages: number;
+    onPageChange: (p: number) => void;
+    totalItems: number;
+    pageSize: number;
+  }) => {
+    const start = (page - 1) * pageSize + 1;
+    const end = Math.min(page * pageSize, totalItems);
 
-  return (
-    <div className="flex items-center justify-between px-5 py-3.5 border-t border-slate-100 bg-slate-50/40">
-      <p className="text-xs text-slate-500 font-medium">
-        Showing {start} to {end} of {totalItems} notifications
-      </p>
-      <div className="flex items-center gap-1.5">
-        <button
-          type="button"
-          disabled={page <= 1}
-          onClick={() => onPageChange(page - 1)}
-          className="w-7 h-7 flex items-center justify-center rounded-lg border border-slate-200 text-slate-500 hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed transition-colors cursor-pointer"
-        >
-          <ChevronLeft className="w-3.5 h-3.5" />
-        </button>
+    return (
+      <div className="flex items-center justify-between px-5 py-3.5 border-t border-slate-100 bg-slate-50/40">
+        <p className="text-xs text-slate-500 font-medium">
+          Showing {start} to {end} of {totalItems} notifications
+        </p>
+        <div className="flex items-center gap-1.5">
+          <button
+            type="button"
+            disabled={page <= 1}
+            onClick={() => onPageChange(page - 1)}
+            className="w-7 h-7 flex items-center justify-center rounded-lg border border-slate-200 text-slate-500 hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed transition-colors cursor-pointer"
+          >
+            <ChevronLeft className="w-3.5 h-3.5" />
+          </button>
 
-        {Array.from({ length: Math.min(totalPages, 5) }, (_, i) => {
-          const p = i + 1;
-          return (
-            <button
-              key={p}
-              type="button"
-              onClick={() => onPageChange(p)}
-              className={cn(
-                'w-7 h-7 flex items-center justify-center rounded-lg text-xs font-bold transition-all cursor-pointer',
-                page === p
-                  ? 'bg-blue-600 text-white shadow-sm'
-                  : 'border border-slate-200 text-slate-600 hover:bg-slate-100'
-              )}
-            >
-              {p}
-            </button>
-          );
-        })}
+          {Array.from({ length: Math.min(totalPages, 5) }, (_, i) => {
+            const p = i + 1;
+            return (
+              <button
+                key={p}
+                type="button"
+                onClick={() => onPageChange(p)}
+                className={cn(
+                  'w-7 h-7 flex items-center justify-center rounded-lg text-xs font-bold transition-all cursor-pointer',
+                  page === p
+                    ? 'bg-blue-600 text-white shadow-sm'
+                    : 'border border-slate-200 text-slate-600 hover:bg-slate-100'
+                )}
+              >
+                {p}
+              </button>
+            );
+          })}
 
-        <button
-          type="button"
-          disabled={page >= totalPages}
-          onClick={() => onPageChange(page + 1)}
-          className="w-7 h-7 flex items-center justify-center rounded-lg border border-slate-200 text-slate-500 hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed transition-colors cursor-pointer"
-        >
-          <ChevronRight className="w-3.5 h-3.5" />
-        </button>
+          <button
+            type="button"
+            disabled={page >= totalPages}
+            onClick={() => onPageChange(page + 1)}
+            className="w-7 h-7 flex items-center justify-center rounded-lg border border-slate-200 text-slate-500 hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed transition-colors cursor-pointer"
+          >
+            <ChevronRight className="w-3.5 h-3.5" />
+          </button>
+        </div>
       </div>
-    </div>
-  );
-});
+    );
+  }
+);
 Pagination.displayName = 'Pagination';
 
 const PAGE_SIZE = 10;
@@ -322,7 +362,7 @@ export default function NotificationsPage() {
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [openMenuId, setOpenMenuId] = useState<string | null>(null);
   const [categoryCounts, setCategoryCounts] = useState<Record<string, number>>({});
-  
+
   // Use actions-only hook — this page manages its own local notification state.
   const {
     socket,
@@ -418,30 +458,38 @@ export default function NotificationsPage() {
       setUnreadCount(data.unreadCount);
     };
     socket.on('notification:new', handleNew);
-    return () => { socket.off('notification:new', handleNew); };
+    return () => {
+      socket.off('notification:new', handleNew);
+    };
   }, [socket]);
 
   // Handlers
-  const handleMarkAsRead = useCallback(async (id: string) => {
-    setNotifications((prev) =>
-      prev.map((n) => (n._id === id ? { ...n, readAt: new Date().toISOString() } : n))
-    );
-    setUnreadCount((c) => Math.max(0, c - 1));
-    setOpenMenuId(null);
-    await markAsRead(id);
-  }, [markAsRead]);
+  const handleMarkAsRead = useCallback(
+    async (id: string) => {
+      setNotifications((prev) =>
+        prev.map((n) => (n._id === id ? { ...n, readAt: new Date().toISOString() } : n))
+      );
+      setUnreadCount((c) => Math.max(0, c - 1));
+      setOpenMenuId(null);
+      await markAsRead(id);
+    },
+    [markAsRead]
+  );
 
-  const handleClear = useCallback(async (id: string) => {
-    setNotifications((prev) => {
-      const notif = prev.find((n) => n._id === id);
-      if (notif && !notif.readAt) setUnreadCount((c) => Math.max(0, c - 1));
-      return prev.filter((n) => n._id !== id);
-    });
-    setSelectedIds((prev) => prev.filter((v) => v !== id));
-    setTotal((t) => Math.max(0, t - 1));
-    setOpenMenuId(null);
-    await clearNotification(id);
-  }, [clearNotification]);
+  const handleClear = useCallback(
+    async (id: string) => {
+      setNotifications((prev) => {
+        const notif = prev.find((n) => n._id === id);
+        if (notif && !notif.readAt) setUnreadCount((c) => Math.max(0, c - 1));
+        return prev.filter((n) => n._id !== id);
+      });
+      setSelectedIds((prev) => prev.filter((v) => v !== id));
+      setTotal((t) => Math.max(0, t - 1));
+      setOpenMenuId(null);
+      await clearNotification(id);
+    },
+    [clearNotification]
+  );
 
   const handleMarkAllRead = useCallback(async () => {
     setNotifications((prev) => prev.map((n) => ({ ...n, readAt: new Date().toISOString() })));
@@ -458,7 +506,9 @@ export default function NotificationsPage() {
     if (!selectedIds.length) return;
     setNotifications((prev) => {
       let count = 0;
-      prev.forEach((n) => { if (selectedIds.includes(n._id) && !n.readAt) count++; });
+      prev.forEach((n) => {
+        if (selectedIds.includes(n._id) && !n.readAt) count++;
+      });
       if (count > 0) setUnreadCount((c) => Math.max(0, c - count));
       setTotal((t) => Math.max(0, t - selectedIds.length));
       return prev.filter((n) => !selectedIds.includes(n._id));
@@ -469,9 +519,7 @@ export default function NotificationsPage() {
   }, [selectedIds, clearSelected]);
 
   const handleToggleSelect = useCallback((id: string) => {
-    setSelectedIds((prev) =>
-      prev.includes(id) ? prev.filter((v) => v !== id) : [...prev, id]
-    );
+    setSelectedIds((prev) => (prev.includes(id) ? prev.filter((v) => v !== id) : [...prev, id]));
   }, []);
 
   const handleToggleSelectAll = useCallback(() => {
@@ -484,19 +532,20 @@ export default function NotificationsPage() {
     setOpenMenuId((prev) => (prev === id ? null : id));
   }, []);
 
-  const handlePageChange = useCallback((p: number) => {
-    setPage(p);
-    loadNotifications(p);
-  }, [loadNotifications]);
+  const handlePageChange = useCallback(
+    (p: number) => {
+      setPage(p);
+      loadNotifications(p);
+    },
+    [loadNotifications]
+  );
 
   // Search filter (client-side)
   const filtered = useMemo(() => {
     if (!searchQuery.trim()) return notifications;
     const q = searchQuery.toLowerCase();
     return notifications.filter(
-      (n) =>
-        n.title.toLowerCase().includes(q) ||
-        n.message.toLowerCase().includes(q)
+      (n) => n.title.toLowerCase().includes(q) || n.message.toLowerCase().includes(q)
     );
   }, [notifications, searchQuery]);
 
@@ -510,40 +559,43 @@ export default function NotificationsPage() {
     }));
   }, [categoryCounts, total]);
 
-  const statCards = useMemo(() => [
-    {
-      label: 'All Notifications',
-      sub: 'Total notifications',
-      value: total,
-      icon: ListFilter,
-      iconBg: 'bg-blue-50',
-      iconColor: 'text-blue-600',
-    },
-    {
-      label: 'Unread',
-      sub: 'Pending to read',
-      value: unreadCount,
-      icon: CheckCircle2,
-      iconBg: 'bg-green-50',
-      iconColor: 'text-green-600',
-    },
-    {
-      label: 'Today',
-      sub: "Today's activity",
-      value: todayCount,
-      icon: Clock,
-      iconBg: 'bg-orange-50',
-      iconColor: 'text-orange-500',
-    },
-    {
-      label: 'This Month',
-      sub: 'Total this month',
-      value: monthCount,
-      icon: Calendar,
-      iconBg: 'bg-purple-50',
-      iconColor: 'text-purple-600',
-    },
-  ], [total, unreadCount, todayCount, monthCount]);
+  const statCards = useMemo(
+    () => [
+      {
+        label: 'All Notifications',
+        sub: 'Total notifications',
+        value: total,
+        icon: ListFilter,
+        iconBg: 'bg-blue-50',
+        iconColor: 'text-blue-600',
+      },
+      {
+        label: 'Unread',
+        sub: 'Pending to read',
+        value: unreadCount,
+        icon: CheckCircle2,
+        iconBg: 'bg-green-50',
+        iconColor: 'text-green-600',
+      },
+      {
+        label: 'Today',
+        sub: "Today's activity",
+        value: todayCount,
+        icon: Clock,
+        iconBg: 'bg-orange-50',
+        iconColor: 'text-orange-500',
+      },
+      {
+        label: 'This Month',
+        sub: 'Total this month',
+        value: monthCount,
+        icon: Calendar,
+        iconBg: 'bg-purple-50',
+        iconColor: 'text-purple-600',
+      },
+    ],
+    [total, unreadCount, todayCount, monthCount]
+  );
 
   return (
     <DashboardShell>
@@ -556,7 +608,9 @@ export default function NotificationsPage() {
             </div>
             <div>
               <h1 className="text-[20px] font-bold text-slate-900">Notifications</h1>
-              <p className="text-slate-400 text-xs">Stay updated with all important activities and system alerts.</p>
+              <p className="text-slate-400 text-xs">
+                Stay updated with all important activities and system alerts.
+              </p>
             </div>
           </div>
           <div className="flex items-center gap-2.5">
@@ -590,8 +644,16 @@ export default function NotificationsPage() {
           {statCards.map((stat) => {
             const Icon = stat.icon;
             return (
-              <div key={stat.label} className="bg-white rounded-2xl border border-slate-200/70 p-4 flex items-center gap-3.5 shadow-xs">
-                <div className={cn('w-11 h-11 rounded-xl flex items-center justify-center shrink-0', stat.iconBg)}>
+              <div
+                key={stat.label}
+                className="bg-white rounded-2xl border border-slate-200/70 p-4 flex items-center gap-3.5 shadow-xs"
+              >
+                <div
+                  className={cn(
+                    'w-11 h-11 rounded-xl flex items-center justify-center shrink-0',
+                    stat.iconBg
+                  )}
+                >
                   <Icon className={cn('w-5 h-5', stat.iconColor)} />
                 </div>
                 <div>
@@ -610,7 +672,9 @@ export default function NotificationsPage() {
           <div className="w-52 shrink-0 space-y-5">
             {/* Filter by Category */}
             <div className="bg-white rounded-2xl border border-slate-200/70 p-4 shadow-xs">
-              <p className="text-xs font-extrabold text-slate-700 tracking-wider uppercase mb-3">Filter by Category</p>
+              <p className="text-xs font-extrabold text-slate-700 tracking-wider uppercase mb-3">
+                Filter by Category
+              </p>
               <div className="space-y-0.5">
                 {categoryWithCounts.map((cat) => {
                   const Icon = cat.icon;
@@ -622,19 +686,19 @@ export default function NotificationsPage() {
                       onClick={() => setSelectedCategory(cat.value)}
                       className={cn(
                         'w-full flex items-center justify-between gap-2 px-2.5 py-2 rounded-xl text-xs font-semibold transition-all cursor-pointer',
-                        isActive
-                          ? 'bg-blue-600 text-white'
-                          : 'text-slate-600 hover:bg-slate-100'
+                        isActive ? 'bg-blue-600 text-white' : 'text-slate-600 hover:bg-slate-100'
                       )}
                     >
                       <div className="flex items-center gap-2">
                         <Icon className={cn('w-3.5 h-3.5', isActive ? 'text-white' : cat.color)} />
                         <span>{cat.label}</span>
                       </div>
-                      <span className={cn(
-                        'text-[10px] font-black px-1.5 py-0.5 rounded-full',
-                        isActive ? 'bg-white/20 text-white' : 'bg-slate-100 text-slate-500'
-                      )}>
+                      <span
+                        className={cn(
+                          'text-[10px] font-black px-1.5 py-0.5 rounded-full',
+                          isActive ? 'bg-white/20 text-white' : 'bg-slate-100 text-slate-500'
+                        )}
+                      >
                         {cat.count}
                       </span>
                     </button>
@@ -645,7 +709,9 @@ export default function NotificationsPage() {
 
             {/* Filter by Status */}
             <div className="bg-white rounded-2xl border border-slate-200/70 p-4 shadow-xs">
-              <p className="text-xs font-extrabold text-slate-700 tracking-wider uppercase mb-3">Filter by Status</p>
+              <p className="text-xs font-extrabold text-slate-700 tracking-wider uppercase mb-3">
+                Filter by Status
+              </p>
               <div className="space-y-2">
                 {(['all', 'unread', 'read'] as StatusFilter[]).map((s) => (
                   <label key={s} className="flex items-center gap-2.5 cursor-pointer">
@@ -657,7 +723,9 @@ export default function NotificationsPage() {
                       onChange={() => setStatusFilter(s)}
                       className="text-blue-600 border-slate-300 focus:ring-blue-500 cursor-pointer"
                     />
-                    <span className="text-xs font-semibold text-slate-700 capitalize">{s === 'all' ? 'All' : s === 'unread' ? 'Unread' : 'Read'}</span>
+                    <span className="text-xs font-semibold text-slate-700 capitalize">
+                      {s === 'all' ? 'All' : s === 'unread' ? 'Unread' : 'Read'}
+                    </span>
                   </label>
                 ))}
               </div>
@@ -723,7 +791,9 @@ export default function NotificationsPage() {
                 <div className="flex items-center gap-3">
                   <input
                     type="checkbox"
-                    checked={selectedIds.length === notifications.length && notifications.length > 0}
+                    checked={
+                      selectedIds.length === notifications.length && notifications.length > 0
+                    }
                     onChange={handleToggleSelectAll}
                     className="rounded border-slate-300 text-blue-600 focus:ring-blue-500 w-4 h-4 cursor-pointer"
                   />
@@ -769,7 +839,9 @@ export default function NotificationsPage() {
                   <Bell className="w-6 h-6 text-slate-300" />
                 </div>
                 <p className="text-sm font-bold text-slate-600">All caught up!</p>
-                <p className="text-xs text-slate-400">No notifications match your current filters.</p>
+                <p className="text-xs text-slate-400">
+                  No notifications match your current filters.
+                </p>
               </div>
             )}
 

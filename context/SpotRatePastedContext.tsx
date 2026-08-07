@@ -1,13 +1,6 @@
 'use client';
 
-import React, {
-  createContext,
-  useCallback,
-  useContext,
-  useState,
-  useMemo,
-  ReactNode,
-} from 'react';
+import React, { createContext, useCallback, useContext, useState, useMemo, ReactNode } from 'react';
 import axiosInstance from '../app/axios/axiosInstance';
 
 export interface SpotRatePastedContextValue {

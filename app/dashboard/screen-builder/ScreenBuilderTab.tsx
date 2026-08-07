@@ -436,13 +436,16 @@ export default function ScreenBuilderTab({
     try {
       const res = await marketplaceApi.updateProfile({ logo: logoUrl });
       if (res?.merchant) {
-        setMerchant((prev) => ({
-          ...(prev || {}),
-          ...res.merchant,
-          commodities: (res.merchant as any)?.commodities?.length
-            ? (res.merchant as any).commodities
-            : (prev as any)?.commodities || commodities || [],
-        } as Merchant));
+        setMerchant(
+          (prev) =>
+            ({
+              ...(prev || {}),
+              ...res.merchant,
+              commodities: (res.merchant as any)?.commodities?.length
+                ? (res.merchant as any).commodities
+                : (prev as any)?.commodities || commodities || [],
+            }) as Merchant
+        );
         if ((res.merchant as any)?.commodities?.length) {
           setCommodities((res.merchant as any).commodities);
         }
@@ -464,11 +467,18 @@ export default function ScreenBuilderTab({
       return false;
     }
     if (slugChecking) {
-      if (showAlert) showMessage('Validating screen URL availability, please wait a moment...', 'info');
+      if (showAlert)
+        showMessage('Validating screen URL availability, please wait a moment...', 'info');
       return false;
     }
     if (slugAvailable === false) {
-      if (showAlert) showMessage(slugMessage ? `Cannot proceed: ${slugMessage}` : '✕ This URL is already in use. Please choose a different URL slug.', 'error');
+      if (showAlert)
+        showMessage(
+          slugMessage
+            ? `Cannot proceed: ${slugMessage}`
+            : '✕ This URL is already in use. Please choose a different URL slug.',
+          'error'
+        );
       return false;
     }
     if (!draft.selectedLayout) {
@@ -581,7 +591,10 @@ export default function ScreenBuilderTab({
     const MAX_SIZE_BYTES = MAX_SIZE_MB * 1024 * 1024;
 
     if (file.size > MAX_SIZE_BYTES) {
-      showMessage(`⚠️ File size exceeds ${MAX_SIZE_MB}MB (${(file.size / (1024 * 1024)).toFixed(1)}MB). Please choose an image smaller than 5MB.`, 'error');
+      showMessage(
+        `⚠️ File size exceeds ${MAX_SIZE_MB}MB (${(file.size / (1024 * 1024)).toFixed(1)}MB). Please choose an image smaller than 5MB.`,
+        'error'
+      );
       e.target.value = ''; // Reset input field
       return;
     }
@@ -613,10 +626,7 @@ export default function ScreenBuilderTab({
         let finalUrl = event.target?.result as string;
         if (ctx) {
           ctx.drawImage(img, 0, 0, width, height);
-          finalUrl = canvas.toDataURL(
-            file.type === 'image/png' ? 'image/png' : 'image/jpeg',
-            0.85
-          );
+          finalUrl = canvas.toDataURL(file.type === 'image/png' ? 'image/png' : 'image/jpeg', 0.85);
         }
         setDraft((prev) => ({ ...prev, [field]: finalUrl }));
         if (field === 'logoUrl' && setAsProfileLogo) {
@@ -908,7 +918,10 @@ export default function ScreenBuilderTab({
       return;
     }
     if (slugAvailable === false) {
-      showMessage(`The URL slug "${draft.screenSlug}" is unavailable. Please choose another.`, 'error');
+      showMessage(
+        `The URL slug "${draft.screenSlug}" is unavailable. Please choose another.`,
+        'error'
+      );
       setStep(1);
       return;
     }
@@ -953,7 +966,10 @@ export default function ScreenBuilderTab({
     }
 
     if (slugAvailable === false) {
-      showMessage(`The URL slug "${draft.screenSlug}" is already in use. Please enter an available URL.`, 'error');
+      showMessage(
+        `The URL slug "${draft.screenSlug}" is already in use. Please enter an available URL.`,
+        'error'
+      );
       setStep(1);
       return;
     }
@@ -982,7 +998,10 @@ export default function ScreenBuilderTab({
       await load();
       if (onSaveSuccess) onSaveSuccess();
     } catch (err: any) {
-      const msg = err?.response?.data?.message || err?.message || 'Publish failed. Please check your screen configuration.';
+      const msg =
+        err?.response?.data?.message ||
+        err?.message ||
+        'Publish failed. Please check your screen configuration.';
       showMessage(msg, 'error');
     } finally {
       setSaving(false);
@@ -1275,7 +1294,9 @@ export default function ScreenBuilderTab({
                   <div>
                     <label className="mb-1.5 flex items-center justify-between text-xs font-semibold uppercase tracking-wide text-slate-500">
                       <span>Upload Logo</span>
-                      <span className="text-[10px] lowercase text-slate-400 font-normal">Max 5MB</span>
+                      <span className="text-[10px] lowercase text-slate-400 font-normal">
+                        Max 5MB
+                      </span>
                     </label>
                     <input
                       type="file"
@@ -1332,7 +1353,9 @@ export default function ScreenBuilderTab({
                   <div>
                     <label className="mb-1.5 flex items-center justify-between text-xs font-semibold uppercase tracking-wide text-slate-500">
                       <span>Background Image</span>
-                      <span className="text-[10px] lowercase text-slate-400 font-normal">Max 5MB (1080p/4K)</span>
+                      <span className="text-[10px] lowercase text-slate-400 font-normal">
+                        Max 5MB (1080p/4K)
+                      </span>
                     </label>
                     <input
                       type="file"

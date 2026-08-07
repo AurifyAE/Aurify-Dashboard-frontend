@@ -310,9 +310,7 @@ export default function MerchantProfilePage() {
               type="button"
               onClick={() => setActiveTab(tab.key)}
               className={`relative z-10 flex flex-1 items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold transition-colors whitespace-nowrap cursor-pointer ${
-                isActive
-                  ? 'text-amber-700 font-bold'
-                  : 'text-slate-500 hover:text-slate-700'
+                isActive ? 'text-amber-700 font-bold' : 'text-slate-500 hover:text-slate-700'
               }`}
             >
               {isActive && (
@@ -322,7 +320,7 @@ export default function MerchantProfilePage() {
                   transition={{ type: 'spring', stiffness: 350, damping: 30 }}
                 />
               )}
-            
+
               <tab.icon className="h-4 w-4" />
               <span>{tab.label}</span>
             </button>

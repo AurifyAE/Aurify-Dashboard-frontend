@@ -73,7 +73,9 @@ export const apiGetMe = async (token: string): Promise<AuthResponse> => {
  * apiLogout with 2.5-second timeout protection.
  * Even if the backend or network hangs, it rejects cleanly so the client proceeds.
  */
-export const apiLogout = async (timeoutMs: number = 2500): Promise<{ success: boolean; error?: string }> => {
+export const apiLogout = async (
+  timeoutMs: number = 2500
+): Promise<{ success: boolean; error?: string }> => {
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
 

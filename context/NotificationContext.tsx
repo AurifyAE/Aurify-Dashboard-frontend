@@ -195,7 +195,7 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
     socket.on('connect', () => {
       console.log('[NotificationContext] Socket connected successfully:', socket.id);
       socket.emit('join-merchant-notifications', { merchantId: merchant.merchantId });
-      
+
       // On reconnect (not initial connect), re-sync missed notifications
       if (isInitialConnectRef.current) {
         isInitialConnectRef.current = false;
@@ -235,7 +235,10 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
       prevNotifs = prev;
       return prev.map((n) => (n._id === id ? { ...n, readAt: new Date().toISOString() } : n));
     });
-    setUnreadCount((c) => { prevCount = c; return Math.max(0, c - 1); });
+    setUnreadCount((c) => {
+      prevCount = c;
+      return Math.max(0, c - 1);
+    });
     try {
       await notificationsApi.markAsRead(id);
     } catch (err) {
@@ -248,8 +251,14 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
   const markAllAsRead = useCallback(async () => {
     let prevNotifs: Notification[] = [];
     let prevCount = 0;
-    setLatestNotifications((prev) => { prevNotifs = prev; return prev.map((n) => ({ ...n, readAt: new Date().toISOString() })); });
-    setUnreadCount((c) => { prevCount = c; return 0; });
+    setLatestNotifications((prev) => {
+      prevNotifs = prev;
+      return prev.map((n) => ({ ...n, readAt: new Date().toISOString() }));
+    });
+    setUnreadCount((c) => {
+      prevCount = c;
+      return 0;
+    });
     try {
       await notificationsApi.readAll();
     } catch (err) {
@@ -261,7 +270,10 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
 
   const clearNotification = useCallback(async (id: string) => {
     let prevNotifs: Notification[] = [];
-    setLatestNotifications((prev) => { prevNotifs = prev; return prev.filter((n) => n._id !== id); });
+    setLatestNotifications((prev) => {
+      prevNotifs = prev;
+      return prev.filter((n) => n._id !== id);
+    });
     try {
       await notificationsApi.clear(id);
     } catch (err) {
@@ -273,8 +285,14 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
   const clearAll = useCallback(async () => {
     let prevNotifs: Notification[] = [];
     let prevCount = 0;
-    setLatestNotifications((prev) => { prevNotifs = prev; return []; });
-    setUnreadCount((c) => { prevCount = c; return 0; });
+    setLatestNotifications((prev) => {
+      prevNotifs = prev;
+      return [];
+    });
+    setUnreadCount((c) => {
+      prevCount = c;
+      return 0;
+    });
     try {
       await notificationsApi.clearAll();
     } catch (err) {
@@ -286,7 +304,10 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
 
   const clearAllRead = useCallback(async () => {
     let prevNotifs: Notification[] = [];
-    setLatestNotifications((prev) => { prevNotifs = prev; return prev.filter((n) => !n.readAt); });
+    setLatestNotifications((prev) => {
+      prevNotifs = prev;
+      return prev.filter((n) => !n.readAt);
+    });
     try {
       await notificationsApi.clearAllRead();
     } catch (err) {
@@ -297,7 +318,10 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
 
   const clearSelected = useCallback(async (ids: string[]) => {
     let prevNotifs: Notification[] = [];
-    setLatestNotifications((prev) => { prevNotifs = prev; return prev.filter((n) => !ids.includes(n._id)); });
+    setLatestNotifications((prev) => {
+      prevNotifs = prev;
+      return prev.filter((n) => !ids.includes(n._id));
+    });
     try {
       await notificationsApi.clearSelected(ids);
     } catch (err) {
@@ -326,7 +350,16 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
       socket: socketInstance,
       merchant,
     }),
-    [markAsRead, markAllAsRead, clearNotification, clearAll, clearAllRead, clearSelected, socketInstance, merchant]
+    [
+      markAsRead,
+      markAllAsRead,
+      clearNotification,
+      clearAll,
+      clearAllRead,
+      clearSelected,
+      socketInstance,
+      merchant,
+    ]
   );
 
   // Toast value re-renders only toast consumers (e.g. overlay component)
@@ -338,9 +371,7 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
   return (
     <NotificationDataContext.Provider value={dataValue}>
       <NotificationActionsContext.Provider value={actionsValue}>
-        <ToastContext.Provider value={toastValue}>
-          {children}
-        </ToastContext.Provider>
+        <ToastContext.Provider value={toastValue}>{children}</ToastContext.Provider>
       </NotificationActionsContext.Provider>
     </NotificationDataContext.Provider>
   );
@@ -364,7 +395,8 @@ export function useNotificationData(): NotificationDataContextValue {
  */
 export function useNotificationActions(): NotificationActionsContextValue {
   const context = useContext(NotificationActionsContext);
-  if (!context) throw new Error('useNotificationActions must be used within a NotificationProvider');
+  if (!context)
+    throw new Error('useNotificationActions must be used within a NotificationProvider');
   return context;
 }
 
@@ -386,8 +418,5 @@ export function useNotifications() {
   const data = useNotificationData();
   const actions = useNotificationActions();
   const toast = useToast();
-  return useMemo(
-    () => ({ ...data, ...actions, ...toast }),
-    [data, actions, toast]
-  );
+  return useMemo(() => ({ ...data, ...actions, ...toast }), [data, actions, toast]);
 }

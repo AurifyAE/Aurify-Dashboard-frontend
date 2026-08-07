@@ -23,7 +23,8 @@ export type AuthState = 'initializing' | 'authenticated' | 'unauthenticated' | '
 
 export interface LogoutResult {
   success: boolean;
-  reason: 'success' | 'network_error' | 'timeout' | 'server_error' | 'remote_sync' | 'duplicate_blocked';
+  reason:
+    'success' | 'network_error' | 'timeout' | 'server_error' | 'remote_sync' | 'duplicate_blocked';
   durationMs: number;
 }
 
@@ -146,7 +147,9 @@ class LogoutManagerClass {
     // 2. Fault-Tolerant Before Hooks (Promise.allSettled)
     if (this.beforeHooks.size > 0) {
       console.log(`[LogoutManager] Running ${this.beforeHooks.size} beforeLogout hooks...`);
-      await Promise.allSettled(Array.from(this.beforeHooks).map((fn) => Promise.resolve().then(fn)));
+      await Promise.allSettled(
+        Array.from(this.beforeHooks).map((fn) => Promise.resolve().then(fn))
+      );
     }
 
     // 3. Terminate Background Timers and Pollers
@@ -154,11 +157,15 @@ class LogoutManagerClass {
     CleanupRegistry.executeAllCleanups();
 
     // 4. Abort In-Flight HTTP Requests
-    console.log(`[LogoutManager] Aborting RequestRegistry (${RequestRegistry.size()} controllers)...`);
+    console.log(
+      `[LogoutManager] Aborting RequestRegistry (${RequestRegistry.size()} controllers)...`
+    );
     RequestRegistry.abortAllRequests();
 
     // 5. Disconnect Real-Time WebSockets
-    console.log(`[LogoutManager] Disconnecting SocketRegistry (${SocketRegistry.size()} sockets)...`);
+    console.log(
+      `[LogoutManager] Disconnecting SocketRegistry (${SocketRegistry.size()} sockets)...`
+    );
     SocketRegistry.disconnectAllSockets();
 
     // 6. Backend Session Revocation with Timeout Guard
@@ -204,10 +211,12 @@ class LogoutManagerClass {
     const finalReason = backendResult.success
       ? 'success'
       : backendResult.error === 'timeout'
-      ? 'timeout'
-      : 'network_error';
+        ? 'timeout'
+        : 'network_error';
 
-    console.log(`[LogoutManager] ✅ Logout pipeline completed in ${durationMs}ms (Reason: ${finalReason})`);
+    console.log(
+      `[LogoutManager] ✅ Logout pipeline completed in ${durationMs}ms (Reason: ${finalReason})`
+    );
 
     // 11. Seamless Navigation to Login
     const targetUrl = options?.redirectUrl || '/login';

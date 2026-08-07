@@ -20,7 +20,9 @@ const AUTH_STORAGE_KEYS = [
 /**
  * Decode basic JWT payload on client side without extra dependencies
  */
-export const decodeToken = (token: string): { email?: string; role?: string; id?: string; companyName?: string } | null => {
+export const decodeToken = (
+  token: string
+): { email?: string; role?: string; id?: string; companyName?: string } | null => {
   try {
     const base64Url = token.split('.')[1];
     if (!base64Url) return null;

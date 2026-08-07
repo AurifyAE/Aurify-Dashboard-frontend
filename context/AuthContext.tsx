@@ -22,11 +22,7 @@ import {
   apiRegister,
   apiGetMe,
 } from '@/lib/auth';
-import {
-  LogoutManager,
-  AuthState,
-  LogoutResult,
-} from '@/services/auth/logoutManager';
+import { LogoutManager, AuthState, LogoutResult } from '@/services/auth/logoutManager';
 import { CleanupRegistry } from '@/lib/CleanupRegistry';
 
 // ─── Context Types ────────────────────────────────────────────────────────────
@@ -101,14 +97,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [hasHydrated]);
 
   // Stable redirect helper — reason: 'deleted' = account removed/suspended, 'session' = generic expiry
-  const forceRegisterRedirect = useCallback((reason: 'deleted' | 'session' = 'session') => {
-    removeToken();
-    setUser(null);
-    LogoutManager.setState('unauthenticated');
-    if (!pathnameRef.current.startsWith('/login') && !pathnameRef.current.startsWith('/register')) {
-      router.push(`/login?alert=${reason}`);
-    }
-  }, [router]);
+  const forceRegisterRedirect = useCallback(
+    (reason: 'deleted' | 'session' = 'session') => {
+      removeToken();
+      setUser(null);
+      LogoutManager.setState('unauthenticated');
+      if (
+        !pathnameRef.current.startsWith('/login') &&
+        !pathnameRef.current.startsWith('/register')
+      ) {
+        router.push(`/login?alert=${reason}`);
+      }
+    },
+    [router]
+  );
 
   const forceRegisterRedirectRef = useRef(forceRegisterRedirect);
   useEffect(() => {
@@ -141,14 +143,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
 
     try {
-      const res = await fetch(`${(await import('@/lib/env')).BACKEND_URL || process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:5001'}/api/auth/me`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-        credentials: 'include',
-      });
+      const res = await fetch(
+        `${(await import('@/lib/env')).BACKEND_URL || process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:5001'}/api/auth/me`,
+        {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+          credentials: 'include',
+        }
+      );
 
       // Only log out on explicit auth rejection (401 Unauthorized / 403 Forbidden)
       // Ignore 5xx server errors, network failures, timeouts etc.

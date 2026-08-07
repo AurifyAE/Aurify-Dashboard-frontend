@@ -480,8 +480,8 @@ export default function AdminClientsPage() {
                   onClick={() => handleResetPassword(editingMerchant._id)}
                   className="absolute top-4 right-4 bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 hover:text-blue-600 font-medium text-xs px-3 py-1.5 rounded-lg shadow-sm transition-all inline-flex items-center gap-1.5"
                 >
-                 Reset Password
-                 </button>
+                  Reset Password
+                </button>
               </div>
 
               {/* Grid 1: Status & Limits */}
@@ -576,7 +576,8 @@ export default function AdminClientsPage() {
                             const val = e.target.value;
                             setEditingMerchant({
                               ...editingMerchant,
-                              maxScreens: val === '' ? '' : (isNaN(parseInt(val, 10)) ? '' : parseInt(val, 10)),
+                              maxScreens:
+                                val === '' ? '' : isNaN(parseInt(val, 10)) ? '' : parseInt(val, 10),
                             });
                           }}
                           placeholder="Enter max screens"
@@ -605,7 +606,8 @@ export default function AdminClientsPage() {
                             const val = e.target.value;
                             setEditingMerchant({
                               ...editingMerchant,
-                              maxDevices: val === '' ? '' : (isNaN(parseInt(val, 10)) ? '' : parseInt(val, 10)),
+                              maxDevices:
+                                val === '' ? '' : isNaN(parseInt(val, 10)) ? '' : parseInt(val, 10),
                             });
                           }}
                           placeholder="Enter max devices"

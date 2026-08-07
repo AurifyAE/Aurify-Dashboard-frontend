@@ -20,7 +20,8 @@ export interface Notification {
   type: 'SUCCESS' | 'INFO' | 'WARNING' | 'ERROR';
   priority: 'LOW' | 'NORMAL' | 'HIGH' | 'CRITICAL';
   category: 'APPROVAL' | 'ADMIN' | 'SYSTEM' | 'FEATURE' | 'SECURITY' | 'BILLING' | 'WARNING';
-  sourceModule: 'MARKETPLACE' | 'SCREEN_BUILDER' | 'THEME' | 'BILLING' | 'ADMIN' | 'AUTH' | 'ANALYTICS';
+  sourceModule:
+    'MARKETPLACE' | 'SCREEN_BUILDER' | 'THEME' | 'BILLING' | 'ADMIN' | 'AUTH' | 'ANALYTICS';
   version: number;
   silent: boolean;
   isPinned: boolean;
@@ -70,7 +71,9 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
 }
 
 export const notificationsApi = {
-  list: (params: { page?: number; pageSize?: number; category?: string; unread?: boolean } = {}) => {
+  list: (
+    params: { page?: number; pageSize?: number; category?: string; unread?: boolean } = {}
+  ) => {
     const q = new URLSearchParams();
     if (params.page) q.append('page', String(params.page));
     if (params.pageSize) q.append('pageSize', String(params.pageSize));
