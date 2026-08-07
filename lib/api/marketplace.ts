@@ -157,7 +157,7 @@ export const marketplaceApi = {
     }),
   allLiveScreens: () => request<any[]>('/screens/all'),
   checkScreenSlug: (slug: string, excludeLayoutId?: string) =>
-    request<{ available: boolean; message?: string }>(
+    request<{ available: boolean; message?: string; suggestions?: string[] }>(
       `/screens/check-slug?slug=${encodeURIComponent(slug)}${excludeLayoutId ? `&excludeLayoutId=${encodeURIComponent(excludeLayoutId)}` : ''}`
     ),
   checkMerchantSlug: (slug: string) =>
