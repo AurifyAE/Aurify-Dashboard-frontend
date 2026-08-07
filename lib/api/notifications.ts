@@ -14,6 +14,7 @@ export interface NotificationActor {
 
 export interface Notification {
   _id: string;
+  recipientUserId: string;
   merchantId: string;
   title: string;
   message: string;
@@ -21,7 +22,13 @@ export interface Notification {
   priority: 'LOW' | 'NORMAL' | 'HIGH' | 'CRITICAL';
   category: 'APPROVAL' | 'ADMIN' | 'SYSTEM' | 'FEATURE' | 'SECURITY' | 'BILLING' | 'WARNING';
   sourceModule:
-    'MARKETPLACE' | 'SCREEN_BUILDER' | 'THEME' | 'BILLING' | 'ADMIN' | 'AUTH' | 'ANALYTICS';
+    | 'MARKETPLACE'
+    | 'SCREEN_BUILDER'
+    | 'THEME'
+    | 'BILLING'
+    | 'ADMIN'
+    | 'AUTH'
+    | 'ANALYTICS';
   version: number;
   silent: boolean;
   isPinned: boolean;
@@ -43,6 +50,13 @@ export interface PaginatedNotifications {
   total: number;
   unread: number;
   hasMore: boolean;
+}
+
+export interface SyncNotificationsResult {
+  deltaNotifications: Notification[];
+  unread: number;
+  activeReadIds: string[];
+  syncedAt: string;
 }
 
 function headers(): HeadersInit {
@@ -80,6 +94,11 @@ export const notificationsApi = {
     if (params.category) q.append('category', params.category);
     if (params.unread) q.append('unread', 'true');
     return request<PaginatedNotifications>(`?${q.toString()}`);
+  },
+  sync: (cursor?: string) => {
+    const q = new URLSearchParams();
+    if (cursor) q.append('cursor', cursor);
+    return request<SyncNotificationsResult>(`/sync?${q.toString()}`);
   },
   unreadCount: () => request<{ unread: number }>('/unread-count'),
   markAsRead: (id: string) =>

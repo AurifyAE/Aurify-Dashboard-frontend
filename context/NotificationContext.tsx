@@ -112,9 +112,9 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
-  // Fetch active merchant profile for user role
+  // Fetch active merchant profile for logged-in user or admin
   useEffect(() => {
-    if (user && user.role === 'user') {
+    if (user) {
       marketplaceApi
         .myMerchant()
         .then((m) => setMerchant(m))
@@ -164,9 +164,11 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
     setToastQueue((prev) => prev.filter((t) => t.id !== id));
   }, []);
 
-  // ── Establish single WebSocket connection safely ──────────────────────────
+  const lastCursorRef = useRef<string | undefined>(undefined);
+
+  // Establish single WebSocket connection safely
   useEffect(() => {
-    if (!merchant) {
+    if (!merchant && (!user || (user.role !== 'admin' && user.role !== 'super_admin'))) {
       if (socketRef.current) {
         socketRef.current.disconnect();
         socketRef.current = null;
@@ -178,7 +180,6 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
     const token = getToken();
     if (!token) return;
 
-    // Reuse existing socket connection if available
     if (socketRef.current) return;
 
     const socket = io(BACKEND_URL, {
@@ -189,18 +190,41 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
     socketRef.current = socket;
     setSocketInstance(socket);
 
-    // Register socket with SocketRegistry
     const unregisterSocket = SocketRegistry.registerSocket('notification', socket);
 
     socket.on('connect', () => {
       console.log('[NotificationContext] Socket connected successfully:', socket.id);
-      socket.emit('join-merchant-notifications', { merchantId: merchant.merchantId });
+      socket.emit('join-user-notifications');
+      if (merchant?.merchantId) {
+        socket.emit('join-merchant-notifications', { merchantId: merchant.merchantId });
+      }
 
-      // On reconnect (not initial connect), re-sync missed notifications
+      // On reconnect, execute cursor-based sync to recover missed notifications and state changes
       if (isInitialConnectRef.current) {
         isInitialConnectRef.current = false;
       } else {
-        loadInitialData();
+        notificationsApi
+          .sync(lastCursorRef.current)
+          .then((res) => {
+            if (res.deltaNotifications && res.deltaNotifications.length > 0) {
+              setLatestNotifications((prev) => {
+                const map = new Map<string, Notification>();
+                res.deltaNotifications.forEach((n) => map.set(n._id, n));
+                prev.forEach((n) => {
+                  if (!map.has(n._id)) map.set(n._id, n);
+                });
+                const merged = Array.from(map.values()).sort(
+                  (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+                );
+                return merged.slice(0, 20);
+              });
+            }
+            if (res.unread !== undefined) setUnreadCount(res.unread);
+          })
+          .catch((err) => {
+            console.error('[NotificationContext] Reconnect sync error:', err);
+            loadInitialData();
+          });
       }
     });
 
@@ -208,7 +232,11 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
       console.log('[NotificationContext] Incoming WebSocket notification:', data.notification);
       setLatestNotifications((prev) => {
         const filtered = prev.filter((n) => n._id !== data.notification._id);
-        return [data.notification, ...filtered].slice(0, 20);
+        const updated = [data.notification, ...filtered].slice(0, 20);
+        if (updated.length > 0) {
+          lastCursorRef.current = `${updated[0].createdAt}_${updated[0]._id}`;
+        }
+        return updated;
       });
       setUnreadCount(data.unreadCount);
     });
@@ -217,6 +245,40 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
       setUnreadCount(data.unreadCount);
     });
 
+    // Multi-tab state synchronization
+    socket.on(
+      'notification:state-change',
+      (data: {
+        type: 'read' | 'all-read' | 'cleared' | 'cleared-read' | 'all-cleared' | 'cleared-selected' | 'deleted';
+        notificationId?: string;
+        notificationIds?: string[];
+        unreadCount?: number;
+      }) => {
+        console.log('[NotificationContext] Multi-tab state-change event received:', data.type);
+        if (data.unreadCount !== undefined) setUnreadCount(data.unreadCount);
+
+        if (data.type === 'read' && data.notificationId) {
+          setLatestNotifications((prev) =>
+            prev.map((n) => (n._id === data.notificationId ? { ...n, readAt: new Date().toISOString() } : n))
+          );
+        } else if (data.type === 'all-read') {
+          setLatestNotifications((prev) =>
+            prev.map((n) => ({ ...n, readAt: n.readAt || new Date().toISOString() }))
+          );
+        } else if (data.type === 'cleared' && data.notificationId) {
+          setLatestNotifications((prev) => prev.filter((n) => n._id !== data.notificationId));
+        } else if (data.type === 'deleted' && data.notificationId) {
+          setLatestNotifications((prev) => prev.filter((n) => n._id !== data.notificationId));
+        } else if (data.type === 'cleared-read') {
+          setLatestNotifications((prev) => prev.filter((n) => !n.readAt));
+        } else if (data.type === 'all-cleared') {
+          setLatestNotifications([]);
+        } else if (data.type === 'cleared-selected' && data.notificationIds) {
+          setLatestNotifications((prev) => prev.filter((n) => !data.notificationIds?.includes(n._id)));
+        }
+      }
+    );
+
     return () => {
       if (socketRef.current) {
         socketRef.current.disconnect();
@@ -224,7 +286,7 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
         setSocketInstance(null);
       }
     };
-  }, [merchant, loadInitialData]);
+  }, [merchant, user, loadInitialData]);
 
   // ── API Actions (all stable useCallback — never recreated after mount) ────
 
