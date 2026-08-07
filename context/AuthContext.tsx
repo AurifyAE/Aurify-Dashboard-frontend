@@ -100,13 +100,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     hasHydratedRef.current = hasHydrated;
   }, [hasHydrated]);
 
-  // Stable redirect helper for suspended or deleted accounts
-  const forceRegisterRedirect = useCallback(() => {
+  // Stable redirect helper — reason: 'deleted' = account removed/suspended, 'session' = generic expiry
+  const forceRegisterRedirect = useCallback((reason: 'deleted' | 'session' = 'session') => {
     removeToken();
     setUser(null);
     LogoutManager.setState('unauthenticated');
     if (!pathnameRef.current.startsWith('/login') && !pathnameRef.current.startsWith('/register')) {
-      router.push('/login?alert=deleted');
+      router.push(`/login?alert=${reason}`);
     }
   }, [router]);
 
@@ -141,9 +141,33 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
 
     try {
-      const res = await apiGetMe(token);
-      if (res.success && res.user) {
-        const newUser = res.user;
+      const res = await fetch(`${(await import('@/lib/env')).BACKEND_URL || process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:5001'}/api/auth/me`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        credentials: 'include',
+      });
+
+      // Only log out on explicit auth rejection (401 Unauthorized / 403 Forbidden)
+      // Ignore 5xx server errors, network failures, timeouts etc.
+      if (res.status === 401 || res.status === 403) {
+        forceRegisterRedirectRef.current();
+        setIsLoading(false);
+        return;
+      }
+
+      if (!res.ok) {
+        // Server error or network issue — keep user logged in, don't redirect
+        console.warn('Auth check returned non-OK status:', res.status);
+        setIsLoading(false);
+        return;
+      }
+
+      const data = await res.json().catch(() => ({ success: false }));
+      if (data.success && data.user) {
+        const newUser = data.user;
         setUser((prevUser) => {
           if (!prevUser) return newUser;
           if (
@@ -159,11 +183,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           return newUser;
         });
         LogoutManager.setState('authenticated');
-      } else {
-        forceRegisterRedirectRef.current();
+      } else if (data.success === false && data.message?.toLowerCase().includes('deleted')) {
+        // Explicitly deleted/suspended account — force logout with 'deleted' reason
+        forceRegisterRedirectRef.current('deleted');
       }
+      // If data.success is false for any other reason, stay logged in
     } catch (err) {
-      console.error('Auth check failed:', err);
+      // Network error / server down — keep user logged in, don't redirect
+      console.warn('Auth check network error (staying logged in):', err);
     }
     setIsLoading(false);
   }, []);

@@ -422,12 +422,36 @@ export default function ScreenBuilderTab({
   const [slugAvailable, setSlugAvailable] = useState<boolean | null>(null);
   const [slugMessage, setSlugMessage] = useState<string>('');
   const [suggestions, setSuggestions] = useState<string[]>([]);
+  const [setAsProfileLogo, setSetAsProfileLogo] = useState(false);
+  const [commodities, setCommodities] = useState<any[]>([]);
 
   const showMessage = (text: string, type: 'info' | 'success' | 'error' = 'info') => {
     toast.dismiss();
     if (type === 'error') toast.error(text);
     else if (type === 'success') toast.success(text);
     else toast(text);
+  };
+
+  const syncLogoToProfile = async (logoUrl: string) => {
+    try {
+      const res = await marketplaceApi.updateProfile({ logo: logoUrl });
+      if (res?.merchant) {
+        setMerchant((prev) => ({
+          ...(prev || {}),
+          ...res.merchant,
+          commodities: (res.merchant as any)?.commodities?.length
+            ? (res.merchant as any).commodities
+            : (prev as any)?.commodities || commodities || [],
+        } as Merchant));
+        if ((res.merchant as any)?.commodities?.length) {
+          setCommodities((res.merchant as any).commodities);
+        }
+      }
+      showMessage('Logo set as company profile icon!', 'success');
+    } catch (err: any) {
+      console.error('Failed to sync profile logo:', err);
+      showMessage(err?.message || 'Failed to set profile icon', 'error');
+    }
   };
 
   const validateStep1 = (showAlert = true): boolean => {
@@ -586,19 +610,25 @@ export default function ScreenBuilderTab({
         canvas.width = width;
         canvas.height = height;
         const ctx = canvas.getContext('2d');
+        let finalUrl = event.target?.result as string;
         if (ctx) {
           ctx.drawImage(img, 0, 0, width, height);
-          const compressedDataUrl = canvas.toDataURL(
+          finalUrl = canvas.toDataURL(
             file.type === 'image/png' ? 'image/png' : 'image/jpeg',
             0.85
           );
-          setDraft((prev) => ({ ...prev, [field]: compressedDataUrl }));
-        } else {
-          setDraft((prev) => ({ ...prev, [field]: event.target?.result as string }));
+        }
+        setDraft((prev) => ({ ...prev, [field]: finalUrl }));
+        if (field === 'logoUrl' && setAsProfileLogo) {
+          syncLogoToProfile(finalUrl);
         }
       };
       img.onerror = () => {
-        setDraft((prev) => ({ ...prev, [field]: event.target?.result as string }));
+        const rawUrl = event.target?.result as string;
+        setDraft((prev) => ({ ...prev, [field]: rawUrl }));
+        if (field === 'logoUrl' && setAsProfileLogo) {
+          syncLogoToProfile(rawUrl);
+        }
       };
       img.src = event.target?.result as string;
     };
@@ -615,6 +645,7 @@ export default function ScreenBuilderTab({
         marketplaceApi.news().catch(() => []),
       ]);
       setMerchant(m);
+      setCommodities((m as any)?.commodities || []);
       setThemes(installed);
       setLayouts(savedLayouts);
       setNews(newsItems);
@@ -1253,21 +1284,48 @@ export default function ScreenBuilderTab({
                       className="block w-full text-xs text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer"
                     />
                     {draft.logoUrl && (
-                      <div className="mt-2 flex items-center gap-2 text-xs text-slate-500">
-                        <span className="font-semibold">Current:</span>
-                        <img
-                          src={draft.logoUrl}
-                          alt="logo"
-                          className="h-8 w-auto rounded border border-slate-200 bg-slate-50 object-contain p-0.5"
-                        />
-                        <button
-                          type="button"
-                          onClick={() => setDraft({ ...draft, logoUrl: '' })}
-                          className="p-1 text-red-500 hover:bg-red-50 rounded-lg transition-all"
-                          title="Remove Logo"
-                        >
-                          <Trash2 className="h-3.5 w-3.5" />
-                        </button>
+                      <div className="mt-2.5 space-y-2">
+                        <div className="flex items-center gap-2 text-xs text-slate-500">
+                          <span className="font-semibold">Current:</span>
+                          <img
+                            src={draft.logoUrl}
+                            alt="logo"
+                            className="h-8 w-auto rounded border border-slate-200 bg-slate-50 object-contain p-0.5"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setDraft({ ...draft, logoUrl: '' });
+                              setSetAsProfileLogo(false);
+                            }}
+                            className="p-1 text-red-500 hover:bg-red-50 rounded-lg transition-all"
+                            title="Remove Logo"
+                          >
+                            <Trash2 className="h-3.5 w-3.5" />
+                          </button>
+                        </div>
+
+                        <div className="flex items-center gap-2 pt-1 border-t border-slate-100">
+                          <input
+                            type="checkbox"
+                            id="setAsProfileLogoCheckbox"
+                            checked={setAsProfileLogo}
+                            onChange={async (e) => {
+                              const checked = e.target.checked;
+                              setSetAsProfileLogo(checked);
+                              if (checked && draft.logoUrl) {
+                                syncLogoToProfile(draft.logoUrl);
+                              }
+                            }}
+                            className="h-3.5 w-3.5 rounded border-slate-300 text-blue-600 focus:ring-blue-500 cursor-pointer"
+                          />
+                          <label
+                            htmlFor="setAsProfileLogoCheckbox"
+                            className="text-xs text-slate-600 select-none cursor-pointer font-medium"
+                          >
+                            Set as profile icon
+                          </label>
+                        </div>
                       </div>
                     )}
                   </div>
@@ -1743,7 +1801,8 @@ export default function ScreenBuilderTab({
               merchant,
               theme: selectedTheme,
               layout: draft,
-              commodities: (merchant as any)?.commodities || [],
+              commodities:
+                commodities.length > 0 ? commodities : (merchant as any)?.commodities || [],
               news: news,
             }}
             isDraggable={step === 2}

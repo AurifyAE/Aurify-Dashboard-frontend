@@ -154,7 +154,7 @@ export default function MyScreensTab({ onEditLayout, onCreateNew }: MyScreensTab
             return (
               <div
                 key={layout.layoutId}
-                className={`overflow-hidden flex flex-col rounded-2xl border transition-all hover:shadow-xl bg-white ${
+                className={`overflow-hidden flex flex-col rounded-2xl border transition-all hover:shadow-md bg-white ${
                   isPublished
                     ? 'border-emerald-200 shadow-sm hover:border-emerald-300'
                     : 'border-slate-200 hover:border-slate-300'
