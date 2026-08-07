@@ -484,11 +484,22 @@ export default function ScreenBuilderTab({
       try {
         const res = await marketplaceApi.checkScreenSlug(slug, draft.layoutId);
         setSlugAvailable(res.available);
-        setSlugMessage(res.message);
-        setSuggestions(res.suggestions || []);
+        setSlugMessage(res.message || '');
+        setSuggestions(
+          res.suggestions ||
+            (!res.available
+              ? [
+                  `${slug}-2`,
+                  `${slug}-${new Date().getFullYear()}`,
+                  `${slug}-live`,
+                  `${slug}-display`,
+                ]
+              : [])
+        );
       } catch (err: any) {
         setSlugAvailable(null);
         setSlugMessage('Unable to verify URL availability.');
+        setSuggestions([]);
       } finally {
         setSlugChecking(false);
       }
