@@ -98,3 +98,22 @@ export const apiLogout = async (
     };
   }
 };
+
+/**
+ * Silently refresh the access token using the httpOnly refresh cookie.
+ * Returns the new access token string, or null on failure.
+ */
+export const apiRefreshToken = async (): Promise<string | null> => {
+  try {
+    const res = await fetch(`${BASE_URL}/api/auth/refresh`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include', // sends aurify_refresh cookie automatically
+    });
+    if (!res.ok) return null;
+    const data = await res.json().catch(() => ({}));
+    return data?.token ?? null;
+  } catch {
+    return null;
+  }
+};

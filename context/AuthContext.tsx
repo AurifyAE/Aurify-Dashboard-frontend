@@ -21,6 +21,7 @@ import {
   apiLogin,
   apiRegister,
   apiGetMe,
+  apiRefreshToken,
 } from '@/lib/auth';
 import { LogoutManager, AuthState, LogoutResult } from '@/services/auth/logoutManager';
 import { CleanupRegistry } from '@/lib/CleanupRegistry';
@@ -142,6 +143,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setHasHydrated(true);
     }
 
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 5000); // 5s timeout
+
     try {
       const res = await fetch(
         `${(await import('@/lib/env')).BACKEND_URL || process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:5001'}/api/auth/me`,
@@ -152,13 +156,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             Authorization: `Bearer ${token}`,
           },
           credentials: 'include',
+          signal: controller.signal,
         }
       );
+      clearTimeout(timeoutId);
 
-      // Only log out on explicit auth rejection (401 Unauthorized / 403 Forbidden)
-      // Ignore 5xx server errors, network failures, timeouts etc.
+      // On 401/403 — try a silent token refresh first before logging out
       if (res.status === 401 || res.status === 403) {
-        forceRegisterRedirectRef.current();
+        const newToken = await apiRefreshToken();
+        if (newToken) {
+          // Successfully refreshed — save the new token and stay logged in
+          setToken(newToken);
+          setIsLoading(false);
+          return;
+        }
+        // Refresh failed — genuine session expiry, log out
+        forceRegisterRedirectRef.current('session');
         setIsLoading(false);
         return;
       }
@@ -193,9 +206,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         forceRegisterRedirectRef.current('deleted');
       }
       // If data.success is false for any other reason, stay logged in
-    } catch (err) {
-      // Network error / server down — keep user logged in, don't redirect
-      console.warn('Auth check network error (staying logged in):', err);
+    } catch (err: any) {
+      clearTimeout(timeoutId);
+      if (err?.name === 'AbortError') {
+        console.warn('Auth check timed out — server unreachable, staying logged in');
+      } else {
+        // Network error / server down — keep user logged in, don't redirect
+        console.warn('Auth check network error (staying logged in):', err);
+      }
     }
     setIsLoading(false);
   }, []);
