@@ -160,45 +160,83 @@ export default function MyScreensTab({ onEditLayout, onCreateNew }: MyScreensTab
                     : 'border-slate-200 hover:border-slate-300'
                 }`}
               >
-                {/* Header / Cover Replacement */}
-                <div
-                  className={`p-5 flex flex-col gap-3 relative ${
-                    isPublished
-                      ? 'bg-gradient-to-br from-emerald-500 to-teal-700'
-                      : 'bg-gradient-to-br from-slate-700 to-slate-900'
-                  }`}
-                >
-                  <img
-                    src={'/images/aurify-logo1.svg'}
-                    alt="Background"
-                    className="object-cover h-full object-contain absolute top-0 right-0 opacity-5   brightness-0 grayscale-100  "
-                  />
-                  <div className="flex justify-between items-start">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-white/10 backdrop-blur-md shadow-sm border border-white/20">
-                      <Monitor className="h-5 w-5 text-white" />
+                {/* Card Header — shows uploaded background image or gradient fallback */}
+                {(() => {
+                  const bgUrl = (layout.styles as any)?.backgroundUrl as string | undefined;
+                  const logoUrl = (layout.styles as any)?.logoUrl as string | undefined;
+                  return (
+                    <div className="relative h-36 overflow-hidden flex flex-col justify-between p-4">
+                      {/* Blurred background image */}
+                      {bgUrl && (
+                        <img
+                          src={bgUrl}
+                          alt=""
+                          className="absolute inset-0 w-full h-full object-cover pointer-events-none"
+                          style={{ filter: 'blur(1px)', transform: 'scale(1.1)' }}
+                        />
+                      )}
+
+                      {/* Gradient overlay — lighter if image, stronger if fallback */}
+                      <div
+                        className={`absolute inset-0 ${
+                          bgUrl
+                            ? 'bg-gradient-to-t from-black/70 via-black/25 to-black/10'
+                            : isPublished
+                              ? 'bg-gradient-to-br from-emerald-500 to-teal-700'
+                              : 'bg-gradient-to-br from-slate-700 to-slate-900'
+                        }`}
+                      />
+
+                      {/* Top row: logo + status badge */}
+                      <div className="relative flex justify-between items-start z-10">
+                        {logoUrl ? (
+                          <img
+                            src={logoUrl}
+                            alt="Logo"
+                            className="h-9 w-9 rounded-xl object-contain bg-white/20 backdrop-blur-sm border border-white/30 p-1"
+                          />
+                        ) : (
+                          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-white/15 backdrop-blur-md border border-white/20">
+                            <Monitor className="h-4 w-4 text-white" />
+                          </div>
+                        )}
+                        <span
+                          className={`rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider border backdrop-blur-md ${
+                            isPublished
+                              ? 'bg-emerald-400/25 text-emerald-100 border-emerald-300/30'
+                              : 'bg-white/10 text-white/80 border-white/20'
+                          }`}
+                        >
+                          {layout.status}
+                        </span>
+                      </div>
+
+                      {/* Bottom row: name + slug */}
+                      <div className="relative z-10">
+                        <h3
+                          className="font-bold text-base text-white leading-tight truncate drop-shadow"
+                          title={layout.name}
+                        >
+                          {layout.name}
+                        </h3>
+                        <p className="text-xs text-white/65 font-medium truncate mt-0.5">
+                          /{layout.screenSlug}
+                        </p>
+                      </div>
+
+                      {/* No background placeholder text */}
+                      {!bgUrl && (
+                        <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                          <img
+                            src={'/images/aurify-logo1.svg'}
+                            alt=""
+                            className="h-full w-auto object-contain opacity-5 brightness-0 grayscale"
+                          />
+                        </div>
+                      )}
                     </div>
-                    <span
-                      className={`rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider border backdrop-blur-md ${
-                        isPublished
-                          ? 'bg-emerald-400/20 text-white border-emerald-300/30'
-                          : 'bg-white/10 text-white border-white/20'
-                      }`}
-                    >
-                      {layout.status}
-                    </span>
-                  </div>
-                  <div className="mt-2">
-                    <h3
-                      className="font-bold text-lg text-white leading-tight truncate"
-                      title={layout.name}
-                    >
-                      {layout.name}
-                    </h3>
-                    <p className="text-sm text-white/70 font-medium truncate">
-                      /{layout.screenSlug}
-                    </p>
-                  </div>
-                </div>
+                  );
+                })()}
 
                 {/* Info & Actions */}
                 <div className="p-5 flex-1 flex flex-col">
