@@ -400,12 +400,6 @@ export default function ScreenBuilderTab({
   const initialStep = parseInt(searchParams.get('step') || '1', 10);
   const [step, setStepState] = useState(isNaN(initialStep) ? 1 : initialStep);
 
-  const setStep = (newStep: number) => {
-    setStepState(newStep);
-    const params = new URLSearchParams(searchParams.toString());
-    params.set('step', newStep.toString());
-    router.push(`?${params.toString()}`);
-  };
   const [merchant, setMerchant] = useState<Merchant | null>(null);
   const [themes, setThemes] = useState<MerchantTheme[]>([]);
   const [layouts, setLayouts] = useState<ScreenLayout[]>([]);
@@ -428,6 +422,49 @@ export default function ScreenBuilderTab({
   const [slugAvailable, setSlugAvailable] = useState<boolean | null>(null);
   const [slugMessage, setSlugMessage] = useState<string>('');
   const [suggestions, setSuggestions] = useState<string[]>([]);
+
+  const showMessage = (text: string, type: 'info' | 'success' | 'error' = 'info') => {
+    toast.dismiss();
+    if (type === 'error') toast.error(text);
+    else if (type === 'success') toast.success(text);
+    else toast(text);
+  };
+
+  const validateStep1 = (showAlert = true): boolean => {
+    if (!draft.name.trim()) {
+      if (showAlert) showMessage('Please enter a screen name before proceeding.', 'error');
+      return false;
+    }
+    if (!draft.screenSlug?.trim()) {
+      if (showAlert) showMessage('Please enter a URL slug before proceeding.', 'error');
+      return false;
+    }
+    if (slugChecking) {
+      if (showAlert) showMessage('Validating screen URL availability, please wait a moment...', 'info');
+      return false;
+    }
+    if (slugAvailable === false) {
+      if (showAlert) showMessage(slugMessage ? `Cannot proceed: ${slugMessage}` : '✕ This URL is already in use. Please choose a different URL slug.', 'error');
+      return false;
+    }
+    if (!draft.selectedLayout) {
+      if (showAlert) showMessage('Please select a layout before proceeding.', 'error');
+      return false;
+    }
+    return true;
+  };
+
+  const setStep = (newStep: number, validate = true) => {
+    if (validate && newStep > 1) {
+      if (!validateStep1(true)) {
+        return;
+      }
+    }
+    setStepState(newStep);
+    const params = new URLSearchParams(searchParams.toString());
+    params.set('step', newStep.toString());
+    router.push(`?${params.toString()}`);
+  };
 
   useEffect(() => {
     if (isFirstLoad.current) return;
@@ -566,13 +603,6 @@ export default function ScreenBuilderTab({
       img.src = event.target?.result as string;
     };
     reader.readAsDataURL(file);
-  };
-
-  const showMessage = (text: string, type: 'info' | 'success' | 'error' = 'info') => {
-    toast.dismiss();
-    if (type === 'error') toast.error(text);
-    else if (type === 'success') toast.success(text);
-    else toast(text);
   };
 
   const load = async () => {
