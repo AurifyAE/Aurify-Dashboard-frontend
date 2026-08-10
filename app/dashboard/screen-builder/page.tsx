@@ -31,14 +31,20 @@ function ScreenConsoleContent() {
       .catch((err) => console.error('Failed to fetch merchant details:', err));
   }, []);
 
-  // Sync tab from query parameter if provided (e.g. /dashboard/screen-builder?tab=themes)
+  // Sync tab and layoutId from query parameter if provided (e.g. /dashboard/screen-builder?tab=themes)
   useEffect(() => {
     const tabParam = searchParams.get('tab');
+    const layoutIdParam = searchParams.get('layoutId');
     if (
       tabParam &&
       ['my-screens', 'builder', 'themes', 'profile', 'others', 'news'].includes(tabParam)
     ) {
       setActiveTab(tabParam as TabId);
+    }
+    if (layoutIdParam) {
+      setEditingLayoutId(layoutIdParam);
+    } else if (tabParam !== 'builder') {
+      setEditingLayoutId(undefined);
     }
   }, [searchParams]);
 
@@ -47,17 +53,31 @@ function ScreenConsoleContent() {
     const params = new URLSearchParams(searchParams.toString());
     params.set('tab', tab);
     params.delete('step');
+    if (tab !== 'builder') {
+      params.delete('layoutId');
+      setEditingLayoutId(undefined);
+    }
     router.push(`?${params.toString()}`);
   };
 
   const handleEditLayout = (layoutId: string) => {
     setEditingLayoutId(layoutId);
-    handleTabChange('builder');
+    setActiveTab('builder');
+    const params = new URLSearchParams(searchParams.toString());
+    params.set('tab', 'builder');
+    params.set('layoutId', layoutId);
+    params.delete('step');
+    router.push(`?${params.toString()}`);
   };
 
   const handleCreateNew = () => {
     setEditingLayoutId(undefined);
-    handleTabChange('builder');
+    setActiveTab('builder');
+    const params = new URLSearchParams(searchParams.toString());
+    params.set('tab', 'builder');
+    params.delete('layoutId');
+    params.delete('step');
+    router.push(`?${params.toString()}`);
   };
 
   const tabsConfig = [

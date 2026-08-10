@@ -397,6 +397,8 @@ export default function ScreenBuilderTab({
   const [openAccordion, setOpenAccordion] = useState<string | null>('Global Colors');
   const router = useRouter();
   const searchParams = useSearchParams();
+  const queryLayoutId = searchParams.get('layoutId') || undefined;
+  const activeEditingLayoutId = editingLayoutId || queryLayoutId;
   const initialStep = parseInt(searchParams.get('step') || '1', 10);
   const [step, setStepState] = useState(isNaN(initialStep) ? 1 : initialStep);
 
@@ -510,6 +512,9 @@ export default function ScreenBuilderTab({
   }, [draft]);
 
   useEffect(() => {
+    // Avoid checking slug prematurely during initial load before the draft is loaded
+    if (loading || isFirstLoad.current) return;
+
     const slug = draft.screenSlug?.trim();
     if (!slug) {
       setSlugAvailable(null);
@@ -577,7 +582,7 @@ export default function ScreenBuilderTab({
     }, 400);
 
     return () => clearTimeout(handler);
-  }, [draft.screenSlug, draft.layoutId]);
+  }, [draft.screenSlug, draft.layoutId, loading]);
 
   const handleImageUpload = (
     e: React.ChangeEvent<HTMLInputElement>,
@@ -669,13 +674,14 @@ export default function ScreenBuilderTab({
         if (stored) localDraft = JSON.parse(stored);
       } catch (e) {}
 
-      if (editingLayoutId) {
-        const target = savedLayouts.find((l) => l.layoutId === editingLayoutId);
+      if (activeEditingLayoutId) {
+        const target = savedLayouts.find((l) => l.layoutId === activeEditingLayoutId);
         if (target) {
-          if (localDraft && localDraft.layoutId === editingLayoutId) {
+          if (localDraft && localDraft.layoutId === activeEditingLayoutId) {
             setDraft({
               ...defaultDraft,
               ...localDraft,
+              layoutId: target.layoutId,
               selectedClocks: localDraft.selectedClocks?.length
                 ? localDraft.selectedClocks
                 : defaultDraft.selectedClocks,
@@ -737,7 +743,7 @@ export default function ScreenBuilderTab({
 
   useEffect(() => {
     load();
-  }, [editingLayoutId]);
+  }, [editingLayoutId, queryLayoutId]);
 
   const selectedTheme = themes.find((t) => t.themeId === draft.themeId);
   const themeColors = selectedTheme?.customizations as
@@ -930,7 +936,12 @@ export default function ScreenBuilderTab({
     try {
       const saved = await marketplaceApi.saveLayout(buildPayload(themeId));
       setDraft((prev) => ({ ...prev, layoutId: saved.layoutId, themeId }));
-      setEditingLayoutId(saved.layoutId);
+      if (setEditingLayoutId) {
+        setEditingLayoutId(saved.layoutId);
+      }
+      const params = new URLSearchParams(searchParams.toString());
+      params.set('layoutId', saved.layoutId);
+      router.push(`?${params.toString()}`);
       await load();
       showMessage('Draft saved successfully.', 'success');
       if (onSaveSuccess) onSaveSuccess();
@@ -993,6 +1004,9 @@ export default function ScreenBuilderTab({
       if (setEditingLayoutId) {
         setEditingLayoutId(undefined);
       }
+      const params = new URLSearchParams(searchParams.toString());
+      params.delete('layoutId');
+      router.push(`?${params.toString()}`);
 
       showMessage(`🎉 Screen is live: ${result.liveUrl}`, 'success');
       await load();
@@ -1012,6 +1026,10 @@ export default function ScreenBuilderTab({
     if (setEditingLayoutId) {
       setEditingLayoutId(undefined);
     }
+    const params = new URLSearchParams(searchParams.toString());
+    params.delete('layoutId');
+    params.delete('step');
+    router.push(`?${params.toString()}`);
     setColumnHistory([]);
     setDraft(defaultDraft);
     setStep(1);
@@ -1854,9 +1872,16 @@ export default function ScreenBuilderTab({
                   <button
                     key={layout.layoutId}
                     type="button"
-                    onClick={() => setEditingLayoutId(layout.layoutId)}
+                    onClick={() => {
+                      if (setEditingLayoutId) {
+                        setEditingLayoutId(layout.layoutId);
+                      }
+                      const params = new URLSearchParams(searchParams.toString());
+                      params.set('layoutId', layout.layoutId);
+                      router.push(`?${params.toString()}`);
+                    }}
                     className={`flex items-center justify-between rounded-xl border px-3 py-2 text-left hover:border-blue-200 hover:bg-blue-50/30 transition-all ${
-                      editingLayoutId === layout.layoutId
+                      (activeEditingLayoutId === layout.layoutId)
                         ? 'border-blue-500 bg-blue-50/30'
                         : 'border-slate-100 bg-slate-50'
                     }`}
