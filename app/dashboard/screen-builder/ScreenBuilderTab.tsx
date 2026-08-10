@@ -923,6 +923,10 @@ export default function ScreenBuilderTab({
       setStep(1);
       return;
     }
+    if (slugChecking) {
+      showMessage('Validating screen URL availability, please wait a moment...', 'info');
+      return;
+    }
     if (slugAvailable === false) {
       showMessage(
         `The URL slug "${draft.screenSlug}" is unavailable. Please choose another.`,
@@ -944,7 +948,6 @@ export default function ScreenBuilderTab({
       router.push(`?${params.toString()}`);
       await load();
       showMessage('Draft saved successfully.', 'success');
-      if (onSaveSuccess) onSaveSuccess();
     } catch (err: any) {
       const msg = err?.response?.data?.message || err?.message || 'Save failed. Please try again.';
       showMessage(msg, 'error');
@@ -1000,17 +1003,19 @@ export default function ScreenBuilderTab({
       localStorage.removeItem('aurify-builder-draft');
       setColumnHistory([]);
       setDraft(defaultDraft);
-      setStep(1);
+      setStepState(1);
       if (setEditingLayoutId) {
         setEditingLayoutId(undefined);
       }
-      const params = new URLSearchParams(searchParams.toString());
-      params.delete('layoutId');
-      router.push(`?${params.toString()}`);
 
       showMessage(`🎉 Screen is live: ${result.liveUrl}`, 'success');
-      await load();
-      if (onSaveSuccess) onSaveSuccess();
+
+      // Navigate to My Screens tab
+      if (setActiveTab) {
+        setActiveTab('my-screens');
+      } else if (onSaveSuccess) {
+        onSaveSuccess();
+      }
     } catch (err: any) {
       const msg =
         err?.response?.data?.message ||
