@@ -604,7 +604,21 @@ export default function ScreenBuilderTab({
       return;
     }
 
-    // Auto-compress and scale to standard high-resolution display dimensions
+    // If uploading an SVG, preserve raw vector format directly (retaining 100% transparency & sharpness)
+    if (file.type === 'image/svg+xml' || file.name.toLowerCase().endsWith('.svg')) {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        const rawSvgUrl = event.target?.result as string;
+        setDraft((prev) => ({ ...prev, [field]: rawSvgUrl }));
+        if (field === 'logoUrl' && setAsProfileLogo) {
+          syncLogoToProfile(rawSvgUrl);
+        }
+      };
+      reader.readAsDataURL(file);
+      return;
+    }
+
+    // Auto-compress and scale raster images to standard high-resolution display dimensions
     const reader = new FileReader();
     reader.onload = (event) => {
       const img = new Image();
@@ -631,7 +645,8 @@ export default function ScreenBuilderTab({
         let finalUrl = event.target?.result as string;
         if (ctx) {
           ctx.drawImage(img, 0, 0, width, height);
-          finalUrl = canvas.toDataURL(file.type === 'image/png' ? 'image/png' : 'image/jpeg', 0.85);
+          const isTransparent = file.type === 'image/png' || file.type === 'image/webp' || field === 'logoUrl';
+          finalUrl = canvas.toDataURL(isTransparent ? 'image/png' : 'image/jpeg', 0.9);
         }
         setDraft((prev) => ({ ...prev, [field]: finalUrl }));
         if (field === 'logoUrl' && setAsProfileLogo) {
