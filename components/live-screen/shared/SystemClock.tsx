@@ -77,7 +77,7 @@ const SystemClock = ({ theme, colors = {} }: SystemClockProps) => {
         <Typography
           sx={{
             fontSize: { xs: '12px', sm: '2vw' },
-            fontWeight: 400,
+            fontWeight: 600,
             letterSpacing: '2px',
             color: textColor,
             lineHeight: '1',
@@ -87,8 +87,9 @@ const SystemClock = ({ theme, colors = {} }: SystemClockProps) => {
         </Typography>
         <Typography
           sx={{
-            fontSize: { xs: '12px', sm: '1vw' },
+            fontSize: { xs: '12px', sm: '1.3vw' },
             color: textColor,
+            fontWeight: '600',
             letterSpacing: '2px',
             lineHeight: '1',
           }}

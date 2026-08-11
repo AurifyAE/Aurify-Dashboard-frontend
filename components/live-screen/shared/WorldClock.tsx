@@ -123,7 +123,7 @@ const WorldClockHorizontal = ({ theme, colors = {}, selectedClocks }: WorldClock
             <Typography
               sx={{
                 color: textColor,
-                fontSize: { xs: '8px', lg: '0.6vw' },
+                fontSize: { xs: '8px', lg: '1.2vw' },
                 fontWeight: '600',
                 textTransform: 'uppercase',
               }}
@@ -132,7 +132,8 @@ const WorldClockHorizontal = ({ theme, colors = {}, selectedClocks }: WorldClock
             </Typography>
             <Typography
               sx={{
-                fontSize: { xs: '14px', lg: '1vw' },
+                fontSize: { xs: '14px', lg: '1.2vw' },
+                fontWeight: '600',
                 color: textColor,
               }}
             >
