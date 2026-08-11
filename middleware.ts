@@ -29,7 +29,6 @@ export function middleware(request: NextRequest) {
   // Redirect unauthenticated users trying to access protected routes
   if (isProtected && !isAuthenticated) {
     const loginUrl = new URL('/login', request.url);
-    loginUrl.searchParams.set('from', pathname);
     const res = NextResponse.redirect(loginUrl);
     if (rawToken) {
       res.cookies.delete('aurify_token');

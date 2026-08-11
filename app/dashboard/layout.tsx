@@ -19,8 +19,7 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
     if (!user || authState === 'unauthenticated') {
       if (!hasRedirectedRef.current) {
         hasRedirectedRef.current = true;
-        const redirectTarget = `/login?from=${encodeURIComponent(pathname || '/dashboard')}`;
-        router.replace(redirectTarget);
+        router.replace('/login');
       }
     }
   }, [user, isLoading, hasHydrated, authState, isLoggingOut, pathname, router]);
