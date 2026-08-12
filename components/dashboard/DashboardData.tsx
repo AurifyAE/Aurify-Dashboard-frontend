@@ -207,13 +207,19 @@ const DashboardData = () => {
     }
   }, [silverData?.bid, silverBaseline]);
 
-  // Generate clean, natural mock history based on the active spot price
-  const getHistoricalData = (basePrice: number, interval: string) => {
+  // Generate clean, natural mock history that remains stable for past points
+  const getHistoricalData = (baseline: number, currentPrice: number, interval: string) => {
     const count = interval === '7D' ? 7 : 15;
+    const seedOffset = interval === '1H' ? 0 : interval === '24H' ? 100 : 200;
+    
     return Array.from({ length: count }).map((_, i) => {
-      const wave = Math.sin(i * 0.6) * 0.001;
-      const noise = (Math.cos(i * 1.5) + (Math.random() - 0.5) * 0.4) * 0.0005;
-      const price = basePrice * (1 + wave + noise);
+      // Deterministic wave (no Math.random) so the past shape is fixed
+      const wave = Math.sin((i + seedOffset) * 0.6) * 0.001;
+      const noise = Math.cos((i + seedOffset) * 1.5) * 0.0005;
+      
+      // Past points are anchored to the baseline. Only the last point is live.
+      const isLastPoint = i === count - 1;
+      const price = isLastPoint ? currentPrice : baseline * (1 + wave + noise);
 
       let timeLabel = '';
       const now = new Date();
@@ -243,6 +249,7 @@ const DashboardData = () => {
 
   const goldChartData = useMemo(() => {
     const base = goldPriceNum;
+    const baseline = goldBaseline || base;
     const ticks = goldTicks;
 
     if (activeInterval === 'Live') {
@@ -254,11 +261,12 @@ const DashboardData = () => {
       }
       return ticks;
     }
-    return getHistoricalData(base, activeInterval);
-  }, [activeInterval, goldTicks, goldPriceNum]);
+    return getHistoricalData(baseline, base, activeInterval);
+  }, [activeInterval, goldTicks, goldPriceNum, goldBaseline]);
 
   const silverChartData = useMemo(() => {
     const base = silverPriceNum;
+    const baseline = silverBaseline || base;
     const ticks = silverTicks;
 
     if (activeInterval === 'Live') {
@@ -270,8 +278,8 @@ const DashboardData = () => {
       }
       return ticks;
     }
-    return getHistoricalData(base, activeInterval);
-  }, [activeInterval, silverTicks, silverPriceNum]);
+    return getHistoricalData(baseline, base, activeInterval);
+  }, [activeInterval, silverTicks, silverPriceNum, silverBaseline]);
 
   // Calculate live percentage differences
   const goldPct = useMemo(() => {
@@ -391,8 +399,18 @@ const DashboardData = () => {
     maintainAspectRatio: false,
     plugins: {
       legend: { position: 'top' as const },
-      title: { display: true, text: 'Chart.js line chart style' },
+      title: { display: false },
     },
+    scales: {
+      x: {
+        grid: { display: false },
+        border: { display: false },
+      },
+      y: {
+        grid: { display: false },
+        border: { display: false },
+      }
+    }
   };
 
   if (!mounted) return null;
