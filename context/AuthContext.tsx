@@ -20,13 +20,9 @@ import {
   decodeToken,
   apiLogin,
   apiRegister,
-  apiGetMe,
 } from '@/lib/auth';
-import {
-  LogoutManager,
-  AuthState,
-  LogoutResult,
-} from '@/services/auth/logoutManager';
+import { fetchWithAuth } from '@/lib/api/client';
+import { LogoutManager, AuthState, LogoutResult } from '@/services/auth/logoutManager';
 import { CleanupRegistry } from '@/lib/CleanupRegistry';
 
 // ─── Context Types ────────────────────────────────────────────────────────────
@@ -100,15 +96,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     hasHydratedRef.current = hasHydrated;
   }, [hasHydrated]);
 
-  // Stable redirect helper for suspended or deleted accounts
-  const forceRegisterRedirect = useCallback(() => {
-    removeToken();
-    setUser(null);
-    LogoutManager.setState('unauthenticated');
-    if (!pathnameRef.current.startsWith('/login') && !pathnameRef.current.startsWith('/register')) {
-      router.push('/login?alert=deleted');
-    }
-  }, [router]);
+  // Stable redirect helper — reason: 'deleted' = account removed/suspended, 'session' = generic expiry
+  const forceRegisterRedirect = useCallback(
+    (reason: 'deleted' | 'session' = 'session') => {
+      removeToken();
+      setUser(null);
+      LogoutManager.setState('unauthenticated');
+      if (
+        !pathnameRef.current.startsWith('/login') &&
+        !pathnameRef.current.startsWith('/register')
+      ) {
+        router.push(`/login?alert=${reason}`);
+      }
+    },
+    [router]
+  );
 
   const forceRegisterRedirectRef = useRef(forceRegisterRedirect);
   useEffect(() => {
@@ -140,10 +142,37 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setHasHydrated(true);
     }
 
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 5000); // 5s timeout
+
     try {
-      const res = await apiGetMe(token);
-      if (res.success && res.user) {
-        const newUser = res.user;
+      const res = await fetchWithAuth(
+        `${(await import('@/lib/env')).BACKEND_URL || process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:5001'}/api/auth/me`,
+        {
+          method: 'GET',
+          signal: controller.signal,
+        }
+      );
+      clearTimeout(timeoutId);
+
+      // On 401/403, fetchWithAuth already attempted a refresh.
+      // If it's STILL 401, the session is genuinely expired.
+      if (res.status === 401 || res.status === 403) {
+        forceRegisterRedirectRef.current('session');
+        setIsLoading(false);
+        return;
+      }
+
+      if (!res.ok) {
+        // Server error or network issue — keep user logged in, don't redirect
+        console.warn('Auth check returned non-OK status:', res.status);
+        setIsLoading(false);
+        return;
+      }
+
+      const data = await res.json().catch(() => ({ success: false }));
+      if (data.success && data.user) {
+        const newUser = data.user;
         setUser((prevUser) => {
           if (!prevUser) return newUser;
           if (
@@ -159,11 +188,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           return newUser;
         });
         LogoutManager.setState('authenticated');
-      } else {
-        forceRegisterRedirectRef.current();
+      } else if (data.success === false && data.message?.toLowerCase().includes('deleted')) {
+        // Explicitly deleted/suspended account — force logout with 'deleted' reason
+        forceRegisterRedirectRef.current('deleted');
       }
-    } catch (err) {
-      console.error('Auth check failed:', err);
+      // If data.success is false for any other reason, stay logged in
+    } catch (err: any) {
+      clearTimeout(timeoutId);
+      if (err?.name === 'AbortError') {
+        console.warn('Auth check timed out — server unreachable, staying logged in');
+      } else {
+        // Network error / server down — keep user logged in, don't redirect
+        console.warn('Auth check network error (staying logged in):', err);
+      }
     }
     setIsLoading(false);
   }, []);

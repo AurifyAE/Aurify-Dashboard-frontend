@@ -1,5 +1,5 @@
-import axiosInstance from '@/app/axios/axiosInstance';
-
+import { BACKEND_URL } from '@/lib/env';
+import { fetchWithAuth } from './client';
 export interface AdminMerchant {
   _id: string;
   merchantId: string;
@@ -25,19 +25,33 @@ export interface AdminMerchant {
 
 export const adminApi = {
   getMerchants: async () => {
-    const response = await axiosInstance.get<{ data: AdminMerchant[] }>('/admin/users');
-    return response.data.data;
+    const res = await fetchWithAuth(`${BACKEND_URL}/api/admin/users`);
+    if (!res.ok) throw new Error(`Request failed (${res.status})`);
+    const json = await res.json();
+    return json.data as AdminMerchant[];
   },
   updateMerchant: async (id: string, data: Partial<AdminMerchant>) => {
-    const response = await axiosInstance.patch<{ data: AdminMerchant }>(`/admin/users/${id}`, data);
-    return response.data.data;
+    const res = await fetchWithAuth(`${BACKEND_URL}/api/admin/users/${id}`, {
+      method: 'PATCH',
+      body: JSON.stringify(data),
+    });
+    if (!res.ok) throw new Error(`Request failed (${res.status})`);
+    const json = await res.json();
+    return json.data as AdminMerchant;
   },
   deleteMerchant: async (id: string) => {
-    const response = await axiosInstance.delete(`/admin/users/${id}`);
-    return response.data;
+    const res = await fetchWithAuth(`${BACKEND_URL}/api/admin/users/${id}`, {
+      method: 'DELETE',
+    });
+    if (!res.ok) throw new Error(`Request failed (${res.status})`);
+    return await res.json();
   },
   resetPassword: async (id: string, newPassword: string) => {
-    const response = await axiosInstance.post(`/admin/users/${id}/reset-password`, { newPassword });
-    return response.data;
+    const res = await fetchWithAuth(`${BACKEND_URL}/api/admin/users/${id}/reset-password`, {
+      method: 'POST',
+      body: JSON.stringify({ newPassword }),
+    });
+    if (!res.ok) throw new Error(`Request failed (${res.status})`);
+    return await res.json();
   },
 };

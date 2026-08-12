@@ -397,15 +397,11 @@ export default function ScreenBuilderTab({
   const [openAccordion, setOpenAccordion] = useState<string | null>('Global Colors');
   const router = useRouter();
   const searchParams = useSearchParams();
+  const queryLayoutId = searchParams.get('layoutId') || undefined;
+  const activeEditingLayoutId = editingLayoutId || queryLayoutId;
   const initialStep = parseInt(searchParams.get('step') || '1', 10);
   const [step, setStepState] = useState(isNaN(initialStep) ? 1 : initialStep);
 
-  const setStep = (newStep: number) => {
-    setStepState(newStep);
-    const params = new URLSearchParams(searchParams.toString());
-    params.set('step', newStep.toString());
-    router.push(`?${params.toString()}`);
-  };
   const [merchant, setMerchant] = useState<Merchant | null>(null);
   const [themes, setThemes] = useState<MerchantTheme[]>([]);
   const [layouts, setLayouts] = useState<ScreenLayout[]>([]);
@@ -428,6 +424,83 @@ export default function ScreenBuilderTab({
   const [slugAvailable, setSlugAvailable] = useState<boolean | null>(null);
   const [slugMessage, setSlugMessage] = useState<string>('');
   const [suggestions, setSuggestions] = useState<string[]>([]);
+  const [setAsProfileLogo, setSetAsProfileLogo] = useState(false);
+  const [commodities, setCommodities] = useState<any[]>([]);
+
+  const showMessage = (text: string, type: 'info' | 'success' | 'error' = 'info') => {
+    toast.dismiss();
+    if (type === 'error') toast.error(text);
+    else if (type === 'success') toast.success(text);
+    else toast(text);
+  };
+
+  const syncLogoToProfile = async (logoUrl: string) => {
+    try {
+      const res = await marketplaceApi.updateProfile({ logo: logoUrl });
+      if (res?.merchant) {
+        setMerchant(
+          (prev) =>
+            ({
+              ...(prev || {}),
+              ...res.merchant,
+              commodities: (res.merchant as any)?.commodities?.length
+                ? (res.merchant as any).commodities
+                : (prev as any)?.commodities || commodities || [],
+            }) as Merchant
+        );
+        if ((res.merchant as any)?.commodities?.length) {
+          setCommodities((res.merchant as any).commodities);
+        }
+      }
+      showMessage('Logo set as company profile icon!', 'success');
+    } catch (err: any) {
+      console.error('Failed to sync profile logo:', err);
+      showMessage(err?.message || 'Failed to set profile icon', 'error');
+    }
+  };
+
+  const validateStep1 = (showAlert = true): boolean => {
+    if (!draft.name.trim()) {
+      if (showAlert) showMessage('Please enter a screen name before proceeding.', 'error');
+      return false;
+    }
+    if (!draft.screenSlug?.trim()) {
+      if (showAlert) showMessage('Please enter a URL slug before proceeding.', 'error');
+      return false;
+    }
+    if (slugChecking) {
+      if (showAlert)
+        showMessage('Validating screen URL availability, please wait a moment...', 'info');
+      return false;
+    }
+    if (slugAvailable === false) {
+      if (showAlert)
+        showMessage(
+          slugMessage
+            ? `Cannot proceed: ${slugMessage}`
+            : '✕ This URL is already in use. Please choose a different URL slug.',
+          'error'
+        );
+      return false;
+    }
+    if (!draft.selectedLayout) {
+      if (showAlert) showMessage('Please select a layout before proceeding.', 'error');
+      return false;
+    }
+    return true;
+  };
+
+  const setStep = (newStep: number, validate = true) => {
+    if (validate && newStep > 1) {
+      if (!validateStep1(true)) {
+        return;
+      }
+    }
+    setStepState(newStep);
+    const params = new URLSearchParams(searchParams.toString());
+    params.set('step', newStep.toString());
+    router.push(`?${params.toString()}`);
+  };
 
   useEffect(() => {
     if (isFirstLoad.current) return;
@@ -439,6 +512,9 @@ export default function ScreenBuilderTab({
   }, [draft]);
 
   useEffect(() => {
+    // Avoid checking slug prematurely during initial load before the draft is loaded
+    if (loading || isFirstLoad.current) return;
+
     const slug = draft.screenSlug?.trim();
     if (!slug) {
       setSlugAvailable(null);
@@ -506,7 +582,7 @@ export default function ScreenBuilderTab({
     }, 400);
 
     return () => clearTimeout(handler);
-  }, [draft.screenSlug, draft.layoutId]);
+  }, [draft.screenSlug, draft.layoutId, loading]);
 
   const handleImageUpload = (
     e: React.ChangeEvent<HTMLInputElement>,
@@ -520,7 +596,10 @@ export default function ScreenBuilderTab({
     const MAX_SIZE_BYTES = MAX_SIZE_MB * 1024 * 1024;
 
     if (file.size > MAX_SIZE_BYTES) {
-      showMessage(`⚠️ File size exceeds ${MAX_SIZE_MB}MB (${(file.size / (1024 * 1024)).toFixed(1)}MB). Please choose an image smaller than 5MB.`, 'error');
+      showMessage(
+        `⚠️ File size exceeds ${MAX_SIZE_MB}MB (${(file.size / (1024 * 1024)).toFixed(1)}MB). Please choose an image smaller than 5MB.`,
+        'error'
+      );
       e.target.value = ''; // Reset input field
       return;
     }
@@ -549,30 +628,26 @@ export default function ScreenBuilderTab({
         canvas.width = width;
         canvas.height = height;
         const ctx = canvas.getContext('2d');
+        let finalUrl = event.target?.result as string;
         if (ctx) {
           ctx.drawImage(img, 0, 0, width, height);
-          const compressedDataUrl = canvas.toDataURL(
-            file.type === 'image/png' ? 'image/png' : 'image/jpeg',
-            0.85
-          );
-          setDraft((prev) => ({ ...prev, [field]: compressedDataUrl }));
-        } else {
-          setDraft((prev) => ({ ...prev, [field]: event.target?.result as string }));
+          finalUrl = canvas.toDataURL(file.type === 'image/png' ? 'image/png' : 'image/jpeg', 0.85);
+        }
+        setDraft((prev) => ({ ...prev, [field]: finalUrl }));
+        if (field === 'logoUrl' && setAsProfileLogo) {
+          syncLogoToProfile(finalUrl);
         }
       };
       img.onerror = () => {
-        setDraft((prev) => ({ ...prev, [field]: event.target?.result as string }));
+        const rawUrl = event.target?.result as string;
+        setDraft((prev) => ({ ...prev, [field]: rawUrl }));
+        if (field === 'logoUrl' && setAsProfileLogo) {
+          syncLogoToProfile(rawUrl);
+        }
       };
       img.src = event.target?.result as string;
     };
     reader.readAsDataURL(file);
-  };
-
-  const showMessage = (text: string, type: 'info' | 'success' | 'error' = 'info') => {
-    toast.dismiss();
-    if (type === 'error') toast.error(text);
-    else if (type === 'success') toast.success(text);
-    else toast(text);
   };
 
   const load = async () => {
@@ -585,6 +660,7 @@ export default function ScreenBuilderTab({
         marketplaceApi.news().catch(() => []),
       ]);
       setMerchant(m);
+      setCommodities((m as any)?.commodities || []);
       setThemes(installed);
       setLayouts(savedLayouts);
       setNews(newsItems);
@@ -598,13 +674,14 @@ export default function ScreenBuilderTab({
         if (stored) localDraft = JSON.parse(stored);
       } catch (e) {}
 
-      if (editingLayoutId) {
-        const target = savedLayouts.find((l) => l.layoutId === editingLayoutId);
+      if (activeEditingLayoutId) {
+        const target = savedLayouts.find((l) => l.layoutId === activeEditingLayoutId);
         if (target) {
-          if (localDraft && localDraft.layoutId === editingLayoutId) {
+          if (localDraft && localDraft.layoutId === activeEditingLayoutId) {
             setDraft({
               ...defaultDraft,
               ...localDraft,
+              layoutId: target.layoutId,
               selectedClocks: localDraft.selectedClocks?.length
                 ? localDraft.selectedClocks
                 : defaultDraft.selectedClocks,
@@ -666,7 +743,7 @@ export default function ScreenBuilderTab({
 
   useEffect(() => {
     load();
-  }, [editingLayoutId]);
+  }, [editingLayoutId, queryLayoutId]);
 
   const selectedTheme = themes.find((t) => t.themeId === draft.themeId);
   const themeColors = selectedTheme?.customizations as
@@ -846,8 +923,15 @@ export default function ScreenBuilderTab({
       setStep(1);
       return;
     }
+    if (slugChecking) {
+      showMessage('Validating screen URL availability, please wait a moment...', 'info');
+      return;
+    }
     if (slugAvailable === false) {
-      showMessage(`The URL slug "${draft.screenSlug}" is unavailable. Please choose another.`, 'error');
+      showMessage(
+        `The URL slug "${draft.screenSlug}" is unavailable. Please choose another.`,
+        'error'
+      );
       setStep(1);
       return;
     }
@@ -856,10 +940,14 @@ export default function ScreenBuilderTab({
     try {
       const saved = await marketplaceApi.saveLayout(buildPayload(themeId));
       setDraft((prev) => ({ ...prev, layoutId: saved.layoutId, themeId }));
-      setEditingLayoutId(saved.layoutId);
+      if (setEditingLayoutId) {
+        setEditingLayoutId(saved.layoutId);
+      }
+      const params = new URLSearchParams(searchParams.toString());
+      params.set('layoutId', saved.layoutId);
+      router.push(`?${params.toString()}`);
       await load();
       showMessage('Draft saved successfully.', 'success');
-      if (onSaveSuccess) onSaveSuccess();
     } catch (err: any) {
       const msg = err?.response?.data?.message || err?.message || 'Save failed. Please try again.';
       showMessage(msg, 'error');
@@ -892,7 +980,10 @@ export default function ScreenBuilderTab({
     }
 
     if (slugAvailable === false) {
-      showMessage(`The URL slug "${draft.screenSlug}" is already in use. Please enter an available URL.`, 'error');
+      showMessage(
+        `The URL slug "${draft.screenSlug}" is already in use. Please enter an available URL.`,
+        'error'
+      );
       setStep(1);
       return;
     }
@@ -912,16 +1003,24 @@ export default function ScreenBuilderTab({
       localStorage.removeItem('aurify-builder-draft');
       setColumnHistory([]);
       setDraft(defaultDraft);
-      setStep(1);
+      setStepState(1);
       if (setEditingLayoutId) {
         setEditingLayoutId(undefined);
       }
 
       showMessage(`🎉 Screen is live: ${result.liveUrl}`, 'success');
-      await load();
-      if (onSaveSuccess) onSaveSuccess();
+
+      // Navigate to My Screens tab
+      if (setActiveTab) {
+        setActiveTab('my-screens');
+      } else if (onSaveSuccess) {
+        onSaveSuccess();
+      }
     } catch (err: any) {
-      const msg = err?.response?.data?.message || err?.message || 'Publish failed. Please check your screen configuration.';
+      const msg =
+        err?.response?.data?.message ||
+        err?.message ||
+        'Publish failed. Please check your screen configuration.';
       showMessage(msg, 'error');
     } finally {
       setSaving(false);
@@ -932,6 +1031,10 @@ export default function ScreenBuilderTab({
     if (setEditingLayoutId) {
       setEditingLayoutId(undefined);
     }
+    const params = new URLSearchParams(searchParams.toString());
+    params.delete('layoutId');
+    params.delete('step');
+    router.push(`?${params.toString()}`);
     setColumnHistory([]);
     setDraft(defaultDraft);
     setStep(1);
@@ -1214,7 +1317,9 @@ export default function ScreenBuilderTab({
                   <div>
                     <label className="mb-1.5 flex items-center justify-between text-xs font-semibold uppercase tracking-wide text-slate-500">
                       <span>Upload Logo</span>
-                      <span className="text-[10px] lowercase text-slate-400 font-normal">Max 5MB</span>
+                      <span className="text-[10px] lowercase text-slate-400 font-normal">
+                        Max 5MB
+                      </span>
                     </label>
                     <input
                       type="file"
@@ -1223,28 +1328,57 @@ export default function ScreenBuilderTab({
                       className="block w-full text-xs text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer"
                     />
                     {draft.logoUrl && (
-                      <div className="mt-2 flex items-center gap-2 text-xs text-slate-500">
-                        <span className="font-semibold">Current:</span>
-                        <img
-                          src={draft.logoUrl}
-                          alt="logo"
-                          className="h-8 w-auto rounded border border-slate-200 bg-slate-50 object-contain p-0.5"
-                        />
-                        <button
-                          type="button"
-                          onClick={() => setDraft({ ...draft, logoUrl: '' })}
-                          className="p-1 text-red-500 hover:bg-red-50 rounded-lg transition-all"
-                          title="Remove Logo"
-                        >
-                          <Trash2 className="h-3.5 w-3.5" />
-                        </button>
+                      <div className="mt-2.5 space-y-2">
+                        <div className="flex items-center gap-2 text-xs text-slate-500">
+                          <span className="font-semibold">Current:</span>
+                          <img
+                            src={draft.logoUrl}
+                            alt="logo"
+                            className="h-8 w-auto rounded border border-slate-200 bg-slate-50 object-contain p-0.5"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setDraft({ ...draft, logoUrl: '' });
+                              setSetAsProfileLogo(false);
+                            }}
+                            className="p-1 text-red-500 hover:bg-red-50 rounded-lg transition-all"
+                            title="Remove Logo"
+                          >
+                            <Trash2 className="h-3.5 w-3.5" />
+                          </button>
+                        </div>
+
+                        <div className="flex items-center gap-2 pt-1 border-t border-slate-100">
+                          <input
+                            type="checkbox"
+                            id="setAsProfileLogoCheckbox"
+                            checked={setAsProfileLogo}
+                            onChange={async (e) => {
+                              const checked = e.target.checked;
+                              setSetAsProfileLogo(checked);
+                              if (checked && draft.logoUrl) {
+                                syncLogoToProfile(draft.logoUrl);
+                              }
+                            }}
+                            className="h-3.5 w-3.5 rounded border-slate-300 text-blue-600 focus:ring-blue-500 cursor-pointer"
+                          />
+                          <label
+                            htmlFor="setAsProfileLogoCheckbox"
+                            className="text-xs text-slate-600 select-none cursor-pointer font-medium"
+                          >
+                            Set as profile icon
+                          </label>
+                        </div>
                       </div>
                     )}
                   </div>
                   <div>
                     <label className="mb-1.5 flex items-center justify-between text-xs font-semibold uppercase tracking-wide text-slate-500">
                       <span>Background Image</span>
-                      <span className="text-[10px] lowercase text-slate-400 font-normal">Max 5MB (1080p/4K)</span>
+                      <span className="text-[10px] lowercase text-slate-400 font-normal">
+                        Max 5MB (1080p/4K)
+                      </span>
                     </label>
                     <input
                       type="file"
@@ -1713,7 +1847,8 @@ export default function ScreenBuilderTab({
               merchant,
               theme: selectedTheme,
               layout: draft,
-              commodities: (merchant as any)?.commodities || [],
+              commodities:
+                commodities.length > 0 ? commodities : (merchant as any)?.commodities || [],
               news: news,
             }}
             isDraggable={step === 2}
@@ -1742,9 +1877,16 @@ export default function ScreenBuilderTab({
                   <button
                     key={layout.layoutId}
                     type="button"
-                    onClick={() => setEditingLayoutId(layout.layoutId)}
+                    onClick={() => {
+                      if (setEditingLayoutId) {
+                        setEditingLayoutId(layout.layoutId);
+                      }
+                      const params = new URLSearchParams(searchParams.toString());
+                      params.set('layoutId', layout.layoutId);
+                      router.push(`?${params.toString()}`);
+                    }}
                     className={`flex items-center justify-between rounded-xl border px-3 py-2 text-left hover:border-blue-200 hover:bg-blue-50/30 transition-all ${
-                      editingLayoutId === layout.layoutId
+                      activeEditingLayoutId === layout.layoutId
                         ? 'border-blue-500 bg-blue-50/30'
                         : 'border-slate-100 bg-slate-50'
                     }`}

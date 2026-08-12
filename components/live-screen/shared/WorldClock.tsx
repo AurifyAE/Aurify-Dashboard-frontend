@@ -7,23 +7,24 @@ import indiaFlag from '../images/india.png';
 import uaeFlag from '../images/uae.png';
 import ukFlag from '../images/uk.png';
 import usaFlag from '../images/usa.png';
+import singaporeFlag from '../images/singapore.png';
+import saudiFlag from '../images/saudi.png';
+import qatarFlag from '../images/qatar.png';
+import bahrainFlag from '../images/bahrain.png';
+import kuwaitFlag from '../images/kuwait.png';
+import omanFlag from '../images/oman.png';
 
 export const clockConfig = [
   { key: 'india', label: 'INDIA', timeZone: 'Asia/Kolkata', flag: indiaFlag.src },
   { key: 'uae', label: 'UAE', timeZone: 'Asia/Dubai', flag: uaeFlag.src },
   { key: 'london', label: 'LONDON', timeZone: 'Europe/London', flag: ukFlag.src },
   { key: 'usa', label: 'USA', timeZone: 'America/New_York', flag: usaFlag.src },
-  {
-    key: 'singapore',
-    label: 'SINGAPORE',
-    timeZone: 'Asia/Singapore',
-    flag: '/images/singapore.png',
-  },
-  { key: 'saudi', label: 'SAUDI', timeZone: 'Asia/Riyadh', flag: '/images/saudi.png' },
-  { key: 'qatar', label: 'QATAR', timeZone: 'Asia/Qatar', flag: '/images/qatar.png' },
-  { key: 'bahrain', label: 'BAHRAIN', timeZone: 'Asia/Bahrain', flag: '/images/bahrain.png' },
-  { key: 'kuwait', label: 'KUWAIT', timeZone: 'Asia/Kuwait', flag: '/images/kuwait.png' },
-  { key: 'oman', label: 'OMAN', timeZone: 'Asia/Muscat', flag: '/images/oman.png' },
+  { key: 'singapore', label: 'SINGAPORE', timeZone: 'Asia/Singapore', flag: singaporeFlag.src },
+  { key: 'saudi', label: 'SAUDI', timeZone: 'Asia/Riyadh', flag: saudiFlag.src },
+  { key: 'qatar', label: 'QATAR', timeZone: 'Asia/Qatar', flag: qatarFlag.src },
+  { key: 'bahrain', label: 'BAHRAIN', timeZone: 'Asia/Bahrain', flag: bahrainFlag.src },
+  { key: 'kuwait', label: 'KUWAIT', timeZone: 'Asia/Kuwait', flag: kuwaitFlag.src },
+  { key: 'oman', label: 'OMAN', timeZone: 'Asia/Muscat', flag: omanFlag.src },
 ];
 
 interface WorldClockProps {
@@ -122,7 +123,7 @@ const WorldClockHorizontal = ({ theme, colors = {}, selectedClocks }: WorldClock
             <Typography
               sx={{
                 color: textColor,
-                fontSize: { xs: '8px', lg: '0.6vw' },
+                fontSize: { xs: '8px', lg: '1.2vw' },
                 fontWeight: '600',
                 textTransform: 'uppercase',
               }}
@@ -131,7 +132,8 @@ const WorldClockHorizontal = ({ theme, colors = {}, selectedClocks }: WorldClock
             </Typography>
             <Typography
               sx={{
-                fontSize: { xs: '14px', lg: '1vw' },
+                fontSize: { xs: '14px', lg: '1.2vw' },
+                fontWeight: '600',
                 color: textColor,
               }}
             >

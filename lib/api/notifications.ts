@@ -1,5 +1,5 @@
 import { BACKEND_URL } from '@/lib/env';
-import { getToken } from '@/lib/auth';
+import { fetchWithAuth } from './client';
 
 export interface NotificationAction {
   label: string;
@@ -14,13 +14,21 @@ export interface NotificationActor {
 
 export interface Notification {
   _id: string;
+  recipientUserId: string;
   merchantId: string;
   title: string;
   message: string;
   type: 'SUCCESS' | 'INFO' | 'WARNING' | 'ERROR';
   priority: 'LOW' | 'NORMAL' | 'HIGH' | 'CRITICAL';
   category: 'APPROVAL' | 'ADMIN' | 'SYSTEM' | 'FEATURE' | 'SECURITY' | 'BILLING' | 'WARNING';
-  sourceModule: 'MARKETPLACE' | 'SCREEN_BUILDER' | 'THEME' | 'BILLING' | 'ADMIN' | 'AUTH' | 'ANALYTICS';
+  sourceModule:
+    | 'MARKETPLACE'
+    | 'SCREEN_BUILDER'
+    | 'THEME'
+    | 'BILLING'
+    | 'ADMIN'
+    | 'AUTH'
+    | 'ANALYTICS';
   version: number;
   silent: boolean;
   isPinned: boolean;
@@ -44,19 +52,17 @@ export interface PaginatedNotifications {
   hasMore: boolean;
 }
 
-function headers(): HeadersInit {
-  const h: HeadersInit = { 'Content-Type': 'application/json' };
-  const token = typeof window !== 'undefined' ? getToken() : null;
-  if (token) (h as Record<string, string>)['Authorization'] = `Bearer ${token}`;
-  return h;
+export interface SyncNotificationsResult {
+  deltaNotifications: Notification[];
+  unread: number;
+  activeReadIds: string[];
+  syncedAt: string;
 }
 
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
-  const res = await fetch(`${BACKEND_URL}/api/notifications${path}`, {
+  const res = await fetchWithAuth(`${BACKEND_URL}/api/notifications${path}`, {
     cache: 'no-store',
     ...init,
-    headers: { ...headers(), ...(init?.headers || {}) },
-    credentials: 'include',
   });
 
   const contentType = res.headers.get('content-type') || '';
@@ -70,13 +76,20 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
 }
 
 export const notificationsApi = {
-  list: (params: { page?: number; pageSize?: number; category?: string; unread?: boolean } = {}) => {
+  list: (
+    params: { page?: number; pageSize?: number; category?: string; unread?: boolean } = {}
+  ) => {
     const q = new URLSearchParams();
     if (params.page) q.append('page', String(params.page));
     if (params.pageSize) q.append('pageSize', String(params.pageSize));
     if (params.category) q.append('category', params.category);
     if (params.unread) q.append('unread', 'true');
     return request<PaginatedNotifications>(`?${q.toString()}`);
+  },
+  sync: (cursor?: string) => {
+    const q = new URLSearchParams();
+    if (cursor) q.append('cursor', cursor);
+    return request<SyncNotificationsResult>(`/sync?${q.toString()}`);
   },
   unreadCount: () => request<{ unread: number }>('/unread-count'),
   markAsRead: (id: string) =>

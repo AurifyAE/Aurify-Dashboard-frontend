@@ -23,17 +23,37 @@ import {
 import { cn } from '@/lib/utils';
 import { useSpotRate } from '@/context/SpotRateContext';
 import {
-  AreaChart,
-  Area,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
   PieChart,
   Pie,
   Cell,
+  Tooltip,
+  ResponsiveContainer,
+  AreaChart,
+  Area,
 } from 'recharts';
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip as ChartTooltip,
+  Legend,
+  Filler,
+} from 'chart.js';
+import { Line } from 'react-chartjs-2';
+
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  ChartTooltip,
+  Legend,
+  Filler
+);
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Autoplay } from 'swiper/modules';
 import 'swiper/css';
@@ -187,13 +207,19 @@ const DashboardData = () => {
     }
   }, [silverData?.bid, silverBaseline]);
 
-  // Generate clean, natural mock history based on the active spot price
-  const getHistoricalData = (basePrice: number, interval: string) => {
+  // Generate clean, natural mock history that remains stable for past points
+  const getHistoricalData = (baseline: number, currentPrice: number, interval: string) => {
     const count = interval === '7D' ? 7 : 15;
+    const seedOffset = interval === '1H' ? 0 : interval === '24H' ? 100 : 200;
+    
     return Array.from({ length: count }).map((_, i) => {
-      const wave = Math.sin(i * 0.6) * 0.001;
-      const noise = (Math.cos(i * 1.5) + (Math.random() - 0.5) * 0.4) * 0.0005;
-      const price = basePrice * (1 + wave + noise);
+      // Deterministic wave (no Math.random) so the past shape is fixed
+      const wave = Math.sin((i + seedOffset) * 0.6) * 0.001;
+      const noise = Math.cos((i + seedOffset) * 1.5) * 0.0005;
+      
+      // Past points are anchored to the baseline. Only the last point is live.
+      const isLastPoint = i === count - 1;
+      const price = isLastPoint ? currentPrice : baseline * (1 + wave + noise);
 
       let timeLabel = '';
       const now = new Date();
@@ -223,6 +249,7 @@ const DashboardData = () => {
 
   const goldChartData = useMemo(() => {
     const base = goldPriceNum;
+    const baseline = goldBaseline || base;
     const ticks = goldTicks;
 
     if (activeInterval === 'Live') {
@@ -234,11 +261,12 @@ const DashboardData = () => {
       }
       return ticks;
     }
-    return getHistoricalData(base, activeInterval);
-  }, [activeInterval, goldTicks, goldPriceNum]);
+    return getHistoricalData(baseline, base, activeInterval);
+  }, [activeInterval, goldTicks, goldPriceNum, goldBaseline]);
 
   const silverChartData = useMemo(() => {
     const base = silverPriceNum;
+    const baseline = silverBaseline || base;
     const ticks = silverTicks;
 
     if (activeInterval === 'Live') {
@@ -250,8 +278,8 @@ const DashboardData = () => {
       }
       return ticks;
     }
-    return getHistoricalData(base, activeInterval);
-  }, [activeInterval, silverTicks, silverPriceNum]);
+    return getHistoricalData(baseline, base, activeInterval);
+  }, [activeInterval, silverTicks, silverPriceNum, silverBaseline]);
 
   // Calculate live percentage differences
   const goldPct = useMemo(() => {
@@ -341,6 +369,51 @@ const DashboardData = () => {
 
   // Color theme definitions for active metal (glowing lines & custom gradients)
   const chartColor = activeMetal === 'gold' ? '#C9A44C' : '#8C8E8F';
+
+  const goldChartJsData = useMemo(() => ({
+    labels: goldChartData.map(d => d.time),
+    datasets: [
+      {
+        label: 'Gold Spot Rate',
+        data: goldChartData.map(d => d.price),
+        borderColor: 'rgb(255, 205, 86)', // yellow from CHART_COLORS
+        backgroundColor: 'rgba(255, 205, 86, 0.5)',
+      },
+    ],
+  }), [goldChartData]);
+
+  const silverChartJsData = useMemo(() => ({
+    labels: silverChartData.map(d => d.time),
+    datasets: [
+      {
+        label: 'Silver Spot Rate',
+        data: silverChartData.map(d => d.price),
+        borderColor: 'rgb(201, 203, 207)', // grey from CHART_COLORS
+        backgroundColor: 'rgba(201, 203, 207, 0.5)',
+      },
+    ],
+  }), [silverChartData]);
+
+  const chartOptions = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: { position: 'top' as const },
+      title: { display: false },
+    },
+    scales: {
+      x: {
+        grid: { display: false },
+        border: { display: true, color: '#E2E8F0', width: 2 },
+        ticks: { maxTicksLimit: 5, autoSkip: true },
+      },
+      y: {
+        grid: { display: false },
+        border: { display: true, color: '#E2E8F0', width: 2 },
+        ticks: { maxTicksLimit: 5 },
+      }
+    }
+  };
 
   if (!mounted) return null;
 
@@ -562,60 +635,9 @@ const DashboardData = () => {
             </div>
 
             <div className="h-[250px] w-full">
-              <ResponsiveContainer width="100%" height="100%">
-                <AreaChart
-                  data={goldChartData}
-                  margin={{ left: -15, right: 5, top: 10, bottom: 0 }}
-                >
-                  <defs>
-                    <linearGradient id="glowGradientGold" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#d4a017" stopOpacity={0.2} />
-                      <stop offset="95%" stopColor="#d4a017" stopOpacity={0.0} />
-                    </linearGradient>
-                  </defs>
-                  <CartesianGrid strokeDasharray="4 4" vertical={false} stroke="#E2E8F0" />
-                  <XAxis
-                    dataKey="time"
-                    tickLine={false}
-                    axisLine={false}
-                    tick={{ fill: '#94A3B8', fontSize: 10, fontWeight: 'bold' }}
-                  />
-                  <YAxis
-                    domain={['auto', 'auto']}
-                    tickLine={false}
-                    axisLine={false}
-                    tick={{ fill: '#94A3B8', fontSize: 10, fontWeight: 'bold' }}
-                  />
-                  <Tooltip
-                    content={({ active, payload }) => {
-                      if (active && payload && payload.length) {
-                        return (
-                          <div className="bg-white/90 backdrop-blur-sm border border-slate-200 p-2.5 rounded-xl shadow-lg">
-                            <div className="text-[10px] font-bold text-slate-400 mb-1">
-                              {payload[0].payload.time}
-                            </div>
-                            <div className="text-sm font-black text-slate-800">
-                              {payload[0].value}{' '}
-                              <span className="text-[10px] text-slate-500 font-bold">USD</span>
-                            </div>
-                          </div>
-                        );
-                      }
-                      return null;
-                    }}
-                  />
-                  <Area
-                    type="monotone"
-                    dataKey="price"
-                    stroke="#d4a017"
-                    strokeWidth={2.5}
-                    fillOpacity={1}
-                    fill="url(#glowGradientGold)"
-                    animationDuration={1500}
-                    isAnimationActive={true}
-                  />
-                </AreaChart>
-              </ResponsiveContainer>
+              <div className="w-full h-full relative">
+                <Line data={goldChartJsData} options={chartOptions} />
+              </div>
             </div>
           </div>
 
@@ -645,60 +667,9 @@ const DashboardData = () => {
             </div>
 
             <div className="h-[250px] w-full">
-              <ResponsiveContainer width="100%" height="100%">
-                <AreaChart
-                  data={silverChartData}
-                  margin={{ left: -15, right: 5, top: 10, bottom: 0 }}
-                >
-                  <defs>
-                    <linearGradient id="glowGradientSilver" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#94A3B8" stopOpacity={0.2} />
-                      <stop offset="95%" stopColor="#94A3B8" stopOpacity={0.0} />
-                    </linearGradient>
-                  </defs>
-                  <CartesianGrid strokeDasharray="4 4" vertical={false} stroke="#E2E8F0" />
-                  <XAxis
-                    dataKey="time"
-                    tickLine={false}
-                    axisLine={false}
-                    tick={{ fill: '#94A3B8', fontSize: 10, fontWeight: 'bold' }}
-                  />
-                  <YAxis
-                    domain={['auto', 'auto']}
-                    tickLine={false}
-                    axisLine={false}
-                    tick={{ fill: '#94A3B8', fontSize: 10, fontWeight: 'bold' }}
-                  />
-                  <Tooltip
-                    content={({ active, payload }) => {
-                      if (active && payload && payload.length) {
-                        return (
-                          <div className="bg-white/90 backdrop-blur-sm border border-slate-200 p-2.5 rounded-xl shadow-lg">
-                            <div className="text-[10px] font-bold text-slate-400 mb-1">
-                              {payload[0].payload.time}
-                            </div>
-                            <div className="text-sm font-black text-slate-800">
-                              {payload[0].value}{' '}
-                              <span className="text-[10px] text-slate-500 font-bold">USD</span>
-                            </div>
-                          </div>
-                        );
-                      }
-                      return null;
-                    }}
-                  />
-                  <Area
-                    type="monotone"
-                    dataKey="price"
-                    stroke="#94A3B8"
-                    strokeWidth={2.5}
-                    fillOpacity={1}
-                    fill="url(#glowGradientSilver)"
-                    animationDuration={1500}
-                    isAnimationActive={true}
-                  />
-                </AreaChart>
-              </ResponsiveContainer>
+              <div className="w-full h-full relative">
+                <Line data={silverChartJsData} options={chartOptions} />
+              </div>
             </div>
           </div>
         </CardContent>

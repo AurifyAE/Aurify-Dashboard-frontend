@@ -11,12 +11,7 @@ interface PoweredByAurifyProps {
   mt?: string | number;
 }
 
-const PoweredByAurify = ({
-  colors,
-  fontSize = { xs: '15px', md: '1.2vw' },
-  defaultColor = '#fff',
-  mt,
-}: PoweredByAurifyProps) => {
+const PoweredByAurify = ({ colors, defaultColor = '#fff', mt }: PoweredByAurifyProps) => {
   return (
     <Box
       sx={{
@@ -36,7 +31,7 @@ const PoweredByAurify = ({
         target="_blank"
         rel="noopener noreferrer"
         sx={{
-          fontSize,
+          fontSize: { xs: '15px', md: '1.2vw' },
           fontWeight: 500,
           color: colors?.poweredByText || defaultColor,
           display: 'flex',
@@ -44,7 +39,6 @@ const PoweredByAurify = ({
           justifyContent: 'center',
           gap: '0.5vw',
           whiteSpace: 'nowrap',
-          letterSpacing: '0.05em',
         }}
       >
         Powered by

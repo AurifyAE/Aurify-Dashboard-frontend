@@ -73,7 +73,9 @@ export const apiGetMe = async (token: string): Promise<AuthResponse> => {
  * apiLogout with 2.5-second timeout protection.
  * Even if the backend or network hangs, it rejects cleanly so the client proceeds.
  */
-export const apiLogout = async (timeoutMs: number = 2500): Promise<{ success: boolean; error?: string }> => {
+export const apiLogout = async (
+  timeoutMs: number = 2500
+): Promise<{ success: boolean; error?: string }> => {
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
 
@@ -94,5 +96,24 @@ export const apiLogout = async (timeoutMs: number = 2500): Promise<{ success: bo
       success: false,
       error: isTimeout ? 'timeout' : 'network_error',
     };
+  }
+};
+
+/**
+ * Silently refresh the access token using the httpOnly refresh cookie.
+ * Returns the new access token string, or null on failure.
+ */
+export const apiRefreshToken = async (): Promise<string | null> => {
+  try {
+    const res = await fetch(`${BASE_URL}/api/auth/refresh`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include', // sends aurify_refresh cookie automatically
+    });
+    if (!res.ok) return null;
+    const data = await res.json().catch(() => ({}));
+    return data?.token ?? null;
+  } catch {
+    return null;
   }
 };

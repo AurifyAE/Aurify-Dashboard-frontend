@@ -25,14 +25,22 @@ function LoginContent() {
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
   useEffect(() => {
-    if (searchParams?.get('alert') === 'deleted') {
+    const alert = searchParams?.get('alert');
+    if (alert === 'deleted') {
       Swal.fire({
         icon: 'warning',
-        title: 'Session Expired',
+        title: 'Account Suspended',
         text: 'Your account has been suspended or deleted by the administrator.',
         confirmButtonColor: '#4A90E2',
       });
-      // Clear the query param so the popup doesn't fire again on re-render
+      router.replace('/login');
+    } else if (alert === 'session') {
+      Swal.fire({
+        icon: 'info',
+        title: 'Session Expired',
+        text: 'Your session has expired. Please log in again.',
+        confirmButtonColor: '#4A90E2',
+      });
       router.replace('/login');
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps

@@ -64,26 +64,80 @@ function formatTimeAgo(dateString: string): string {
 const NotificationIcon = memo(({ iconKey, type }: { iconKey?: string; type: string }) => {
   const colorClass = useMemo(() => {
     switch (type) {
-      case 'SUCCESS': return 'bg-emerald-100 text-emerald-600';
-      case 'WARNING': return 'bg-orange-100 text-orange-600';
-      case 'ERROR':   return 'bg-red-100 text-red-600';
-      default:        return 'bg-blue-100 text-blue-600';
+      case 'SUCCESS':
+        return 'bg-emerald-100 text-emerald-600';
+      case 'WARNING':
+        return 'bg-orange-100 text-orange-600';
+      case 'ERROR':
+        return 'bg-red-100 text-red-600';
+      default:
+        return 'bg-blue-100 text-blue-600';
     }
   }, [type]);
 
   const className = `w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${colorClass}`;
 
   switch (iconKey) {
-    case 'check-circle':  return <div className={className}><CheckCircle2 className="w-4 h-4" /></div>;
-    case 'x-circle':      return <div className={className}><XCircle className="w-4 h-4" /></div>;
-    case 'credit-card':   return <div className={className}><CreditCard className="w-4 h-4" /></div>;
-    case 'sliders':       return <div className={className}><Sliders className="w-4 h-4" /></div>;
-    case 'tv':            return <div className={className}><Tv className="w-4 h-4" /></div>;
-    case 'eye-off':       return <div className={className}><EyeOff className="w-4 h-4" /></div>;
-    case 'trending-up':   return <div className={className}><TrendingUp className="w-4 h-4" /></div>;
-    case 'key':           return <div className={className}><Key className="w-4 h-4" /></div>;
-    case 'user-check':    return <div className={className}><UserCheck className="w-4 h-4" /></div>;
-    default:              return <div className={className}><Bell className="w-4 h-4" /></div>;
+    case 'check-circle':
+      return (
+        <div className={className}>
+          <CheckCircle2 className="w-4 h-4" />
+        </div>
+      );
+    case 'x-circle':
+      return (
+        <div className={className}>
+          <XCircle className="w-4 h-4" />
+        </div>
+      );
+    case 'credit-card':
+      return (
+        <div className={className}>
+          <CreditCard className="w-4 h-4" />
+        </div>
+      );
+    case 'sliders':
+      return (
+        <div className={className}>
+          <Sliders className="w-4 h-4" />
+        </div>
+      );
+    case 'tv':
+      return (
+        <div className={className}>
+          <Tv className="w-4 h-4" />
+        </div>
+      );
+    case 'eye-off':
+      return (
+        <div className={className}>
+          <EyeOff className="w-4 h-4" />
+        </div>
+      );
+    case 'trending-up':
+      return (
+        <div className={className}>
+          <TrendingUp className="w-4 h-4" />
+        </div>
+      );
+    case 'key':
+      return (
+        <div className={className}>
+          <Key className="w-4 h-4" />
+        </div>
+      );
+    case 'user-check':
+      return (
+        <div className={className}>
+          <UserCheck className="w-4 h-4" />
+        </div>
+      );
+    default:
+      return (
+        <div className={className}>
+          <Bell className="w-4 h-4" />
+        </div>
+      );
   }
 });
 NotificationIcon.displayName = 'NotificationIcon';
@@ -316,9 +370,8 @@ const Header = memo(function Header() {
                       <div>
                         <p className="text-sm font-bold text-blue-900">New Users Pending</p>
                         <p className="text-[12px] mt-0.5 leading-snug text-blue-700/80">
-                          {pendingUsersCount}{' '}
-                          {pendingUsersCount === 1 ? 'user is' : 'users are'} currently pending
-                          approval to access the dashboard.
+                          {pendingUsersCount} {pendingUsersCount === 1 ? 'user is' : 'users are'}{' '}
+                          currently pending approval to access the dashboard.
                         </p>
                       </div>
                     </div>

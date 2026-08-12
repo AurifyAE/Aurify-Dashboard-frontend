@@ -13,6 +13,7 @@ import React, {
 import { io, Socket } from 'socket.io-client';
 import { API_URL, API_KEY, SOCKET_SECRET } from '@/lib/env';
 import { BACKEND_URL } from '@/lib/env';
+import { fetchWithAuth } from '@/lib/api/client';
 import { useAuth } from '@/context/AuthContext';
 import { getToken } from '@/lib/auth';
 import { SocketRegistry } from '@/lib/SocketRegistry';
@@ -191,12 +192,7 @@ export function SpotRateProvider({ children }: { children: ReactNode }) {
 
     const fetchSettings = async () => {
       try {
-        const res = await fetch(`${BACKEND_URL}/api/spotrate/settings`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-          credentials: 'include',
-        });
+        const res = await fetchWithAuth(`${BACKEND_URL}/api/spotrate/settings`);
         if (res.ok) {
           const json = await res.json();
           const data = json?.data;
@@ -225,13 +221,11 @@ export function SpotRateProvider({ children }: { children: ReactNode }) {
         const token = getToken();
         if (token) {
           try {
-            await fetch(`${BACKEND_URL}/api/spotrate/settings`, {
+            await fetchWithAuth(`${BACKEND_URL}/api/spotrate/settings`, {
               method: 'PATCH',
               headers: {
                 'Content-Type': 'application/json',
-                Authorization: `Bearer ${token}`,
               },
-              credentials: 'include',
               body: JSON.stringify(settings),
             });
           } catch (err) {
