@@ -20,9 +20,8 @@ import {
   decodeToken,
   apiLogin,
   apiRegister,
-  apiGetMe,
-  apiRefreshToken,
 } from '@/lib/auth';
+import { fetchWithAuth } from '@/lib/api/client';
 import { LogoutManager, AuthState, LogoutResult } from '@/services/auth/logoutManager';
 import { CleanupRegistry } from '@/lib/CleanupRegistry';
 
@@ -147,30 +146,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const timeoutId = setTimeout(() => controller.abort(), 5000); // 5s timeout
 
     try {
-      const res = await fetch(
+      const res = await fetchWithAuth(
         `${(await import('@/lib/env')).BACKEND_URL || process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:5001'}/api/auth/me`,
         {
           method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`,
-          },
-          credentials: 'include',
           signal: controller.signal,
         }
       );
       clearTimeout(timeoutId);
 
-      // On 401/403 — try a silent token refresh first before logging out
+      // On 401/403, fetchWithAuth already attempted a refresh.
+      // If it's STILL 401, the session is genuinely expired.
       if (res.status === 401 || res.status === 403) {
-        const newToken = await apiRefreshToken();
-        if (newToken) {
-          // Successfully refreshed — save the new token and stay logged in
-          setToken(newToken);
-          setIsLoading(false);
-          return;
-        }
-        // Refresh failed — genuine session expiry, log out
         forceRegisterRedirectRef.current('session');
         setIsLoading(false);
         return;

@@ -1,5 +1,5 @@
 import { BACKEND_URL } from '@/lib/env';
-import { getToken } from '@/lib/auth';
+import { fetchWithAuth } from './client';
 
 export type MerchantStatus = 'Pending' | 'Active' | 'Suspended';
 
@@ -82,19 +82,10 @@ export interface MerchantCommodity {
   active: boolean;
 }
 
-function headers(): HeadersInit {
-  const h: HeadersInit = { 'Content-Type': 'application/json' };
-  const token = typeof window !== 'undefined' ? getToken() : null;
-  if (token) (h as Record<string, string>)['Authorization'] = `Bearer ${token}`;
-  return h;
-}
-
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
-  const res = await fetch(`${BACKEND_URL}/api/marketplace${path}`, {
+  const res = await fetchWithAuth(`${BACKEND_URL}/api/marketplace${path}`, {
     cache: 'no-store',
     ...init,
-    headers: { ...headers(), ...(init?.headers || {}) },
-    credentials: 'include',
   });
 
   const contentType = res.headers.get('content-type') || '';
