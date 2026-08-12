@@ -604,21 +604,7 @@ export default function ScreenBuilderTab({
       return;
     }
 
-    // If uploading an SVG, preserve raw vector format directly (retaining 100% transparency & sharpness)
-    if (file.type === 'image/svg+xml' || file.name.toLowerCase().endsWith('.svg')) {
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        const rawSvgUrl = event.target?.result as string;
-        setDraft((prev) => ({ ...prev, [field]: rawSvgUrl }));
-        if (field === 'logoUrl' && setAsProfileLogo) {
-          syncLogoToProfile(rawSvgUrl);
-        }
-      };
-      reader.readAsDataURL(file);
-      return;
-    }
-
-    // Auto-compress and scale raster images to standard high-resolution display dimensions
+    // Auto-compress and scale to standard high-resolution display dimensions
     const reader = new FileReader();
     reader.onload = (event) => {
       const img = new Image();
@@ -645,8 +631,7 @@ export default function ScreenBuilderTab({
         let finalUrl = event.target?.result as string;
         if (ctx) {
           ctx.drawImage(img, 0, 0, width, height);
-          const isTransparent = file.type === 'image/png' || file.type === 'image/webp' || field === 'logoUrl';
-          finalUrl = canvas.toDataURL(isTransparent ? 'image/png' : 'image/jpeg', 0.9);
+          finalUrl = canvas.toDataURL(file.type === 'image/png' ? 'image/png' : 'image/jpeg', 0.85);
         }
         setDraft((prev) => ({ ...prev, [field]: finalUrl }));
         if (field === 'logoUrl' && setAsProfileLogo) {
@@ -1901,7 +1886,7 @@ export default function ScreenBuilderTab({
                       router.push(`?${params.toString()}`);
                     }}
                     className={`flex items-center justify-between rounded-xl border px-3 py-2 text-left hover:border-blue-200 hover:bg-blue-50/30 transition-all ${
-                      (activeEditingLayoutId === layout.layoutId)
+                      activeEditingLayoutId === layout.layoutId
                         ? 'border-blue-500 bg-blue-50/30'
                         : 'border-slate-100 bg-slate-50'
                     }`}
