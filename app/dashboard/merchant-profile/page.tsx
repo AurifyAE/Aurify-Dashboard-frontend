@@ -222,9 +222,9 @@ export default function MerchantProfilePage() {
     }));
 
   const inputClass =
-    'w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm text-slate-800 placeholder-slate-400 focus:border-amber-400 focus:outline-none focus:ring-2 focus:ring-amber-400/20 transition-all';
+    'w-full rounded-2xl border border-slate-200/60 bg-slate-50/50 backdrop-blur-sm px-4 py-3.5 text-sm text-slate-800 placeholder-slate-400 shadow-[inset_0_2px_4px_rgba(0,0,0,0.02)] focus:border-blue-500/50 focus:bg-white focus:outline-none focus:ring-4 focus:ring-blue-500/10 transition-all duration-300';
 
-  const labelClass = 'block mb-1.5 text-xs font-semibold uppercase tracking-wide text-slate-500';
+  const labelClass = 'block mb-2 text-[10px] font-bold uppercase tracking-[0.15em] text-slate-500 ml-1';
 
   const TABS = [
     { key: 'company', label: 'Company', icon: Building2 },
@@ -301,7 +301,7 @@ export default function MerchantProfilePage() {
       </div>
 
       {/* Tab Navigation */}
-      <div className="mb-6 relative flex overflow-x-auto rounded-2xl border border-slate-200 bg-slate-50/70 p-1">
+      <div className="mb-8 relative flex overflow-x-auto rounded-2xl border border-white/60 bg-white/40 backdrop-blur-xl p-1.5 shadow-[0_8px_30px_rgb(0,0,0,0.03)]">
         {TABS.map((tab) => {
           const isActive = activeTab === tab.key;
           return (
@@ -309,19 +309,19 @@ export default function MerchantProfilePage() {
               key={tab.key}
               type="button"
               onClick={() => setActiveTab(tab.key)}
-              className={`relative z-10 flex flex-1 items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold transition-colors whitespace-nowrap cursor-pointer ${
-                isActive ? 'text-amber-700 font-bold' : 'text-slate-500 hover:text-slate-700'
+              className={`relative z-10 flex flex-1 items-center justify-center gap-2.5 rounded-xl px-5 py-3 text-sm transition-all duration-300 whitespace-nowrap cursor-pointer ${
+                isActive ? 'text-blue-700 font-bold' : 'text-slate-500 font-semibold hover:text-slate-700 hover:bg-slate-50/50'
               }`}
             >
               {isActive && (
                 <motion.div
                   layoutId="activeTabBg"
-                  className="absolute inset-0 bg-white rounded-xl shadow-xs -z-10 border border-slate-200/60"
-                  transition={{ type: 'spring', stiffness: 350, damping: 30 }}
+                  className="absolute inset-0 bg-white rounded-xl shadow-[0_2px_15px_-3px_rgba(0,0,0,0.07),0_10px_20px_-2px_rgba(0,0,0,0.04)] -z-10 border border-slate-100"
+                  transition={{ type: 'spring', stiffness: 400, damping: 35 }}
                 />
               )}
 
-              <tab.icon className="h-4 w-4" />
+              <tab.icon className={`h-4 w-4 ${isActive ? 'text-blue-600' : 'text-slate-400'}`} />
               <span>{tab.label}</span>
             </button>
           );
@@ -330,13 +330,15 @@ export default function MerchantProfilePage() {
 
       {/* TAB: Company */}
       {activeTab === 'company' && (
-        <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-          <h2 className="mb-5 flex items-center gap-2 font-bold text-slate-900">
-            <Building2 className="h-5 w-5 text-amber-500" />
+        <div className="rounded-3xl border border-white/80 bg-white/70 backdrop-blur-2xl p-8 shadow-[0_8px_40px_rgb(0,0,0,0.04)]">
+          <h2 className="mb-8 flex items-center gap-3 font-black text-slate-900 text-xl tracking-tight">
+            <div className="p-2.5 rounded-xl bg-gradient-to-br from-blue-500/10 to-indigo-500/10 text-blue-600 shadow-[inset_0_2px_4px_rgba(255,255,255,0.5)]">
+              <Building2 className="h-5 w-5" />
+            </div>
             Company Details
           </h2>
-          <div className="grid gap-5 sm:grid-cols-2">
-            <div className="sm:col-span-2">
+          <div className="grid gap-x-8 gap-y-5 sm:grid-cols-2">
+            <div>
               <label className={labelClass}>Company Name</label>
               <input
                 className={inputClass}
@@ -346,7 +348,7 @@ export default function MerchantProfilePage() {
                 }
               />
             </div>
-            <div className="sm:col-span-2">
+            <div>
               <label className={`${labelClass} flex items-center justify-between`}>
                 <span>Merchant URL Namespace</span>
                 {slugChecking ? (
@@ -456,9 +458,11 @@ export default function MerchantProfilePage() {
 
       {/* TAB: Social Media */}
       {activeTab === 'social' && (
-        <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-          <h2 className="mb-5 flex items-center gap-2 font-bold text-slate-900">
-            <Globe className="h-5 w-5 text-amber-500" />
+        <div className="rounded-3xl border border-white/80 bg-white/70 backdrop-blur-2xl p-8 shadow-[0_8px_40px_rgb(0,0,0,0.04)]">
+          <h2 className="mb-8 flex items-center gap-3 font-black text-slate-900 text-xl tracking-tight">
+            <div className="p-2.5 rounded-xl bg-gradient-to-br from-indigo-500/10 to-purple-500/10 text-indigo-600 shadow-[inset_0_2px_4px_rgba(255,255,255,0.5)]">
+              <Globe className="h-5 w-5" />
+            </div>
             Social Media Links
           </h2>
           <div className="space-y-4">
@@ -503,20 +507,22 @@ export default function MerchantProfilePage() {
 
       {/* TAB: Business Hours */}
       {activeTab === 'hours' && (
-        <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-          <h2 className="mb-5 flex items-center gap-2 font-bold text-slate-900">
-            <Clock className="h-5 w-5 text-amber-500" />
+        <div className="rounded-3xl border border-white/80 bg-white/70 backdrop-blur-2xl p-8 shadow-[0_8px_40px_rgb(0,0,0,0.04)]">
+          <h2 className="mb-8 flex items-center gap-3 font-black text-slate-900 text-xl tracking-tight">
+            <div className="p-2.5 rounded-xl bg-gradient-to-br from-emerald-500/10 to-teal-500/10 text-emerald-600 shadow-[inset_0_2px_4px_rgba(255,255,255,0.5)]">
+              <Clock className="h-5 w-5" />
+            </div>
             Business Hours
           </h2>
           <div className="space-y-4">
             {HOURS_CONFIG.map((h) => (
               <div
                 key={h.key}
-                className="flex items-center justify-between gap-4 rounded-xl border border-slate-100 bg-slate-50/60 px-4 py-3"
+                className="flex items-center justify-between gap-4 rounded-2xl border border-slate-200/60 bg-slate-50/50 backdrop-blur-sm px-5 py-4 shadow-[inset_0_2px_4px_rgba(0,0,0,0.02)] transition-all hover:bg-white"
               >
-                <span className="text-sm font-semibold text-slate-700 w-32">{h.label}</span>
+                <span className="text-sm font-bold text-slate-700 w-32 tracking-wide">{h.label}</span>
                 <input
-                  className="flex-1 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-800 focus:border-amber-400 focus:outline-none focus:ring-2 focus:ring-amber-400/20 transition-all"
+                  className="flex-1 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm text-slate-800 focus:border-blue-500/50 focus:outline-none focus:ring-4 focus:ring-blue-500/10 transition-all duration-300"
                   placeholder="e.g. 09:00 – 18:00 or Closed"
                   value={profile.businessHours?.[h.key] || ''}
                   onChange={(e) => setHours(h.key, e.target.value)}
@@ -529,10 +535,12 @@ export default function MerchantProfilePage() {
 
       {/* TAB: Branches */}
       {activeTab === 'branches' && (
-        <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-          <div className="mb-5 flex items-center justify-between">
-            <h2 className="flex items-center gap-2 font-bold text-slate-900">
-              <MapPin className="h-5 w-5 text-amber-500" />
+        <div className="rounded-3xl border border-white/80 bg-white/70 backdrop-blur-2xl p-8 shadow-[0_8px_40px_rgb(0,0,0,0.04)]">
+          <div className="mb-8 flex items-center justify-between">
+            <h2 className="flex items-center gap-3 font-black text-slate-900 text-xl tracking-tight">
+              <div className="p-2.5 rounded-xl bg-gradient-to-br from-amber-500/10 to-orange-500/10 text-amber-600 shadow-[inset_0_2px_4px_rgba(255,255,255,0.5)]">
+                <MapPin className="h-5 w-5" />
+              </div>
               Branch Locations
             </h2>
             <button type="button" onClick={addBranch} className="btn-secondary">
@@ -611,20 +619,21 @@ export default function MerchantProfilePage() {
       )}
 
       {/* Save Button at Bottom */}
-      <div className="mt-6 flex justify-end">
+      <div className="mt-8 flex justify-end sticky bottom-6 z-20">
         <button
           onClick={save}
           disabled={saving || slugAvailable === false || slugChecking}
-          className="btn-primary px-8 py-3 rounded-xl shadow-md transition-all hover:shadow-lg active:scale-[0.98] cursor-pointer flex items-center gap-2"
+          className="group relative flex items-center gap-2 overflow-hidden rounded-2xl bg-gradient-to-r from-blue-600 to-indigo-600 px-10 py-4 font-bold text-white shadow-[0_8px_25px_rgba(79,70,229,0.3)] transition-all duration-300 hover:shadow-[0_12px_35px_rgba(79,70,229,0.4)] hover:-translate-y-1 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {saving ? (
-            <Loader2 className="h-4 w-4 animate-spin" />
+            <Loader2 className="h-5 w-5 animate-spin" />
           ) : saved ? (
-            <Check className="h-4 w-4" />
+            <Check className="h-5 w-5" />
           ) : (
-            <Save className="h-4 w-4" />
+            <Save className="h-5 w-5 group-hover:scale-110 transition-transform" />
           )}
-          <span>{saving ? 'Saving...' : saved ? 'Saved!' : 'Save Profile'}</span>
+          <span className="tracking-wide text-sm">{saving ? 'Saving...' : saved ? 'Saved!' : 'Save Profile'}</span>
+          <div className="absolute inset-0 -z-10 bg-gradient-to-r from-indigo-600 to-purple-600 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
         </button>
       </div>
     </DashboardShell>
