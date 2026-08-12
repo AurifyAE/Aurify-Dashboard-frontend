@@ -404,11 +404,11 @@ const DashboardData = () => {
     scales: {
       x: {
         grid: { display: false },
-        border: { display: false },
+        border: { display: true, color: '#E2E8F0', width: 2 },
       },
       y: {
         grid: { display: false },
-        border: { display: false },
+        border: { display: true, color: '#E2E8F0', width: 2 },
       }
     }
   };
