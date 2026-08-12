@@ -405,10 +405,12 @@ const DashboardData = () => {
       x: {
         grid: { display: false },
         border: { display: true, color: '#E2E8F0', width: 2 },
+        ticks: { maxTicksLimit: 5, autoSkip: true },
       },
       y: {
         grid: { display: false },
         border: { display: true, color: '#E2E8F0', width: 2 },
+        ticks: { maxTicksLimit: 5 },
       }
     }
   };
